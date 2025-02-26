@@ -1,7 +1,7 @@
 import Page from '../..pageMain.js'
 
 //COMPS
-import Intro from './intro.js'
+import Intro from './intro/page.js'
 
 
 

@@ -11,9 +11,15 @@ importers:
       atoms:
         specifier: ^0.2.0
         version: 0.2.0
+      autobind:
+        specifier: ^1.0.3
+        version: 1.0.3
       defaults:
         specifier: ^3.0.0
         version: 3.0.0
+      fontfaceobserver:
+        specifier: ^2.3.0
+        version: 2.3.0
       gsap:
         specifier: ^3.12.7
         version: 3.12.7
@@ -1004,6 +1010,9 @@ packages:
   atoms@0.2.0:
     resolution: {integrity: sha512-HX/dGnzVkZAV1KnXr5tHwY32rFgrQEcx3gt2N1kCrqdBLJnZxiBSDw+G3eZ+elU6h1I2EY2C0zozWZ9lIcRP1w==}
 
+  autobind@1.0.3:
+    resolution: {integrity: sha512-TXyBiWLY51eKVMTYNt4s1CE/Yv5TJabwzMfzGXIJ+pMzagSXYMjAHokmtjRG8s/oD+wyCvRGcKbZsSbZccp59g==}
+
   autoprefixer@10.4.20:
     resolution: {integrity: sha512-XY25y5xSv/wEoqzDyXXME4AFfkZI0P23z6Fs3YgymDnKJkCGOnkL0iTxCa85UTqaSgfcqyf3UA6+c7wUvx/16g==}
     engines: {node: ^10 || ^12 || >=14}
@@ -1556,6 +1565,9 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
+
+  fontfaceobserver@2.3.0:
+    resolution: {integrity: sha512-6FPvD/IVyT4ZlNe7Wcn5Fb/4ChigpucKYSvD6a+0iMoLn2inpo711eyIcKjmDtE5XNcgAkSH9uN/nfAeZzHEfg==}
 
   for-each@0.3.4:
     resolution: {integrity: sha512-kKaIINnFpzW6ffJNDjjyjrk21BkDx38c0xa/klsT8VzLCaMEefv4ZTacrcVR4DmgTeBra++jMDAfS/tS799YDw==}
@@ -3988,6 +4000,8 @@ snapshots:
 
   atoms@0.2.0: {}
 
+  autobind@1.0.3: {}
+
   autoprefixer@10.4.20(postcss@8.5.1):
     dependencies:
       browserslist: 4.24.4
@@ -4664,6 +4678,8 @@ snapshots:
   flatted@3.3.2: {}
 
   follow-redirects@1.15.9: {}
+
+  fontfaceobserver@2.3.0: {}
 
   for-each@0.3.4:
     dependencies:

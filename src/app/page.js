@@ -1,55 +1,35 @@
-import Page from '../lib/utils/pageMain.js'
+import { useEffect, useRef, useState } from "react";
+import Page from "@/lib/utils/pageMain";
+import Intro from "@/app/home/intro/page";
+import Scroll from "@/lib/utils/pageScroll";
+import useBrowser from "@/lib/startup/useBrowser";
 
-//COMPS
-import Intro from './home/intro.js'
-class Home extends Page {
-  constructor (main) {
-    super(main)
-  }
-  async create(content,main,temp=undefined) {
-    super.create(content,main)
-    if(temp!=undefined){
-      document.querySelector('#content').insertAdjacentHTML('afterbegin',temp)
-    }
-    else{
-      let data = await this.loadRestApi(this.main.base+'/wp-json/wp/v2/pages/',content.dataset.id,content.dataset.template)
-      document.querySelector('#content').insertAdjacentHTML('afterbegin',data.csskfields.main)
-    }
-    this.el = document.querySelector('main')
-    this.DOM = {
-      el:this.el
-    }
-    if(this.main.webgl === 0){
-      console.log('sisisoos')
-      await this.loadImages()
-      await this.loadVideos()
-    }
-    await this.createComps()
-    await this.createIos()
-    await this.getReady()
-  }
-  iOpage(animobj){
-    if(animobj.el.classList.contains('iO-scroll')){
-      animobj.class = new Scroll(animobj,this.main.device)
-    }
-    return animobj
-  }
+const HomePage = ({ content, main, temp }) => {
+  const homeRef = useRef(null);
+  const [pageContent, setPageContent] = useState("");
 
-  async createComps(){
-    await super.createComps()
-    if(this.DOM.el.querySelector('.home_intro')){
-      this.components.intro = new Intro(this.DOM.el.querySelector('.home_intro'),this.main.device)
-    }
-  }
+  useEffect(() => {
+    const initHome = async () => {
+      if (!homeRef.current) {
+        homeRef.current = new Page(main);
+      }
+      const generatedContent = await homeRef.current.create(content, main, temp);
+      setPageContent(generatedContent);
+    };
 
-  async animIntro(val){
-    if(this.components.intro){
-      this.components.intro.start()
+    initHome();
+  }, [content, main, temp]);
+
+  useEffect(() => {
+    if (homeRef.current && pageContent) {
+      const contentElement = document.getElementById("content");
+      if (contentElement) {
+        homeRef.current.initializeDOM(contentElement);
+      }
     }
-    return val
-  }
-  async animOut(){
-    super.animOut()
-  }
-}
-export default Home
+  }, [pageContent]);
+
+  return <div id="content" dangerouslySetInnerHTML={{ __html: pageContent }} />;
+};
+
+export default HomePage;

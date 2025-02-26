@@ -1,0 +1,87 @@
+/* Reset Default Browser Styles */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, embed, figure,
+figcaption, footer, header, hgroup, menu,
+nav, output, ruby, section, summary, time,
+mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* Reset box-sizing for all elements */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Normalize block elements */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, main, menu, nav, section {
+  display: block;
+}
+
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Remove default button styles */
+button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Style focus for better accessibility */
+button:focus-visible {
+  outline: 2px solid #4A90E2; /* Example color, adjust as needed */
+  outline-offset: 2px;
+}
+
+/* Remove input/button browser styling */
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+/* Remove spinner/arrows from number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Prevent hidden elements from being displayed */
+[hidden], template {
+  display: none !important;
+}
+
+/* Reset image and SVG behavior */
+img {
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+svg {
+  max-width: 100%;
+}
+
+/* Remove explicit styling for SVG title */
+/* SVG accessibility should be handled with aria-labelledby instead */

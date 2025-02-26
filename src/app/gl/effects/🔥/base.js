@@ -8,7 +8,7 @@ import {
   updateY,
   updateAnim
 
-} from './position.js'
+} from "@/🔥/position";
 
 import {  Vec2 } from 'ogl'
 

@@ -6,8 +6,17 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
+      "@/app/*": ["./src/app/*"],
+      "@/utils/*": ["./src/app/utils/*"],
+      "@/gl/*": ["./src/app/gl/*"],
+      "@/effects/*": ["./src/app/gl/effects/*"],
+      "@/components/*": ["./src/app/components/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/startup/*": ["./src/lib/startup/*"],
+      "@/animations/*": ["./src/lib/animations*"],
+      "@/public/*": ["./public/*"],
       "@/shaders/*": ["./public/shaders/*"],
-      "@/effects/*": ["./src/app/gl/effects/*"]
+      "@/assets/*": ["./public/assets/*"]
     },
     "allowJs": true,
     "checkJs": true,

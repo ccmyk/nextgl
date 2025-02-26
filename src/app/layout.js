@@ -1,18 +1,23 @@
-import "../globals.css"; // Global styles
-import Nav from "@/components/Nav"; // Navigation bar
-import Footer from "@/components/Footer"; // Optional footer
-import "@/lib/startup/constructor"; // App-wide initialization
+// src/app/layout.js
+import "@app/globals.css";
+import WebGLCanvas from "@/components/WebGLCanvas";
+import Navigation from "@/components/NavComponent";
+import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
+// import Footer from "@/components/FooterComponent";
+// import "@/lib/startup/constructor";
 
 export const metadata = {
   title: "Chris Hall Selected Work",
-  description: "A Next.js 15-powered WebGL experience",
+  // description: "A Next.js 15-powered WebGL experience",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const settings = await fetchSiteSettings();
+
   return (
     <html lang="en">
       <body>
-        <Nav />
+      <Nav />
         <main>{children}</main>
         <Footer />
       </body>

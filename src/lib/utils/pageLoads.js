@@ -4,7 +4,7 @@ export function timeout(ms){
 
 export async function loadRestApi(url,id='',temp=''){
   
-  if(import.meta.env.DEV == true){
+  if(import.meta.env.DEV === true){
 
     console.log(url+id+'?device='+this.main.device+'&webp='+this.main.webp+'&template='+temp)
   }
@@ -17,7 +17,7 @@ export async function loadRestApi(url,id='',temp=''){
     
   }
 
-  if(temp!=''){
+  if(temp!==''){
     info.template=temp
   }
 
@@ -37,17 +37,14 @@ export async function loadRestApi(url,id='',temp=''){
       }
     })
 
-    const data = await response.json()
-
-
-    return data
+    return await response.json()
   }
   else{
     url +=id
     url +='?device='+this.main.device
     url +='&webp='+this.main.webp
     url +='&webgl='+this.main.webgl
-    if(temp!=''){
+    if(temp!==''){
      
       url +='&template='+temp 
     }
@@ -56,7 +53,7 @@ export async function loadRestApi(url,id='',temp=''){
      
     })
     const data = await response.json()
-    if(import.meta.env.DEV == true && data.csskfields){
+    if(import.meta.env.DEV === true && data.csskfields){
       
     }
     return data
@@ -85,13 +82,13 @@ export async function scaleLoads(elswait){
 
   for(let path of elswait){
 
-    if(path.tagName=='IMG'){
+    if(path.tagName==='IMG'){
       if(!path.dataset.lazy){
         await this.loadImage(path)
 
       }
     }
-    else if(path.tagName=='VIDEO'){
+    else if(path.tagName==='VIDEO'){
       if(!path.dataset.lazy){
         await this.loadVideo(path)
         path.classList.add('Ldd')
@@ -169,7 +166,7 @@ export async function loadImage(elem,nowait = null) {
       }
 
       img.src = url
-      if(gif==1){
+      if(gif===1){
         elem.src = url
         elem.classList.add('Ldd')
       }
@@ -238,12 +235,7 @@ export async function loadVideo(elem, nowait = false) {
 
 
   return new Promise((resolve, reject) => {
-    if(elem.dataset.loop){
-      elem.loop = false
-    }
-    else{
-      elem.loop = true
-    }
+    elem.loop = !elem.dataset.loop;
     elem.muted = true
     elem.autoplay = true
     elem.setAttribute('webkit-playsinline', 'webkit-playsinline')
@@ -262,7 +254,7 @@ export async function loadVideo(elem, nowait = false) {
       }
     }
     if(elem.dataset.opac){
-      if(this.main.webm==true){
+      if(this.main.webm===true){
         elem.src = elem.dataset.src+'.webm'
       }
       else{

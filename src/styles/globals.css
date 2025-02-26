@@ -1,0 +1,34 @@
+/* src/styles/globals.css */
+@import url("animations/animations.pcss");
+@import url("animations/gsap.module.pcss");
+@import url("animations/lenis.module.pcss");
+
+@import url("components/buttons.pcss");
+@import url("components/debug.pcss");
+@import url("components/details-toggle.pcss");
+@import url("components/device-rotation.pcss");
+@import url("components/hero.module.pcss");
+@import url("components/scrollbar.pcss");
+@import url("components/swiper.module.pcss");
+
+@import url("pages/about.module.pcss");
+@import url("pages/home.module.pcss");
+@import url("pages/project.module.pcss");
+@import url("pages/projects.module.pcss");
+
+@import url("typography/typography.pcss");
+@import url("typography/fonts.pcss");
+
+@import url("utils/global-utils.pcss");
+@import url("utils/helpers.pcss");
+
+@import url("webgl/webgl-effects.pcss");
+@import url("webgl/webgl-objects.pcss");
+@import url("webgl/webgl-ui.pcss");
+@import url("webgl/webgl.module.pcss");
+
+@import url("accessibility.pcss");
+@import url("base.pcss");
+@import url("layout.pcss");
+@import url("reset.pcss");
+@import url("variables.pcss");

@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "atoms": "^0.2.0",
+    "autobind": "^1.0.3",
     "defaults": "^3.0.0",
+    "fontfaceobserver": "^2.3.0",
     "gsap": "^3.12.7",
     "lenis": "^1.1.20",
     "msdf-bmfont": "^1.1.0",

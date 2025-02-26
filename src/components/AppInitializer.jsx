@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import browser from "@/lib/startup/browser.js";
-import { initWebGL } from "@/lib/webgl.js";
+import browser from "@/lib/startup/useBrowser.js";
+import { initWebGL } from "@/lib/webgl/webgl.js";
 
 export default function AppInitializer() {
   useEffect(() => {

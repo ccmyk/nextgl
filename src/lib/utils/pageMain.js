@@ -1,16 +1,17 @@
-
 //Create
 import {
 create,
 createComps,
 cleanP,
 cleanWysi,
-} from './create.js'
+} from '@/utils/pageCreate'
+
 //Comps
 import {
 startComps,
 stopComps
-} from './comps.js'
+} from '@/utiles/pageComponents'
+
 //Events
 import {
 onResize,
@@ -20,7 +21,8 @@ onTouchDown,
 onTouchMove,
 onTouchUp,
 onWheel
-} from './events.js'
+} from '@/utils/pageEvents'
+
 //ios
 import {
 buildThresholdList,
@@ -32,7 +34,8 @@ iOpage,
 iO,
 inViewAddClass,
 showIos,
-} from './ios.js'
+} from '@/utils/pageIos'
+
 //loads
 import {
 timeout,
@@ -44,13 +47,15 @@ loadVideos,
 newVideos,
 loadVideo,
 scaleLoads
-} from './loads.js'
+} from '@/utils/pageLoads'
+
 //scroll
 import {
 stopScroll,
 startScroll,
 animIosScroll
-} from './scroll.js'
+} from '@/utils/pageScroll'
+
 //showhide
 import {
 getReady,
@@ -59,40 +64,31 @@ animIntro,
 animOut,
 start,
 hide
-} from './showhide.js'
-
+} from '@/utils/showHide'
 
 class Page{
   constructor (main) {
-
-
     this.content = document.querySelector("#content")
     this.main = main
+
     // this.footer = footer
     this.speed = 0
     this.isVisible = 0
     this.isScrollable = 1
     this.firstload = 1
-    
-
     this.font = parseFloat(getComputedStyle(document.documentElement).fontSize)
   }
   
   update(speed,posy) {
-    if(this.isVisible == 0){
+    if(this.isVisible === 0){
       return false
     }
 
     this.speed = speed
-    
-
     for(let c of this.updaters){
       this.ios[c].class.update(this.speed,posy)
     }
-
-    
   }
-
 }
 
 //Create
@@ -131,8 +127,6 @@ Page.prototype.loadVideos=loadVideos
 Page.prototype.newVideos=newVideos
 Page.prototype.loadVideo=loadVideo
 Page.prototype.scaleLoads=scaleLoads
-
-
 //scroll
 Page.prototype.stopScroll=stopScroll
 Page.prototype.startScroll=startScroll
@@ -144,8 +138,5 @@ Page.prototype.animIntro=animIntro
 Page.prototype.animOut=animOut
 Page.prototype.start=start
 Page.prototype.hide=hide
-
-
-
 
 export default Page

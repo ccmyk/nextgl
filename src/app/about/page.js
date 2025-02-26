@@ -1,10 +1,8 @@
-import Page from '../..pageMain.js'
+import Page from '@/utils/pageMain'
 
 //COMPS
-import Intro from './intro.js'
-import Scr from './io.js'
-
-
+import Intro from '@/app/about/intro/page'
+import Scr from '.@/app/about/dual/io'
 
 class Home extends Page {
   constructor (main) {
@@ -13,7 +11,7 @@ class Home extends Page {
 
   async create(content,main,temp=undefined) {
     super.create(content,main)
-    if(temp!=undefined){
+    if(temp!==undefined){
 
       document.querySelector('#content').insertAdjacentHTML('afterbegin',temp)
     }
@@ -22,26 +20,18 @@ class Home extends Page {
       document.querySelector('#content').insertAdjacentHTML('afterbegin',data.csskfields.main)
     }
     this.el = document.querySelector('main')
-    
 
     this.DOM = {
       el:this.el
     }
 
-    if(this.main.webgl == 0){
-      
+    if(this.main.webgl === 0){
       await this.loadImages()
       await this.loadVideos()
-      
     }
-    
-    
-
 
     await this.createComps()
     await this.createIos()
-    
-
     await this.getReady()
   }
   iOpage(animobj){
@@ -52,23 +42,15 @@ class Home extends Page {
     return animobj
   }
 
-  
-  
   async createComps(){
-   
-
 
     await super.createComps()
     if(this.DOM.el.querySelector('.about_intro')){
       this.components.intro = new Intro(this.DOM.el.querySelector('.about_intro'),this.main.device)
-    
     }
     
     const i = this.DOM.el.querySelector('.about_list .Awrite i')
-    
-
     for(let a of this.DOM.el.querySelectorAll('.about_dual .cnt_t a')){
-      
       a.insertAdjacentElement('beforeend',i.cloneNode(true))
     }
 
@@ -76,22 +58,12 @@ class Home extends Page {
     for(let a of this.DOM.el.querySelectorAll('.about_list .Awrite .iO')){
       a.parentNode.classList.add('ivi')
       a.parentNode.classList.add('nono')
-
       a.remove()
-
-      
-
     }
-    
     }
   }
-
-
   async animIntro(val){
-
-    
     return val
-   
   }
 
   async animOut(){

@@ -1,4 +1,4 @@
-import { timeout } from '/js🧠🧠🧠/defaults/math🧮.js';
+// src/components/LoaderComponent.jsx
 
 class Loader {
   constructor(main, temp, device) {

@@ -1,0 +1,42 @@
+/* Hide Specific Elements */
+.pHide {
+  position: fixed;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+/* Hide Interactive Elements */
+.iO, .Oi, .OiAlt {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Disable Background for Hidden Elements */
+html:not(.dev) .iO,
+html:not(.dev) .Oi,
+html:not(.dev) .OiChange,
+html:not(.dev) .OiAlt {
+  background: transparent !important;
+}
+
+/* Debugging UI */
+.checkfix {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  font-size: 12px;
+  z-index: 1000;
+  background: #333;
+  color: #fff;
+  font-family: "Neue Montreal Mono", sans-serif;
+  padding: 12px;
+  opacity: 0.1;
+}
+
+.checkfix:hover {
+  opacity: 1;
+}
