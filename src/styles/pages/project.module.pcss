@@ -1,0 +1,136 @@
+/* src/styles/pages/project.module.pcss */
+
+.project .backto {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 57;
+  pointer-events: none;
+}
+
+:root.D .project .backto {
+  top: 8rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .project .backto {
+    top: 8rem;
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .project .backto {
+    top: 12rem;
+  }
+}
+
+.project .backto .Awrite {
+  white-space: nowrap;
+  pointer-events: all;
+  --dark: #8A8A8A;
+  --light: #000;
+}
+
+:root.D .project .backto .Awrite {
+  margin-left: 59rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .project .backto .Awrite {
+    margin-left: 59rem;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .project .backto .Awrite {
+    margin-left: 8.2rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .project .backto .Awrite {
+    margin-left: 9.3rem;
+  }
+}
+
+.project_intro {
+  padding-top: 35vh;
+  position: relative;
+}
+
+.project_intro .iO.iO-outin {
+  height: 20vh;
+  top: 0;
+  left: 0;
+  width: 10px;
+  background: yellow;
+  position: absolute;
+}
+
+.project_intro .cnt {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.project_intro .cnt_n {
+  flex-shrink: 0;
+}
+
+:root.D .project_intro .cnt_n {
+  width: 59rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .project_intro .cnt_n {
+    width: 59rem;
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .project_intro .cnt_n {
+    width: 4.3rem;
+  }
+}
+
+.project_els .cnt {
+  margin-top: 30rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .project_els .cnt {
+    margin-top: 30rem;
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .project_els .cnt {
+    margin-top: 20rem;
+  }
+}
+
+.project_els .cnt_el {
+  position: relative;
+}
+
+:root.D .project_els .cnt_el {
+  width: 105rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .project_els .cnt_el {
+    width: 105rem;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .project_els .cnt_el {
+    width: 58.2rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .project_els .cnt_el {
+    width: 100%;
+  }
+}

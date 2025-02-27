@@ -1,0 +1,304 @@
+/* src/styles/pages/home-about.module.pcss */
+
+.home_about {
+  position: relative;
+}
+
+/* Desktop & Tablet Padding */
+:root.D .home_about,
+@media (orientation: landscape) {
+  :root.T .home_about {
+    padding-top: 40vh;
+  }
+}
+
+/* Mobile Padding */
+@media (orientation: portrait) {
+  :root.T .home_about {
+    padding-top: 20vh;
+  }
+
+  :root.T .home_about+.footer {
+    margin-top: 10rem;
+  }
+}
+
+/* Dark Mode Styles */
+:root.AND .home_about {
+  color: #fff;
+}
+
+/* Radial Background in Dark Mode */
+:root.AND .home_about:before {
+  content: "";
+  position: absolute;
+  top: 25vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 40vh;
+  background: radial-gradient(83% 50%, rgb(0, 0, 0) 0%, rgb(0, 0, 0) 76%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Footer Dark Mode */
+:root.AND .home_about .cnt {
+  background: black;
+  padding-top: 10vh;
+}
+
+:root.AND .home_about+.footer {
+  background: black;
+  margin-top: 0;
+}
+
+:root.AND .home_about+.footer .ttj {
+  opacity: 1;
+  color: #fff;
+}
+
+/* Background Indicator Line */
+.home_about .Oi-bg {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  background: yellow;
+}
+
+/* Background Indicator Line - Position */
+:root.D .home_about .Oi-bg,
+@media (orientation: landscape) {
+  :root.T .home_about .Oi-bg {
+    height: 50vh;
+    top: 15vh;
+  }
+}
+
+/* Mobile Adjustments */
+@media (orientation: portrait) {
+  :root.T .home_about .Oi-bg {
+    height: 30vh;
+    top: -5vh;
+  }
+}
+
+/* Content Wrapper */
+.home_about .cnt {
+  overflow: hidden;
+}
+
+/* Title & Cover */
+.home_about .cnt_tp {
+  position: relative;
+}
+
+/* Mobile Adjustments for Title */
+@media (orientation: portrait) {
+  :root.T .home_about .cnt_tp {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+
+/* Cover Positioning */
+.home_about .cnt_tp .Atitle .cCover {
+  position: absolute;
+  pointer-events: none;
+}
+
+:root.D .home_about .cnt_tp .Atitle .cCover,
+@media (orientation: landscape) {
+  :root.T .home_about .cnt_tp .Atitle .cCover {
+    left: -2rem;
+    right: -2rem;
+    top: -2rem;
+    bottom: -2rem;
+  }
+}
+
+/* Tablet & Mobile Adjustments */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_about .cnt_tp .Atitle .cCover {
+    left: -1rem;
+    right: -1rem;
+    top: -1rem;
+    bottom: -1rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_about .cnt_tp .Atitle .cCover {
+    left: 0;
+    right: 0;
+    top: -1rem;
+    bottom: -1rem;
+    transform: translate(0.02rem, -0.1rem);
+  }
+}
+
+/* Dark Mode Title */
+:root.AND .home_about .cnt_tp .tt1 {
+  opacity: 1;
+  color: #fff;
+}
+
+/* Title Overlay */
+.home_about .cnt_tp .Oi {
+  pointer-events: none !important;
+  top: 100%;
+  bottom: auto;
+  height: 100%;
+}
+
+/* Bottom Section */
+.home_about .cnt_bp {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+/* Section Spacing */
+:root.D .home_about .cnt_bp,
+@media (orientation: landscape) {
+  :root.T .home_about .cnt_bp {
+    margin-top: 8rem;
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .home_about .cnt_bp {
+    margin-top: 4rem;
+  }
+}
+
+/* Content Container */
+.home_about .cnt_x {
+  --dark: #F8F6F2;
+  --light: #000;
+}
+
+/* Desktop Positioning */
+:root.D .home_about .cnt_x,
+@media (orientation: landscape) {
+  :root.T .home_about .cnt_x {
+    margin-left: 59.4rem;
+    width: 34.6rem;
+  }
+}
+
+/* Tablet & Mobile Adjustments */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_about .cnt_x {
+    margin-left: 30rem;
+    width: 34.6rem;
+    margin-top: 4rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_about .cnt_x {
+    margin-left: auto;
+    width: 28rem;
+    margin-top: 4rem;
+  }
+}
+
+/* Link Text */
+.home_about .cnt_x .Aline {
+  color: var(--dark);
+}
+
+/* Hide Link on Desktop */
+:root.D .home_about .cnt_x .linkXS,
+@media (orientation: landscape) {
+  :root.T .home_about .cnt_x .linkXS {
+    display: none;
+  }
+}
+
+/* Show Link on Mobile */
+@media (orientation: portrait) {
+  :root.T .home_about .cnt_x .linkXS {
+    display: inline-block;
+    margin-top: 4rem;
+    color: #fff;
+    opacity: 0;
+    text-transform: uppercase;
+    line-height: 1.27;
+    transition: .45s opacity 1.5s cubic-bezier(0.55, 0, 0.1, 1);
+  }
+}
+
+/* Fade in Link */
+.home_about .cnt_x .Aline.stview+.linkXS {
+  opacity: 1;
+}
+
+/* Content List */
+.home_about .cnt_l {
+  width: 27.7rem;
+  margin-left: auto;
+  margin-top: 4rem;
+}
+
+/* Image Container */
+.home_about .cnt_im {
+  position: relative;
+  display: flex;
+}
+
+/* Desktop Image Positioning */
+:root.D .home_about .cnt_im,
+@media (orientation: landscape) {
+  :root.T .home_about .cnt_im {
+    margin-left: 59.2rem;
+    margin-top: 8rem;
+    width: 70rem;
+  }
+}
+
+/* Tablet & Mobile Adjustments */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_about .cnt_im {
+    margin-left: auto;
+    width: 43.8rem;
+    margin-top: 4rem;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_about .cnt_im {
+    margin-left: auto;
+    width: 28rem;
+    margin-top: 4rem;
+  }
+}
+
+/* Image Overlay */
+.home_about .cnt_im .Oi {
+  pointer-events: all;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* Image & Video Styles */
+.home_about .cnt_im video,
+.home_about .cnt_im img {
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Show Image in Dark Mode */
+:root.AND .home_about .cnt_im video,
+:root.AND .home_about .cnt_im img {
+  opacity: 1;
+  visibility: visible;
+}

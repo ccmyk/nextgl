@@ -1,5 +1,5 @@
 // src/app/layout.js
-import "@app/globals.css";
+import "@app/styles/globals.pcss";
 import WebGLCanvas from "@/components/WebGLCanvas";
 import Navigation from "@/components/NavComponent";
 import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";

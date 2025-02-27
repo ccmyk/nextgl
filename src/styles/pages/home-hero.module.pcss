@@ -1,0 +1,271 @@
+/* src/styles/pages/home-hero.module.pcss */
+
+.home {
+  position: relative;
+}
+
+/* Hero Section */
+.home_hero {
+  height: 100vh;
+  height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 20rem;
+}
+
+@media (min-aspect-ratio: 18/9) {
+  .home_hero {
+    padding-bottom: 10vh;
+  }
+}
+
+/* Content */
+.home_hero .cnt {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.home_hero .cnt_hold {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+/* Desktop Layout */
+:root.D .home_hero .cnt_hold,
+@media (orientation: landscape) {
+  :root.T .home_hero .cnt_hold {
+    margin-left: 59.5rem;
+    padding-top: 8rem;
+  }
+}
+
+/* Tablet Layout */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_hero .cnt_hold {
+    margin-left: 8.5rem;
+    padding-top: 4rem;
+  }
+}
+
+/* Mobile Layout */
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_hold {
+    margin-left: 4.5rem;
+    padding-top: 4rem;
+  }
+}
+
+/* Title Animation Cover */
+:root.D .home_hero .cnt_hold .Atitle .cCover,
+@media (orientation: landscape) {
+  :root.T .home_hero .cnt_hold .Atitle .cCover {
+    left: -2rem;
+    right: -2rem;
+    top: -2rem;
+    bottom: -2rem;
+    pointer-events: none;
+  }
+}
+
+/* Adjustments for First & Last Titles */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_hero .cnt_hold .Atitle:first-child .cCover {
+    left: -1.1rem;
+    right: -1.1rem;
+    top: -1.1rem;
+    bottom: -1.1rem;
+    transform: translate(-1rem);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_hold .Atitle:first-child .cCover {
+    left: -0.55rem;
+    right: -0.55rem;
+    top: -0.55rem;
+    bottom: -0.55rem;
+    transform: translate(-0.1rem);
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .home_hero .cnt_hold .Atitle:last-child {
+    margin-top: -0.6rem;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_hero .cnt_hold .Atitle:last-child .cCover {
+    left: -1.1rem;
+    right: -1.1rem;
+    top: -1.1rem;
+    bottom: -1.1rem;
+    transform: translate(0);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_hold .Atitle:last-child .cCover {
+    left: -0.55rem;
+    right: -0.55rem;
+    top: -0.55rem;
+    bottom: -0.55rem;
+    transform: translate(0);
+  }
+}
+
+/* Hero Title */
+.home_hero .cnt_tt {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.home_hero .cnt_tt .Oiel:not(.act) {
+  pointer-events: none;
+}
+
+.home_hero .cnt_tt .ttj {
+  opacity: 0;
+}
+
+:root.T .home_hero .cnt_tt .ttj {
+  touch-action: none;
+}
+
+:root.AND .home_hero .cnt_tt .ttj {
+  opacity: 1;
+}
+
+/* Bottom Section */
+.home_hero .cnt_bt {
+  margin-top: 3.2rem;
+}
+
+.home_hero .cnt_bt h3 {
+  transition: 0.8s opacity 1.1s cubic-bezier(0.55, 0, 0.1, 1),
+  0.6s transform 1s cubic-bezier(0.55, 0, 0.1, 1);
+  transform-origin: left center;
+  line-height: 1.19;
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_bt h3 {
+    font-size: 1.4rem;
+  }
+}
+
+.home_hero .cnt_bt:not(.stview) h3 {
+  opacity: 0;
+  transform: scaleX(1.2);
+  transition: 0.8s all cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* Hero Scroll Indicator */
+.home_hero .cnt_sc {
+  position: absolute;
+  bottom: 2.4rem;
+}
+
+/* Desktop */
+:root.D .home_hero .cnt_sc,
+@media (orientation: landscape) {
+  :root.T .home_hero .cnt_sc {
+    left: 59.2rem;
+    padding-left: var(--pgrid);
+  }
+}
+
+/* Tablet */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_hero .cnt_sc {
+    left: 8.5rem;
+    padding-left: var(--pgrid);
+  }
+}
+
+/* Mobile */
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_sc {
+    left: 4.5rem;
+    padding-left: var(--pgrid);
+  }
+}
+
+/* Hero Links */
+.home_hero .cnt_lk {
+  position: absolute;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Desktop */
+:root.D .home_hero .cnt_lk,
+@media (orientation: landscape) {
+  :root.T .home_hero .cnt_lk {
+    right: var(--pgrid);
+    bottom: 2.4rem;
+  }
+}
+
+/* Tablet & Mobile */
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .home_hero .cnt_lk {
+    flex-direction: column;
+    left: 8.5rem;
+    bottom: 10.7rem;
+    padding-left: var(--pgrid);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .home_hero .cnt_lk {
+    flex-direction: column;
+    left: 4.5rem;
+    bottom: 10.7rem;
+    padding-left: var(--pgrid);
+  }
+}
+
+/* Link Effects */
+.home_hero .cnt_lk a {
+  --dark: #8A8A8A;
+}
+
+.home_hero .cnt_lk a .iO {
+  width: 1px;
+}
+
+.home_hero .cnt_lk a .char .b {
+  background: black;
+}
+
+.home_hero .cnt_lk a .char .n {
+  transition: 0.3s color cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.home_hero .cnt_lk a .char .f {
+  color: #fff;
+  background: #000;
+}
+
+.home_hero .cnt_lk a i {
+  width: 0.8rem;
+  margin-left: 0.4rem;
+  display: inline-flex;
+  opacity: 0;
+  transition: 0.3s opacity cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.home_hero .cnt_lk a.ivi i {
+  opacity: 1;
+}

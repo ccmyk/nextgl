@@ -1,0 +1,168 @@
+/* src/styles/components/footer.pcss */
+
+/* Footer Base Styles */
+.footer {
+  padding: 1.6rem 0 5.6rem;
+  width: 100%;
+  margin-top: 24rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Footer Content Wrapper */
+.footer_cm {
+  width: 100%;
+}
+
+/* Responsive Footer Container */
+@media (orientation: portrait) {
+  .footer_cm {
+    width: 100vw;
+    margin: 0 auto;
+  }
+  .footer_cm.fix {
+    width: 100vw;
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  .footer_cm {
+    width: 39rem;
+  }
+}
+
+
+.footer_cm .Atitle {
+  margin-left: var(--pgrid);
+}
+
+/* Title Cover */
+.footer_cm .Atitle .cCover {
+  position: absolute;
+}
+
+.footer_cm .Atitle .cCover {
+  left: -2rem;
+  right: -2rem;
+  top: -2rem;
+  bottom: -2rem;
+  pointer-events: none;
+  transform: translateY(-2.2rem);
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  .footer_cm .Atitle .cCover {
+    left: 0;
+    right: 0;
+    top: -1.5rem;
+    bottom: -1.5rem;
+    transform: translateY(-1.4rem);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  .footer_cm .Atitle .cCover {
+    left: 0;
+    right: 0;
+    top: -1rem;
+    bottom: -1rem;
+    transform: translateY(-0.8rem);
+  }
+}
+
+/* Footer Title Canvas */
+.footer_cm .Atitle canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Footer Title Text */
+.footer_cm .Atitle .ttj {
+  opacity: 0;
+}
+
+.footer_cm .Atitle .ttj {
+  font-size: 27.7rem;
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  .footer_cm .Atitle .ttj {
+    font-size: 14.8rem;
+    white-space: nowrap;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  .footer_cm .Atitle .ttj {
+    font-size: 19vw;
+    white-space: nowrap;
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  .footer_cm .Atitle .ttj {
+    font-size: 7.4rem;
+  }
+}
+
+/* Footer Content */
+.footer .cnt {
+  margin-top: 8.5rem;
+}
+
+@media (orientation: portrait) {
+  .footer .cnt {
+    margin-top: 5.6rem;
+  }
+}
+
+/* Footer Links */
+.footer .cnt_lk {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.4rem 1rem;
+}
+
+.footer .cnt_lk .Awrite {
+  --dark: #8A8A8A;
+  --light: #000;
+}
+
+/* Footer Copyright Section */
+.footer .cnt_cr {
+  margin-top: 3.2rem;
+}
+
+/* Footer Contact Section */
+.footer .cnt_cp {
+  margin-top: 3.2rem;
+}
+
+/* Footer Home Page Specific Styles */
+.home .footer .cnt_lk .Awrite {
+  --dark: #8A8A8A;
+  --light: #000;
+}
+
+.home .footer .cnt_lk .Awrite i svg path {
+  fill: #f8f6f2;
+}
+
+.home .footer .cnt_cr .Awrite:first-child {
+  --dark: #8A8A8A;
+  --light: #F8F6F2;
+}
+
+.home .footer .cnt_cr .Awrite:last-child {
+  --dark: #F8F6F2;
+  --light: #000;
+}
+
+.home .footer .cnt_cp {
+  --dark: #8A8A8A;
+  --light: #F8F6F2;
+}
