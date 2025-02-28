@@ -1,8 +1,8 @@
-import Page from '@/utils/pageMain'
+import Page from '@/utils/pageMain.js'
 
 //COMPS
-import Intro from '@/app/about/intro/page'
-import Scr from '.@/app/about/dual/io'
+import Intro from '@/app/about/intro/page.js'
+import Scr from '.@/app/about/dual/io/js'
 
 class Home extends Page {
   constructor (main) {

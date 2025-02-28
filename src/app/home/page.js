@@ -1,88 +1,63 @@
-"use client";
-import { useEffect, useState } from "react";
-import WebGLCanvas from "@/components/WebGLCanvas";
-import useAnimations from "@/lib/animations/useAnimations";
-import Page from "@/lib/utils/pageMain";
-import Intro from "@/app/home/intro";
-import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
-import styles from "@/styles/pages/home.pcss";
+// home/page.js
+import { useEffect, useRef } from 'react';
+import { Renderer, Program, Mesh, Triangle, Vec2 } from 'ogl';
+import Title from "@/components/gl/loader/base.js";
 
-export default function HomePage() {
-  useAnimations();
-  const [siteContent, setSiteContent] = useState("");
+export default function Home() {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    async function fetchContent() {
-      try {
-        const settings = await fetchSiteSettings();
-        setSiteContent(settings?.content || "<p>Loading...</p>");
-      } catch (error) {
-        console.error("Failed to load site settings:", error);
-      }
-    }
-    fetchContent();
+    const canvas = canvasRef.current;
+    const renderer = new Renderer({ canvas });
+    const gl = renderer.gl;
+
+    const geometry = new Triangle(gl);
+    const program = new Program(gl, {
+      vertex: `
+        attribute vec2 uv;
+        attribute vec3 position;
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragment: `
+        precision highp float;
+        varying vec2 vUv;
+        void main() {
+          gl_FragColor = vec4(vUv, 0.0, 1.0);
+        }
+      `,
+    });
+
+    const mesh = new Mesh(gl, { geometry, program });
+
+    const title = new Title({
+      el: canvasRef.current,
+      renderer,
+      mesh,
+      scene: renderer.scene,
+      cam: renderer.camera,
+    });
+
+    const animate = (time) => {
+      title.update(time, 1, new Vec2());
+      requestAnimationFrame(animate);
+    };
+
+    animate(0);
+
+    return () => {
+      // Cleanup
+    };
   }, []);
 
   return (
-    <div id="home-page">
-      {/* WebGL Background */}
-      <WebGLCanvas />
-
-      {/* Hero / Intro Section */}
-      <section className={styles.home_hero}>
-        <div dangerouslySetInnerHTML={{ __html: siteContent }} />
-      </section>
-
-      {/* CMS content here */}
-      <div id="content" dangerouslySetInnerHTML={{ __html: siteContent }} />
+    <div>
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100vh' }} />
     </div>
   );
 }
-
-  async create(content, main, temp = undefined) {
-    super.create(content, main);
-
-    if (temp !== undefined) {
-      document.querySelector("#content").insertAdjacentHTML("afterbegin", temp);
-    } else {
-      let data = await fetchSiteSettings();
-      document.querySelector("#content").insertAdjacentHTML("afterbegin", data.homeContent);
-    }
-
-    this.el = document.querySelector("main");
-    this.DOM = { el: this.el };
-
-    // Check if WebGL is supported
-    if (this.initWebGL()) {
-      console.log("WebGL initialized successfully.");
-    } else {
-      console.warn("WebGL failed, falling back to static assets.");
-      await this.loadImages();
-      await this.loadVideos();
-    }
-
-    await this.createComps();
-    await this.createIos();
-    await this.getReady();
-  }
-
-  async createComps() {
-    await super.createComps();
-    if (this.DOM.el.querySelector(".home_intro")) {
-      this.components.intro = new Intro(this.DOM.el.querySelector(".home_intro"), this.main.device);
-    }
-  }
-
-  async animIntro(val) {
-    if (this.components.intro) {
-      this.components.intro.start();
-    }
-    return val;
-  }
-
-  async animOut() {
-    super.animOut();
-  }
-}
-
-export default Home;
