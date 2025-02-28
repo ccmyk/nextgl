@@ -1,5 +1,3 @@
-// import { checkPos,clamp } from '/js🧠🧠🧠/defaults/math🧮.js'
-
 export default class {
   constructor(obj, device, touch) {
     this.el = obj.el;

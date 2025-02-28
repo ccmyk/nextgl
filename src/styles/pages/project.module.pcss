@@ -1,136 +1,160 @@
 /* src/styles/pages/project.module.pcss */
 
-.project .backto {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  z-index: 57;
-  pointer-events: none;
+:root {
+  --project-color-gray: #8A8A8A;
+  --project-color-black: #000;
+  --project-padding-top: 35vh;
+  --project-margin-top-desktop: 30rem;
+  --project-margin-top-mobile: 20rem;
+  --project-z-index-back: 57;
+  --project-desktop-left-margin: 59rem;
+  --project-tablet-left-margin: 8.2rem;
+  --project-mobile-left-margin: 9.3rem;
 }
 
-:root.D .project .backto {
-  top: 8rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .project .backto {
-    top: 8rem;
-  }
-}
-
-@media (orientation: portrait) {
-  :root.T .project .backto {
-    top: 12rem;
-  }
-}
-
-.project .backto .Awrite {
-  white-space: nowrap;
-  pointer-events: all;
-  --dark: #8A8A8A;
-  --light: #000;
-}
-
-:root.D .project .backto .Awrite {
-  margin-left: 59rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .project .backto .Awrite {
-    margin-left: 59rem;
-  }
-}
-
-@media (orientation: portrait) and (min-width: 744px) {
-  :root.T .project .backto .Awrite {
-    margin-left: 8.2rem;
-  }
-}
-
-@media (orientation: portrait) and (max-width: 745px) {
-  :root.T .project .backto .Awrite {
-    margin-left: 9.3rem;
-  }
-}
-
-.project_intro {
-  padding-top: 35vh;
-  position: relative;
-}
-
-.project_intro .iO.iO-outin {
-  height: 20vh;
-  top: 0;
-  left: 0;
-  width: 10px;
-  background: yellow;
-  position: absolute;
-}
-
-.project_intro .cnt {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-.project_intro .cnt_n {
-  flex-shrink: 0;
-}
-
-:root.D .project_intro .cnt_n {
-  width: 59rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .project_intro .cnt_n {
-    width: 59rem;
-  }
-}
-
-@media (orientation: portrait) {
-  :root.T .project_intro .cnt_n {
-    width: 4.3rem;
-  }
-}
-
-.project_els .cnt {
-  margin-top: 30rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .project_els .cnt {
-    margin-top: 30rem;
-  }
-}
-
-@media (orientation: portrait) {
-  :root.T .project_els .cnt {
-    margin-top: 20rem;
-  }
-}
-
-.project_els .cnt_el {
-  position: relative;
-}
-
-:root.D .project_els .cnt_el {
-  width: 105rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .project_els .cnt_el {
-    width: 105rem;
-  }
-}
-
-@media (orientation: portrait) and (min-width: 744px) {
-  :root.T .project_els .cnt_el {
-    width: 58.2rem;
-  }
-}
-
-@media (orientation: portrait) and (max-width: 745px) {
-  :root.T .project_els .cnt_el {
+/* Project Page Component */
+.project {
+  /* Back to Projects Link */
+  .backto {
+    position: absolute;
+    left: 0;
     width: 100%;
+    z-index: var(--project-z-index-back);
+    pointer-events: none;
+    
+    :root.D & {
+      top: 8rem;
+    }
+    
+    @media (orientation: landscape) {
+      :root.T & {
+        top: 8rem;
+      }
+    }
+    
+    @media (orientation: portrait) {
+      :root.T & {
+        top: 12rem;
+      }
+    }
+    
+    .Awrite {
+      white-space: nowrap;
+      pointer-events: all;
+      --dark: var(--project-color-gray);
+      --light: var(--project-color-black);
+      
+      :root.D & {
+        margin-left: var(--project-desktop-left-margin);
+      }
+      
+      @media (orientation: landscape) {
+        :root.T & {
+          margin-left: var(--project-desktop-left-margin);
+        }
+      }
+      
+      @media (orientation: portrait) and (min-width: 744px) {
+        :root.T & {
+          margin-left: var(--project-tablet-left-margin);
+        }
+      }
+      
+      @media (orientation: portrait) and (max-width: 745px) {
+        :root.T & {
+          margin-left: var(--project-mobile-left-margin);
+        }
+      }
+    }
+  }
+  
+  /* Project Introduction Section */
+  &_intro {
+    padding-top: var(--project-padding-top);
+    position: relative;
+    
+    /* Indicator Overlay */
+    .iO.iO-outin {
+      height: 20vh;
+      top: 0;
+      left: 0;
+      width: 10px;
+      background: yellow;
+      position: absolute;
+    }
+    
+    /* Content Container */
+    .cnt {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      
+      /* Project Number */
+      &_n {
+        flex-shrink: 0;
+        
+        :root.D & {
+          width: var(--project-desktop-left-margin);
+        }
+        
+        @media (orientation: landscape) {
+          :root.T & {
+            width: var(--project-desktop-left-margin);
+          }
+        }
+        
+        @media (orientation: portrait) {
+          :root.T & {
+            width: 4.3rem;
+          }
+        }
+      }
+    }
+  }
+  
+  /* Project Elements Section */
+  &_els {
+    .cnt {
+      margin-top: var(--project-margin-top-desktop);
+      
+      @media (orientation: landscape) {
+        :root.T & {
+          margin-top: var(--project-margin-top-desktop);
+        }
+      }
+      
+      @media (orientation: portrait) {
+        :root.T & {
+          margin-top: var(--project-margin-top-mobile);
+        }
+      }
+      
+      /* Project Element */
+      &_el {
+        position: relative;
+        
+        :root.D & {
+          width: 105rem;
+        }
+        
+        @media (orientation: landscape) {
+          :root.T & {
+            width: 105rem;
+          }
+        }
+        
+        @media (orientation: portrait) and (min-width: 744px) {
+          :root.T & {
+            width: 58.2rem;
+          }
+        }
+        
+        @media (orientation: portrait) and (max-width: 745px) {
+          :root.T & {
+            width: 100%;
+          }
+        }
+      }
+    }
   }
 }

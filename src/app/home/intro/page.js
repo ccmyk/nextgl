@@ -1,7 +1,9 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SplitType from "split-type"; // Handles text splitting
-import styles from "@/styles/pages/home-hero.module.pcss"; // Hero section styles
+import styles from "@/styles/pages/home.pcss"; // Hero section styles
 
 const Intro = ({ element }) => {
   const introRef = useRef(null);

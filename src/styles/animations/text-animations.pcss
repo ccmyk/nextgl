@@ -1,0 +1,66 @@
+/* Text Animation Styles */
+
+/* Hide text initially */
+.Atext,
+.Aline,
+.Awrite {
+  opacity: 0;
+  
+  &.ivi {
+    opacity: 1;
+  }
+}
+
+/* Character styling */
+.char {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  
+  /* Normal character */
+  .n {
+    display: inline-block;
+    opacity: 0;
+    
+    .ivi & {
+      opacity: 1;
+    }
+  }
+  
+  /* Fake character for animation */
+  .f {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    opacity: 0;
+    transform-origin: center;
+  }
+}
+
+/* Line styling */
+.line {
+  display: block;
+  overflow: hidden;
+}
+
+/* Word styling */
+.word {
+  display: inline-block;
+  margin-right: 0.25em;
+  
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+/* Animation containers */
+.Atext_el,
+.Aline_el {
+  display: inline-block;
+}
+
+/* Prevent layout shift during animation */
+.split-text {
+  visibility: visible !important;
+}

@@ -1,26 +1,40 @@
+/* src/styles/utils.pcss */
+
+:root {
+  --utils-z-overlay: 9999;
+  --utils-z-debug: 123481231;
+  --utils-debug-padding: 12px;
+  --utils-spacing: 0.6rem;
+}
+
+/* Utility Classes */
+
 /* Hide Specific Elements */
 .pHide {
   position: fixed;
   pointer-events: none;
-  left: 0;
-  top: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 9999;
+  z-index: var(--utils-z-overlay);
 }
 
 /* Hide Interactive Elements */
-.iO, .Oi, .OiAlt {
+.iO, 
+.Oi, 
+.OiAlt {
   visibility: hidden;
   pointer-events: none;
 }
 
 /* Disable Background for Hidden Elements */
-html:not(.dev) .iO,
-html:not(.dev) .Oi,
-html:not(.dev) .OiChange,
-html:not(.dev) .OiAlt {
-  background: transparent !important;
+html:not(.dev) {
+  .iO,
+  .Oi,
+  .OiChange,
+  .OiAlt {
+    background: transparent !important;
+  }
 }
 
 /* Debugging UI */
@@ -33,19 +47,18 @@ html:not(.dev) .OiAlt {
   background: #333;
   color: #fff;
   font-family: "Neue Montreal Mono", sans-serif;
-  padding: 12px;
+  padding: var(--utils-debug-padding);
   opacity: 0.1;
+  
+  &:hover {
+    opacity: 1;
+  }
 }
 
-.checkfix:hover {
-  opacity: 1;
-}
-
-/* src/styles/utils/debug.pcss */
 /* Debug Background */
 .checkBG {
   position: fixed;
-  z-index: 123481231;
+  z-index: var(--utils-z-debug);
   background: black;
   top: 0;
   right: 0;
@@ -53,26 +66,23 @@ html:not(.dev) .OiAlt {
   display: flex;
   flex-direction: column;
   display: none !important;
-}
-
-/* Debug Inputs */
-.checkBG input[type=checkbox] {
-  background: red;
-  -webkit-appearance: auto;
-  -moz-appearance: auto;
-  appearance: auto;
-}
-
-.checkBG input[type=number] {
-  color: #000;
-  background: white;
-}
-
-/* Debug Labels */
-.checkBG span {
-  display: block;
-  margin-bottom: 0.6rem;
-  margin-top: 0.6rem;
+  
+  /* Debug Inputs */
+  input[type=checkbox] {
+    background: red;
+    appearance: auto;
+  }
+  
+  input[type=number] {
+    color: #000;
+    background: white;
+  }
+  
+  /* Debug Labels */
+  span {
+    display: block;
+    margin-block: var(--utils-spacing);
+  }
 }
 
 /* Hide Debug Elements */
@@ -80,6 +90,7 @@ html:not(.dev) .OiAlt {
   display: none !important;
 }
 
+/* Fake Title Layout */
 .faketit {
   position: fixed;
   left: 0;
@@ -88,12 +99,13 @@ html:not(.dev) .OiAlt {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  
+  .nfo_n {
+    flex-shrink: 0;
+  }
 }
 
-.faketit .nfo_n {
-  flex-shrink: 0;
-}
-
+/* Responsive Adjustments */
 :root.D .faketit .nfo_n {
   width: 23.6rem;
 }

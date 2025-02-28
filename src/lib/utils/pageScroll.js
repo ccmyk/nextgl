@@ -1,5 +1,3 @@
-
-
 //* Funciones de control
 export  function stopScroll(){
   // this.isVisible = 0

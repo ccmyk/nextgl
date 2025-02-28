@@ -1,3 +1,11 @@
+/* src/styles/reset.pcss */
+
+:root {
+  --focus-outline-color: #4A90E2;
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 2px;
+}
+
 /* Reset Default Browser Styles */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -34,7 +42,19 @@ ul, ol {
   list-style: none;
 }
 
-/* Remove default button styles */
+/* Form Elements Reset */
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  
+  &:focus-visible {
+    outline: var(--focus-outline-width) solid var(--focus-outline-color);
+    outline-offset: var(--focus-outline-offset);
+  }
+}
+
+/* Button Reset */
 button {
   background: none;
   border: none;
@@ -43,45 +63,30 @@ button {
   cursor: pointer;
 }
 
-/* Style focus for better accessibility */
-button:focus-visible {
-  outline: 2px solid #4A90E2; /* Example color, adjust as needed */
-  outline-offset: 2px;
+/* Number Input Reset */
+input {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  &[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
-/* Remove input/button browser styling */
-button, input, optgroup, select, textarea {
-  color: inherit;
-  font: inherit;
-  margin: 0;
-}
-
-/* Remove spinner/arrows from number inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-/* Prevent hidden elements from being displayed */
+/* Hidden Elements */
 [hidden], template {
   display: none !important;
 }
 
-/* Reset image and SVG behavior */
-img {
-  height: auto;
+/* Media Elements Reset */
+img, svg {
   max-width: 100%;
-  vertical-align: middle;
+  
+  &:where(img) {
+    height: auto;
+    vertical-align: middle;
+  }
 }
-
-svg {
-  max-width: 100%;
-}
-
-/* Remove explicit styling for SVG title */
-/* SVG accessibility should be handled with aria-labelledby instead */

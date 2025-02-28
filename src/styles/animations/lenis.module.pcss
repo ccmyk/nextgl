@@ -3,28 +3,30 @@ html.lenis {
   height: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  
+  &:scrollbar {
+    display: none;
+  }
 }
 
-html.lenis::-webkit-scrollbar {
-  display: none;
-}
-
-html.lenis:scrollbar {
-  display: none;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
+.lenis {
+  &.lenis-smooth {
+    scroll-behavior: auto;
+    
+    [data-lenis-prevent] {
+      overscroll-behavior: contain;
+    }
+  }
+  
+  &.lenis-stopped {
+    overflow: hidden;
+  }
+  
+  &.lenis-scrolling iframe {
+    pointer-events: none;
+  }
 }

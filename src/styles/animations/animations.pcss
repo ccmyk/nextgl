@@ -1,110 +1,108 @@
+/* src/styles/animations/animations.pcss */
+
+:root {
+  --animation-char-size: 1.1rem;
+  --animation-spacing: 1.8rem;
+  --animation-height: 10px;
+}
+
 /* Optimized Performance for Animations */
 .move {
   will-change: transform;
 }
 
-
+/* Animation Components */
 /* General Animated Text */
 .Awrite,
 .Atext {
   position: relative;
   text-transform: uppercase;
-}
-
-.Awrite .iO,
-.Atext .iO {
-  position: absolute;
-  left: 0;
-  top: 150%;
-  height: 10px;
-  pointer-events: none;
-}
-
-/* Character-based Animation */
-.Awrite .char,
-.Atext .char {
-  position: relative;
-  pointer-events: none;
-}
-
-.Awrite .char .b,
-.Atext .char .b {
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: var(--dark);
-  width: 1.1rem;
-  height: 1.1rem;
-  display: none;
-}
-
-.Awrite .char .n,
-.Atext .char .n {
-  opacity: 0;
-  color: var(--dark);
-}
-
-.Awrite .char .f,
-.Atext .char .f {
-  position: absolute;
-  left: 0;
-  top: 0;
-  opacity: 0;
-  color: var(--light);
-  z-index: 1;
-  background: var(--dark);
-  display: none;
-  transform-origin: left center;
-}
-
-/* Inverted Text Styles */
-.Awrite-inv,
-.Atext-inv {
-  color: var(--light);
-  padding: 2px 4px 1px;
-  background: var(--dark);
-}
-
-.Awrite-inv .char .n,
-.Atext-inv .char .n,
-.Awrite-inv.nono,
-.Atext-inv.nono {
-  color: var(--light);
+  
+  .iO {
+    position: absolute;
+    left: 0;
+    top: 150%;
+    height: var(--animation-height);
+    pointer-events: none;
+  }
+  
+  /* Character-based Animation */
+  .char {
+    position: relative;
+    pointer-events: none;
+    
+    .b {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: var(--dark);
+      width: var(--animation-char-size);
+      height: var(--animation-char-size);
+      display: none;
+    }
+    
+    .n {
+      opacity: 0;
+      color: var(--dark);
+    }
+    
+    .f {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      color: var(--light);
+      z-index: 1;
+      background: var(--dark);
+      display: none;
+      transform-origin: left center;
+    }
+  }
+  
+  /* Inverted Text Styles */
+  &-inv {
+    color: var(--light);
+    padding: 2px 4px 1px;
+    background: var(--dark);
+    
+    .char .n,
+    &.nono {
+      color: var(--light);
+    }
+  }
 }
 
 /* Secondary Animated Text */
 .Atext {
-  text-transform: uppercase;
-  position: relative;
   line-height: 1.27;
   pointer-events: none;
-}
-
-.Atext a {
-  pointer-events: all;
-}
-
-.Atext p+p {
-  margin-top: 1.8rem;
-}
-
-/* Ensuring Background Transparency */
-.Atext .char .f {
-  background: transparent;
-}
-
-/* Intersection Observer Handling */
-.Atext .iO {
-  position: absolute;
-  left: 0;
-  width: 1px;
-  top: 150%;
-  height: 10px;
-}
-
-.Atext.stview .iO {
-  top: 0%;
-  height: 100%;
+  
+  a {
+    pointer-events: all;
+  }
+  
+  p + p {
+    margin-top: var(--animation-spacing);
+  }
+  
+  /* Ensuring Background Transparency */
+  .char .f {
+    background: transparent;
+  }
+  
+  /* Intersection Observer Handling */
+  .iO {
+    position: absolute;
+    left: 0;
+    width: 1px;
+    top: 150%;
+    height: var(--animation-height);
+  }
+  
+  &.stview .iO {
+    top: 0%;
+    height: 100%;
+  }
 }
 
 /* Line Animations */
@@ -114,19 +112,19 @@
   line-height: 1.27;
   pointer-events: none;
   opacity: 0;
-}
-
-.Aline a {
-  pointer-events: all;
-}
-
-.Aline p+p {
-  margin-top: 1.8rem;
-}
-
-.Aline.stview .iO {
-  top: 0%;
-  height: 100%;
+  
+  a {
+    pointer-events: all;
+  }
+  
+  p + p {
+    margin-top: var(--animation-spacing);
+  }
+  
+  &.stview .iO {
+    top: 0%;
+    height: 100%;
+  }
 }
 
 /* Title Animations */
@@ -134,34 +132,28 @@
   position: relative;
   display: inline-flex;
   justify-content: flex-start;
-}
-
-.Atitle .cCover {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.Atitle .Oi {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1;
-  opacity: 1 !important;
-}
-
-.Atitle .tt1 {
-  opacity: 0;
-}
-
-.Atitle canvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  
+  .cCover {
+    position: absolute;
+    inset: 0;
+  }
+  
+  .Oi {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 1 !important;
+  }
+  
+  .tt1 {
+    opacity: 0;
+  }
+  
+  canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
 }

@@ -1,9 +1,7 @@
-
-
-// import Selc from '/atoms🧿🧿🧿/Selc'
-// import Chk from '/atoms🧿🧿🧿/Chk'
-import Link from '/atoms🧿🧿🧿/Link'
-import Title from '/atoms🧿🧿🧿/Title'
+// import Selc from '@/components/atoms/Selc'
+// import Chk from '@/components/atoms/Chk'
+import Link from '@/components/atoms/Link'
+import Title from '@/components/atoms/Title'
 
 
 export async function create (content,main,temp=undefined) {

@@ -1,10 +1,106 @@
 /* src/styles/variables.pcss */
 
-/* Define CSS Variables */
+/* Color Variables */
 :root {
+  /* Brand Colors */
+  --dark: #000;
+  --light: #F8F6F2;
+  --bg: #F8F6F2;
+  
+  /* UI Colors */
   --swiper-theme-color: #1B2126;
-  --primary-font: "Helvetica", sans-serif;
-  --background-color: #f8f6f2;
-  --text-color: #000;
   --button-color: #333;
+  --color-text: #000;
+  --color-text-secondary: #333;
+  --background-color: #f8f6f2;
+  
+  /* Functional Colors */
+  --focus-color: #4A90E2;
+  --error-color: #E53935;
+  --success-color: #43A047;
+}
+
+/* Typography Variables */
+:root {
+  --primary-font: 'Neue Montreal Mono', sans-serif;
+  --heading-font: 'Neue Montreal', sans-serif;
+  --accent-font: 'Air', sans-serif;
+  
+  /* Base Font Sizes */
+  --font-size-base: 1.1rem;
+  --font-size-small: 0.875rem;
+  --font-size-large: 1.25rem;
+  
+  /* Heading Font Sizes */
+  --font-size-h1: 18rem;
+  --font-size-h2: 10rem;
+  --font-size-h3: 6rem;
+  --font-size-h4: 3rem;
+  
+  /* Line Heights */
+  --line-height-tight: 0.9;
+  --line-height-normal: 1.2;
+  --line-height-relaxed: 1.5;
+}
+
+/* Spacing Variables */
+:root {
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 8rem;
+  
+  /* Grid Spacing */
+  --pgrid: calc(50vw - 70.4rem);
+}
+
+/* Z-Index Variables */
+:root {
+  --z-index-base: 1;
+  --z-index-nav: 10;
+  --z-index-modal: 20;
+  --z-index-overlay: 30;
+  --z-index-loader: 40;
+  --z-index-playground: 4;
+  --z-index-mouse: 49;
+}
+
+/* Animation Variables */
+:root {
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.4s ease;
+  --transition-slow: 0.8s ease;
+  
+  /* Easing Functions */
+  --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+  
+  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+  
+  --ease-in-expo: cubic-bezier(0.95, 0.05, 0.795, 0.035);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+  
+  /* Power2 and Power4 equivalents */
+  --ease-power2-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-power2-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-power2-inOut: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --ease-power4-inOut: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Breakpoints */
+/* These are used in media queries */
+:root {
+  --breakpoint-tablet: 744px;
+  --breakpoint-desktop: 1440px;
+  --breakpoint-large: 1920px;
 }

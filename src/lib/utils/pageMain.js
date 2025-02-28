@@ -4,13 +4,13 @@ create,
 createComps,
 cleanP,
 cleanWysi,
-} from '@/utils/pageCreate'
+} from '@/lib/utils/pageCreate'
 
 //Comps
 import {
 startComps,
 stopComps
-} from '@/utiles/pageComponents'
+} from '@/lib/utils/pageComponents'
 
 //Events
 import {
@@ -21,7 +21,7 @@ onTouchDown,
 onTouchMove,
 onTouchUp,
 onWheel
-} from '@/utils/pageEvents'
+} from '@/lib/utils/pageEvents'
 
 //ios
 import {
@@ -34,7 +34,7 @@ iOpage,
 iO,
 inViewAddClass,
 showIos,
-} from '@/utils/pageIos'
+} from '@/lib/utils/pageIos'
 
 //loads
 import {
@@ -47,14 +47,14 @@ loadVideos,
 newVideos,
 loadVideo,
 scaleLoads
-} from '@/utils/pageLoads'
+} from '@/lib/utils/pageLoads'
 
 //scroll
 import {
 stopScroll,
 startScroll,
 animIosScroll
-} from '@/utils/pageScroll'
+} from '@/lib/utils/pageScroll'
 
 //showhide
 import {
@@ -64,7 +64,7 @@ animIntro,
 animOut,
 start,
 hide
-} from '@/utils/showHide'
+} from '@/lib/utils/pageShowHide'
 
 class Page{
   constructor (main) {

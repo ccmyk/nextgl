@@ -1,19 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
-import browser from "@/lib/startup/useBrowser.js";
-import { initWebGL } from "@/lib/webgl/webgl.js";
+import { useEffect, useState } from "react";
+import SmoothScroll from "@/components/SmoothScroll";
 
-export default function AppInitializer() {
+export default function AppInitializer({ children }) {
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
-    const globalSettings = browser.browserCheck();
-    console.log("📡 Browser settings:", globalSettings);
+    // Set CSS variables for viewport height (fixes mobile viewport issues)
+    const setViewportHeight = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
 
-    if (globalSettings.webgl) {
-      const canvas = document.querySelector("#webglCanvas");
-      if (canvas) initWebGL(canvas);
-    }
+    // Initial setup
+    setViewportHeight();
+    
+    // Add resize listener
+    window.addEventListener('resize', setViewportHeight);
+    
+    // Set initialized state
+    setIsInitialized(true);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', setViewportHeight);
+    };
   }, []);
 
-  return null; // This component is only for side-effects
+  return (
+    <SmoothScroll>
+      {children}
+    </SmoothScroll>
+  );
 }

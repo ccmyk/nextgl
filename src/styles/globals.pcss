@@ -1,12 +1,16 @@
-/* src/styles/globals.css */
-@import url("animations/animations.pcss");
-@import url("animations/gsap.module.pcss");
-@import url("animations/lenis.module.pcss");
+/* src/styles/globals.pcss */
 
+/* Import Variables First */
+@import url("variables.pcss");
+
+/* Base Styles */
+@import url("base.pcss");
+@import url("accessibility.pcss");
+@import url("layout.pcss");
+
+/* Component Styles */
 @import url("components/background-grid.pcss");
 @import url("components/buttons.pcss");
-@import url("components/details-toggle.pcss");
-@import url("components/device-rotation.pcss");
 @import url("components/footer.pcss");
 @import url("components/loader.pcss");
 @import url("components/mouse.pcss");
@@ -14,60 +18,16 @@
 @import url("components/scrollbar.pcss");
 @import url("components/swiper.module.pcss");
 
-@import url("pages/about.module.pcss");
-@Import url("pages/error.module.pcss");
-@import url("pages/home.module.pcss");
-@import url("pages/home-about.module.pcss");
-@import url("pages/home-hero.module.pcss");
-@import url("pages/home-projects.module.pcss");
-@import url("pages/project.module.pcss");
-@import url("pages/projects.module.pcss");
-
+/* Typography */
 @import url("typography/typography.pcss");
-@import url("typography/fonts.pcss");
 @import url("typography/wysiwyg.pcss");
 
-@import url("utils/debug.pcss");
-@import url("utils/global-utils.pcss");
-@import url("utils/helpers.pcss");
+/* Animations */
+@import url("animations/animations.pcss");
+@import url("animations/gsap.module.pcss");
+@import url("animations/lenis.module.pcss");
+@import url("animations/interactions.pcss");
 
-@import url("accessibility.pcss");
-@import url("base.pcss");
-@import url("layout.pcss");
-@import url("reset.pcss");
-@import url("utils.pcss");
-@import url("variables.pcss");
-
-html {
-  --dark: #000;
-  --light: #F8F6F2;
-  --bg: #F8F6F2;
-}
-
-.c-vw {
-  margin: 0 auto;
-  width: 100%;
-  padding-left: var(--pgrid);
-  padding-right: var(--pgrid);
-}
-
-.c-vw-s {
-  margin: 0 auto;
-  width: 100%;
-  padding-left: var(--sgrid);
-  padding-right: var(--sgrid);
-}
-
-.c-fs {
-  margin: 0 auto;
-  width: 100%;
-  padding-left: var(--fgrid);
-  padding-right: var(--fgrid);
-}
-
-.glPlay {
-  position: fixed;
-  left: 0;
-  top: 0;
-  pointer-events: none;
-}
+/* Page-Specific Styles */
+@import url("pages/about.module.pcss");
+@import url("pages/home.pcss");

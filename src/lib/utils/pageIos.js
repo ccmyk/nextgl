@@ -1,8 +1,8 @@
-// import Write from '/ios⛓️⛓️⛓️/Write'
+// import Write from '@/lib/utils/Write'
 
-import lazyVideo from '/ios⛓️⛓️⛓️/lazyVideo'
-import lazyImage from '/ios⛓️⛓️⛓️/lazyImage'
-// import lightNav from '/ios⛓️⛓️⛓️/lightnav.js'
+import lazyVideo from '@/lib/utils/lazyVideo'
+import lazyImage from '@/lib/utils/lazyImage'
+// import lightNav from '@/lib/utils/lightnav.js'
 
 
 export function buildThresholdList(numSteps) {
@@ -418,4 +418,3 @@ export  function showIos(){
 }
 
 //* Para animar los ios cuando se hace scroll
-

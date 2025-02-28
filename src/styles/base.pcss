@@ -1,13 +1,34 @@
-/* Base Styles */
+/* src/styles/base.pcss - Combined reset and base styles */
+
+/* Reset Default Browser Styles */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, table, caption,
+tbody, tfoot, thead, tr, th, td, article,
+aside, canvas, details, embed, figure,
+figcaption, footer, header, hgroup, menu,
+nav, output, ruby, section, summary, time,
+mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* Base HTML Element Styles */
 html {
-  font-family: sans-serif;
+  font-family: var(--primary-font, sans-serif);
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   box-sizing: border-box;
   overscroll-behavior: none;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: subpixel-antialiased;
-  -webkit-text-size-adjust: none;
 }
 
 /* Apply box-sizing globally */
@@ -15,11 +36,24 @@ html {
   box-sizing: inherit;
 }
 
+/* Normalize block elements */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, main, menu, nav, section {
+  display: block;
+}
+
 /* Default body styles */
 body {
   margin: 0;
-  line-height: 1;
+  line-height: var(--line-height-normal, 1);
   overscroll-behavior: none;
+  color: var(--text-color, #000);
+  background-color: var(--background-color, #f8f6f2);
+}
+
+/* Remove default list styles */
+ul, ol {
+  list-style: none;
 }
 
 /* Links should inherit color and remove default styles */
@@ -28,6 +62,7 @@ a {
   color: inherit;
   outline: none;
   text-decoration: none;
+  transition: var(--transition-fast, 0.2s ease);
 }
 
 /* Prevent text selection globally */
@@ -44,14 +79,55 @@ button, input, select, textarea {
   background: none;
   border: none;
   outline: none;
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+
+/* Style focus for better accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--focus-color, #4A90E2);
+  outline-offset: 2px;
 }
 
 /* Default input behavior */
 input, textarea {
   -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  pointer-events: auto;
+  user-select: text;
+}
+
+/* Remove spinner/arrows from number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Prevent hidden elements from being displayed */
+[hidden], template {
+  display: none !important;
+}
+
+/* Reset image and SVG behavior */
+img {
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+  border-style: none;
+}
+
+svg {
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: middle;
 }
 
 /* Default layout elements */
@@ -65,4 +141,16 @@ input, textarea {
 
 #content {
   z-index: 3;
+}
+
+/* Define CSS Variables */
+:root {
+  --swiper-theme-color: #1B2126;
+  --primary-font: "Neue Montreal Mono", sans-serif;
+  --background-color: #f8f6f2;
+  --text-color: #000;
+  --button-color: #333;
+  --focus-color: #4A90E2;
+  --transition-fast: 0.2s ease;
+  --line-height-normal: 1;
 }

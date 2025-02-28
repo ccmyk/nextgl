@@ -1,161 +1,151 @@
-'use strict';
+"use client";
 
-export default class {
-  constructor(main) {
-    this.main = main;
-    this.animev = main.events.anim;
-    this.position = [window.innerWidth / 2, window.innerHeight / 2];
-    this.active = 0;
-    this.speed = 0;
-  }
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 
-  async create() {
-    this.el = document.createElement('div');
-    this.el.className = 'mouse';
+export default function MouseComponent() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [cursorType, setCursorType] = useState("default");
+  const cursorRef = useRef(null);
+  const cursorDotRef = useRef(null);
+  const cursorTextRef = useRef(null);
+  const mousePosition = useRef({ x: 0, y: 0 });
+  const targetPosition = useRef({ x: 0, y: 0 });
+  const rafId = useRef(null);
 
-    const pH = document.querySelector('.pHide');
-    pH.onmouseenter = () => {
-      if (this.chd) {
-        gsap.to(this.chd, {
-          width: 0,
-          duration: 0.2,
-          onComplete: () => {
-            if (this.chd) {
-              this.chd.remove();
-              delete this.chd;
-            }
-          },
+  // Initialize mouse cursor
+  useEffect(() => {
+    // Only show custom cursor on non-touch devices
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (isTouchDevice) {
+      return;
+    }
+    
+    // Show cursor
+    setIsVisible(true);
+    
+    // Add event listeners
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
+    
+    // Add hover listeners to interactive elements
+    addInteractiveListeners();
+    
+    // Start animation loop
+    startAnimationLoop();
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
+      removeInteractiveListeners();
+      
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
+    };
+  }, []);
+  
+  // Handle mouse movement
+  const handleMouseMove = (e) => {
+    mousePosition.current = { x: e.clientX, y: e.clientY };
+  };
+  
+  // Handle mouse down
+  const handleMouseDown = () => {
+    setCursorType("active");
+  };
+  
+  // Handle mouse up
+  const handleMouseUp = () => {
+    setCursorType("default");
+  };
+  
+  // Add listeners to interactive elements
+  const addInteractiveListeners = () => {
+    // Links
+    document.querySelectorAll("a, button, [role='button'], input, select, textarea")
+      .forEach(el => {
+        el.addEventListener("mouseenter", () => handleElementEnter(el));
+        el.addEventListener("mouseleave", handleElementLeave);
+      });
+  };
+  
+  // Remove listeners from interactive elements
+  const removeInteractiveListeners = () => {
+    document.querySelectorAll("a, button, [role='button'], input, select, textarea")
+      .forEach(el => {
+        el.removeEventListener("mouseenter", () => handleElementEnter(el));
+        el.removeEventListener("mouseleave", handleElementLeave);
+      });
+  };
+  
+  // Handle element hover enter
+  const handleElementEnter = (el) => {
+    // Check for data attributes for custom cursor behavior
+    const cursorText = el.dataset.cursorText;
+    
+    if (cursorText) {
+      setCursorType("text");
+      if (cursorTextRef.current) {
+        cursorTextRef.current.textContent = cursorText;
+      }
+    } else {
+      setCursorType("hover");
+    }
+  };
+  
+  // Handle element hover leave
+  const handleElementLeave = () => {
+    setCursorType("default");
+    if (cursorTextRef.current) {
+      cursorTextRef.current.textContent = "";
+    }
+  };
+  
+  // Animation loop for smooth cursor movement
+  const startAnimationLoop = () => {
+    const animate = () => {
+      // Smooth interpolation
+      targetPosition.current.x += (mousePosition.current.x - targetPosition.current.x) * 0.15;
+      targetPosition.current.y += (mousePosition.current.y - targetPosition.current.y) * 0.15;
+      
+      // Apply transforms
+      if (cursorRef.current && cursorDotRef.current) {
+        gsap.set(cursorRef.current, {
+          x: targetPosition.current.x,
+          y: targetPosition.current.y
+        });
+        
+        gsap.set(cursorDotRef.current, {
+          x: mousePosition.current.x,
+          y: mousePosition.current.y
         });
       }
+      
+      rafId.current = requestAnimationFrame(animate);
     };
+    
+    animate();
+  };
 
-    document.body.appendChild(this.el);
-    this.initEvents();
-  }
+  if (!isVisible) return null;
 
-  clean() {
-    if (this.chd) {
-      gsap.to(this.chd, {
-        width: 0,
-        duration: 0.2,
-        onComplete: () => {
-          this.chd.remove();
-          delete this.chd;
-        },
-      });
-    }
-  }
-
-  update() {
-    if (this.active == 0) return false;
-    let targetX = this.position[0];
-    let targetY = this.position[1];
-    this.lightX(targetX);
-    this.lightY(targetY);
-  }
-
-  async start() {
-    this.active = 1;
-  }
-
-  initEvents() {
-    window.addEventListener('mousedown', () => {
-      document.documentElement.classList.add('mouse-down');
-    });
-    window.addEventListener('mouseup', () => {
-      document.documentElement.classList.remove('mouse-down');
-    });
-
-    this.lightX = gsap.quickTo(document.querySelector('.mouse'), 'x', { duration: 0.05, ease: 'none' });
-    this.lightY = gsap.quickTo(document.querySelector('.mouse'), 'y', { duration: 0.05, ease: 'none' });
-
-    this.followIn = async (el, ev) => {
-      this.active = 1;
-      if (this.chd) await window.waiter(300);
-      else await window.waiter(6);
-
-      if (this.chd) {
-        this.chd.remove();
-        delete this.chd;
-      }
-
-      if (this.active == 0) return false;
-      this.chd = document.createElement('div');
-      let aW = document.createElement('div');
-      this.chd.classList.add(['mouse_el']);
-      aW.classList.add('Awrite', 'Awrite-inv', 'Ms');
-      if (el.dataset.w) aW.classList.add('Awrite-w');
-      aW.innerHTML = el.dataset.tt;
-      this.animev.detail.state = 0;
-      this.animev.detail.el = aW;
-      document.dispatchEvent(this.animev);
-
-      this.chd.appendChild(aW);
-      this.el.appendChild(this.chd);
-
-      this.animev.detail.state = 1;
-      document.dispatchEvent(this.animev);
-    };
-
-    this.followOut = (el, ev) => {
-      this.active = 0;
-      if (!this.chd) return false;
-      gsap.to(this.chd, {
-        width: 0,
-        duration: 0.2,
-        onComplete: () => {
-          if (this.chd) {
-            this.chd.remove();
-            delete this.chd;
-          }
-        },
-      });
-    };
-  }
-
-  getRelPos(x, y) {
-    let posx = this.followOb.bound.width / 2;
-    let posy = this.followOb.bound.height / 2;
-
-    posx -= x;
-    posy -= y;
-
-    posx = (posx * this.followOb.max) / this.followOb.bound.width;
-    posy = (posy * this.followOb.max) / this.followOb.bound.height;
-    return [posx, posy];
-  }
-
-  reset() {
-    document.documentElement.classList.remove('mouse-follow');
-    this.cleanEvs();
-
-    document.body.onmousemove = (e) => {
-      if (this.active == 0) return false;
-      this.position[0] = e.clientX;
-      this.position[1] = e.clientY;
-    };
-
-    this.mWrite = document.querySelectorAll('.MW');
-    if (this.mWrite) {
-      for (let el of this.mWrite) {
-        if (!el.classList.contains('evt')) {
-          el.addEventListener('mouseenter', (e) => this.followIn(el, e));
-          el.addEventListener('mouseleave', (e) => this.followOut(el, e));
-          el.classList.add('evt');
-        }
-      }
-    }
-  }
-
-  cleanEvs() {
-    if (this.mWrite) {
-      for (let el of this.mWrite) {
-        el.removeEventListener('mouseenter', this.followIn);
-        el.removeEventListener('mouseleave', this.followOut);
-        el.classList.remove('evt');
-      }
-    }
-    window.removeEventListener('mousedown', this.handleMouseDown);
-    window.removeEventListener('mouseup', this.handleMouseUp);
-  }
+  return (
+    <>
+      <div 
+        className={`cursor ${cursorType}`} 
+        ref={cursorRef}
+      >
+        <div className="cursor_text" ref={cursorTextRef}></div>
+      </div>
+      <div 
+        className="cursor_dot" 
+        ref={cursorDotRef}
+      ></div>
+    </>
+  );
 }

@@ -5,7 +5,7 @@ import useAnimations from "@/lib/animations/useAnimations";
 import Page from "@/lib/utils/pageMain";
 import Intro from "@/app/home/intro";
 import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
-import styles from "@/styles/pages/home-hero.module.pcss";
+import styles from "@/styles/pages/home.pcss";
 
 export default function HomePage() {
   useAnimations();

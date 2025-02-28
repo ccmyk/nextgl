@@ -1,14 +1,15 @@
 // src/app/layout.js
-import "@app/styles/globals.pcss";
-import WebGLCanvas from "@/components/WebGLCanvas";
+import "@/styles/globals.pcss";
+import AppInitializer from "@/components/AppInitializer";
+import WebGLApp from "@/components/WebGLApp";
 import Navigation from "@/components/NavComponent";
-import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
 // import Footer from "@/components/FooterComponent";
-// import "@/lib/startup/constructor";
+import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
+import { AnimationProvider } from "@/contexts/AnimationContext";
 
 export const metadata = {
   title: "Chris Hall Selected Work",
-  // description: "A Next.js 15-powered WebGL experience",
+  description: "Interactive portfolio showcasing selected works",
 };
 
 export default async function RootLayout({ children }) {
@@ -17,9 +18,15 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-      <Nav />
-        <main>{children}</main>
-        <Footer />
+        <AppInitializer>
+          <AnimationProvider>
+            <WebGLApp>
+              <Navigation />
+              <main>{children}</main>
+              {/* <Footer /> */}
+            </WebGLApp>
+          </AnimationProvider>
+        </AppInitializer>
       </body>
     </html>
   );

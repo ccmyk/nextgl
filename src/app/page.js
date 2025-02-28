@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from "react";
 import Page from "@/lib/utils/pageMain";
 import Intro from "@/app/home/intro/page";
