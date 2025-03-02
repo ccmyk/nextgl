@@ -1,174 +1,176 @@
-import Page from '@/utils/pageMain';
+"use client";
 
-//COMPS
-import Intro from '@/app/projects/intro/page';
+import { useEffect, useState, useRef } from 'react';
+import { useAppContext } from '@/components/AppInitializer';
+import { loadImages, loadVideos } from '@/lib/utils/pageLoads';
+import { createIos, callIos, showIos } from '@/lib/utils/pageIos';
+import ProjectsIntro from '@/app/projects/intro/page';
 
-class Home extends Page {
-  constructor(main) {
-    super(main);
-  }
-
-  async create(content, main, temp = undefined) {
-    super.create(content, main);
-    if (temp !== undefined) {
-      document.querySelector('#content').insertAdjacentHTML('afterbegin', temp);
-    }
-    // else{
-    //  let data = await this.loadRestApi(this.main.base+'/wp-json/wp/v2/pages/',content.dataset.id,content.dataset.template)
-    //
-    //
-    //  document.querySelector('#content').insertAdjacentHTML('afterbegin',data.csskfields.main)
-    // }
-    this.el = document.querySelector('main');
-
-    this.DOM = {
-      el: this.el,
-    };
-
-    if (this.main.webgl === 0) {
-      await this.loadImages();
-      await this.loadVideos();
-    }
-
-    await this.createComps();
-    await this.createIos();
-    await this.getReady();
-  }
-  iOpage(animobj) {
-    if (animobj.el.classList.contains('iO-scroll')) {
-      animobj.class = new Scroll(animobj, this.main.device);
-    }
-
-    return animobj;
-  }
-
-  async createComps() {
-    await super.createComps();
-    if (this.DOM.el.querySelector('.projects_intro')) {
-      this.components.intro = new Intro(this.DOM.el.querySelector('.projects_intro'), this.main.device);
-    }
-    this.components.accordion = this.DOM.el.querySelector('.toAc');
-    this.components.list = this.DOM.el.querySelector('.toLs');
-
-    this.components.list.onclick = () => {
-      this.components.accordion.classList.remove('act');
-
-      //Better at the end, gives it drama and gives you the feeling
-      //that it's loading
-
-      this.main.events.anim.detail.state = 1;
-      this.main.events.anim.detail.style = 1;
-      document.dispatchEvent(this.main.events.anim);
-      this.main.events.anim.detail.style = 0;
-
-      this.components.list.classList.add('act');
-    };
-
-    this.components.accordion.onclick = () => {
-      this.components.list.classList.remove('act');
-
-      this.main.events.anim.detail.state = 0;
-      this.main.events.anim.detail.style = 1;
-      document.dispatchEvent(this.main.events.anim);
-      this.main.events.anim.detail.style = 0;
-
-      this.components.accordion.classList.add('act');
-    };
-  }
-
-  async start(val = 0) {
-    this.isVisible = 1;
-    this.callIos();
-    let result = await this.animIntro(val);
-    return result;
-  }
-  async animIntro(val) {
-    // if(this.components.intro){
-    //   this.components.intro.start()
-    // }
-
-    this.components.accordion.classList.add('act');
-    document.querySelector('.nav_blur').classList.add('up');
-    if (this.DOM.el.querySelector('.fCanvas')) {
-      this.DOM.el.querySelector('.fCanvas').classList.remove('fCanvas');
-
-      await window.waiter(1100);
-    }
-    return val;
-  }
-
-  async animOut(btn, lenis) {
-    let t = '';
-    let n = '';
-    let time = 1200;
-    const anim = gsap.timeline({ paused: true });
-    if (btn == null) {
-      super.animOut();
-      document.querySelector('.nav_blur').classList.remove('up');
-      return true;
-    } else if (btn.dataset.ids) {
-      if (this.main.device < 2) {
-        if (btn.classList.contains('single')) {
-          btn = this.DOM.el.querySelector('.cnt_el[data-ids="' + btn.dataset.ids + '"]');
-          n = btn.querySelector('.nfo_n');
-          t = btn.querySelector('.nfo_t');
-          anim
-            .to(n, { x: +0 + 'rem', duration: 0.8, ease: 'power2.inOut' }, 0.7)
-            .to(t, { x: +34.4 + 'rem', duration: 0.4, ease: 'power2.inOut' }, 0.6);
-          time = 1400;
-        } else if (btn.classList.contains('cnt_el_sld')) {
-          btn = this.DOM.el.querySelector('.cnt_el[data-ids="' + btn.dataset.ids + '"]');
-          n = btn.querySelector('.nfo_n');
-          t = btn.querySelector('.nfo_t');
-
-          if (this.components.accordion.classList.contains('act')) {
-            anim.to(t, { x: +34.4 + 'rem', duration: 0.6, ease: 'power2.inOut' }, 0.2);
-            time = 1000;
-          } else {
-            anim
-              .to(n, { x: +0 + 'rem', duration: 1, ease: 'power2.inOut' }, 0.2)
-              .to(t, { x: +34.4 + 'rem', duration: 0.8, ease: 'power2.inOut' }, 0.2);
+export default function Projects() {
+  const appContext = useAppContext();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const domRef = useRef({
+    el: null,
+    images: null,
+    videos: null,
+    ios: null
+  });
+  const componentsRef = useRef({
+    intro: null,
+    accordion: null,
+    list: null,
+    activeView: 'accordion'
+  });
+  
+  useEffect(() => {
+    const initPage = async () => {
+      try {
+        // Get main element
+        const mainElement = document.querySelector('main');
+        if (!mainElement) return;
+        
+        domRef.current = {
+          el: mainElement,
+          images: null,
+          videos: null,
+          ios: null
+        };
+        
+        // Check device capabilities
+        const { browserInfo } = appContext || {};
+        const device = browserInfo?.device || 0;
+        const webgl = browserInfo?.webgl || 0;
+        
+        // Load media if needed
+        if (webgl === 0) {
+          await loadImages.call({ DOM: domRef.current });
+          await loadVideos.call({ DOM: domRef.current });
+        }
+        
+        // Initialize components
+        await createComponents();
+        
+        // Create and initialize intersection observers
+        await createIos.call({ 
+          DOM: domRef.current,
+          iOpage: (animobj) => {
+            if (animobj.el.classList.contains('iO-scroll')) {
+              // Scroll animation logic would go here
+              // animobj.class = new Scroll(animobj, device);
+            }
+            return animobj;
           }
-        } else {
-          n = btn.querySelector('.nfo_n');
-          t = btn.querySelector('.nfo_t');
-
-          anim
-            .to(n, { x: +0 + 'rem', duration: 1, ease: 'power2.inOut' }, 0.2)
-            .to(t, { x: +34.4 + 'rem', duration: 0.8, ease: 'power2.inOut' }, 0.2);
-        }
-      } else {
-        if (!btn.classList.contains('cnt_el_sld')) {
-          btn = btn.parentNode.parentNode.parentNode;
-        } else {
-          btn = btn.parentNode;
-        }
-
-        n = btn.querySelector('.nfo_n');
-        t = btn.querySelector('.nfo_t');
+        });
+        
+        callIos.call({ DOM: domRef.current, isVisible: 1 });
+        showIos.call({ DOM: domRef.current });
+        
+        // Setup event listeners
+        setupEventListeners();
+        
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Error initializing projects page:', error);
       }
-
-      btn.classList.add('noOut');
-
-      super.animOut();
-
-      // console.log(window.getComputedStyle(document.querySelector('.Size')).paddingTop)
-
-      lenis.scrollTo(btn, { force: true, offset: document.querySelector('.Size').clientHeight * -1, duration: 0.9 });
-
-      anim.play();
-
-      await window.waiter(time);
-      // await gsap.to(this.DOM.el,{opacity:0})
-
-      document.querySelector('.nav_blur').classList.remove('up');
-      const arr = [n, t];
-      return arr;
-    } else {
-      super.animOut();
-      return true;
-    }
-  }
+    };
+    
+    const createComponents = async () => {
+      // Initialize intro component if it exists
+      const introElement = domRef.current.el.querySelector('.projects_intro');
+      if (introElement) {
+        componentsRef.current.intro = new ProjectsIntro(
+          introElement, 
+          appContext?.browserInfo?.device || 0
+        );
+      }
+      
+      // Get accordion and list elements
+      componentsRef.current.accordion = domRef.current.el.querySelector('.toAc');
+      componentsRef.current.list = domRef.current.el.querySelector('.toLs');
+      
+      // Initialize with accordion view
+      if (componentsRef.current.accordion) {
+        componentsRef.current.accordion.classList.add('act');
+      }
+      
+      // Setup project items
+      setupProjectItems();
+    };
+    
+    const setupProjectItems = () => {
+      // Setup project items
+      const projectItems = domRef.current.el.querySelectorAll('.projects_list .projects_item');
+      projectItems.forEach((item, index) => {
+        // Add data index
+        item.dataset.index = index;
+        
+        // Add click event for project items
+        item.addEventListener('click', handleProjectClick);
+      });
+    };
+    
+    const setupEventListeners = () => {
+      // Toggle between accordion and list views
+      const viewToggleButtons = domRef.current.el.querySelectorAll('.projects_toggle span');
+      viewToggleButtons.forEach(button => {
+        button.addEventListener('click', handleViewToggle);
+      });
+    };
+    
+    const handleViewToggle = (event) => {
+      const viewType = event.target.classList.contains('toAc') ? 'accordion' : 'list';
+      
+      if (componentsRef.current.activeView === viewType) return;
+      
+      // Update active view
+      componentsRef.current.activeView = viewType;
+      
+      // Toggle active class on buttons
+      const viewToggleButtons = domRef.current.el.querySelectorAll('.projects_toggle span');
+      viewToggleButtons.forEach(button => {
+        button.classList.toggle('act');
+      });
+      
+      // Toggle view classes on container
+      const container = domRef.current.el.querySelector('.projects_list');
+      if (container) {
+        if (viewType === 'accordion') {
+          container.classList.remove('list');
+          container.classList.add('accordion');
+        } else {
+          container.classList.remove('accordion');
+          container.classList.add('list');
+        }
+      }
+    };
+    
+    const handleProjectClick = (event) => {
+      // Handle project item click
+      console.log('Project clicked:', event.currentTarget.dataset.index);
+      
+      // Navigation logic would go here
+    };
+    
+    initPage();
+    
+    // Cleanup function
+    return () => {
+      // Remove event listeners
+      const projectItems = document.querySelectorAll('.projects_list .projects_item');
+      projectItems.forEach(item => {
+        item.removeEventListener('click', handleProjectClick);
+      });
+      
+      const viewToggleButtons = document.querySelectorAll('.projects_toggle span');
+      viewToggleButtons.forEach(button => {
+        button.removeEventListener('click', handleViewToggle);
+      });
+    };
+  }, [appContext]);
+  
+  return (
+    <div className="projects-container">
+      {!isLoaded && <div className="loading">Loading projects...</div>}
+    </div>
+  );
 }
-
-export default Home;

@@ -1,114 +1,129 @@
-import Page from '@/utils/pageMain';
+"use client";
 
-//COMPS
-// import Intro from './0Intro'
+import { useEffect, useState, useRef } from 'react';
+import { useAppContext } from '@/components/AppInitializer';
+import { loadImages, loadVideos, newImages, newVideos } from '@/lib/utils/pageLoads';
+import { createIos, callIos, showIos } from '@/lib/utils/pageIos';
 
-class Home extends Page {
-  constructor(main) {
-    super(main);
-  }
-
-  async create(content, main, temp = undefined) {
-    super.create(content, main);
-    if (temp != undefined) {
-      document.querySelector('#content').insertAdjacentHTML('afterbegin', temp);
-    } else {
-      let data = await this.loadRestApi(
-        this.main.base + '/wp-json/wp/v2/pages/',
-        content.dataset.id,
-        content.dataset.template
-      );
-      document.querySelector('#content').insertAdjacentHTML('afterbegin', data.csskfields.main);
-    }
-    this.el = document.querySelector('main');
-
-    this.DOM = {
-      el: this.el,
-    };
-
-    console.log(this.main.device);
-
-    if (this.main.webgl == 0 || this.main.device > 0) {
-      document.documentElement.classList.add('NOGL');
-      this.posel = -1;
-      await this.loadImages();
-      await this.loadVideos();
-
-      if (this.main.device == 1) {
-        this.DOM.el.classList.add('noclick');
-      }
-
-      this.els = this.DOM.el.querySelectorAll('.el');
-
-      for (let [i, a] of this.els.entries()) {
-        let b = a.querySelector('.el_b .Awrite');
-
-        this.main.events.anim.detail.state = 0;
-        this.main.events.anim.detail.el = b;
-
-        document.dispatchEvent(this.main.events.anim);
-
-        a.querySelector('.el_md').onclick = async () => {
-          if (this.posel != -1) {
-            this.els[this.posel].classList.remove('wact');
-
-            let h = this.els[this.posel].querySelector('.el_b .Awrite');
-            this.main.events.anim.detail.state = -1;
-            this.main.events.anim.detail.el = h;
-            document.dispatchEvent(this.main.events.anim);
-
-            if (this.posel == i) {
-              this.posel = -1;
-              return false;
-            }
-          }
-          this.posel = i;
-          this.main.events.anim.detail.state = 1;
-          this.main.events.anim.detail.el = b;
-          document.dispatchEvent(this.main.events.anim);
-
-          this.els[this.posel].classList.add('wact');
+export default function Home() {
+  const appContext = useAppContext();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const domRef = useRef({
+    el: null,
+    images: null,
+    videos: null,
+    ios: null
+  });
+  const elsRef = useRef([]);
+  const poselRef = useRef(-1);
+  
+  useEffect(() => {
+    const initPage = async () => {
+      try {
+        // Get main element
+        const mainElement = document.querySelector('main');
+        if (!mainElement) return;
+        
+        domRef.current = {
+          el: mainElement,
+          images: null,
+          videos: null,
+          ios: null
         };
+        
+        // Check device capabilities
+        const { browserInfo } = appContext || {};
+        const device = browserInfo?.device || 0;
+        const webgl = browserInfo?.webgl || 0;
+        
+        // Handle non-WebGL or mobile devices
+        if (webgl === 0 || device > 0) {
+          document.documentElement.classList.add('NOGL');
+          poselRef.current = -1;
+          
+          // Load media
+          await loadImages.call({ DOM: domRef.current });
+          await loadVideos.call({ DOM: domRef.current });
+          
+          // Add mobile-specific class
+          if (device === 1) {
+            domRef.current.el.classList.add('noclick');
+          }
+          
+          // Setup elements
+          elsRef.current = domRef.current.el.querySelectorAll('.el');
+          
+          // Setup click handlers
+          elsRef.current.forEach((element, index) => {
+            const writeElement = element.querySelector('.el_b .Awrite');
+            
+            if (writeElement) {
+              const animEvent = new CustomEvent('anim', {
+                detail: { state: 0, el: writeElement }
+              });
+              document.dispatchEvent(animEvent);
+            }
+            
+            const moreDetailsElement = element.querySelector('.el_md');
+            if (moreDetailsElement) {
+              moreDetailsElement.addEventListener('click', handleMoreDetails);
+            }
+          });
+        }
+        
+        // Create and initialize intersection observers
+        await createIos.call({ DOM: domRef.current });
+        callIos.call({ DOM: domRef.current, isVisible: 1 });
+        showIos.call({ DOM: domRef.current });
+        
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Error initializing playground:', error);
       }
-    }
-
-    await this.createComps();
-    await this.createIos();
-
-    await this.getReady();
-  }
-  iOpage(animobj) {
-    return animobj;
-  }
-
-  async createComps() {
-    await super.createComps();
-
-    let cont = 0;
-    for (let a of this.DOM.el.querySelectorAll('.el')) {
-      a.classList.add('el-' + cont);
-
-      cont++;
-      if (cont == 12) {
-        cont = 0;
+    };
+    
+    const handleMoreDetails = async (event) => {
+      // Handle more details click
+      if (poselRef.current != -1) {
+        elsRef.current[poselRef.current].classList.remove('wact');
+        
+        const h = elsRef.current[poselRef.current].querySelector('.el_b .Awrite');
+        const animEvent = new CustomEvent('anim', {
+          detail: { state: -1, el: h }
+        });
+        document.dispatchEvent(animEvent);
+        
+        if (poselRef.current == event.target.closest('.el').dataset.index) {
+          poselRef.current = -1;
+          return false;
+        }
       }
-    }
-  }
-
-  async animIntro(val) {
-    if (this.components.intro) {
-      this.components.intro.start();
-    }
-
-    // gsap.to('.Mbg',{marginLeft:-1+'rem',marginRight:-1+'rem',duration:.32})
-
-    return val;
-  }
-
-  async animOut() {
-    super.animOut();
-    // gsap.to('.Mbg',{marginLeft:0+'rem',marginRight:0+'rem',duration:.32})
-  }
+      poselRef.current = event.target.closest('.el').dataset.index;
+      const b = event.target.closest('.el').querySelector('.el_b .Awrite');
+      const animEvent = new CustomEvent('anim', {
+        detail: { state: 1, el: b }
+      });
+      document.dispatchEvent(animEvent);
+      
+      elsRef.current[poselRef.current].classList.add('wact');
+    };
+    
+    initPage();
+    
+    // Cleanup function
+    return () => {
+      elsRef.current.forEach(element => {
+        const moreDetailsElement = element.querySelector('.el_md');
+        if (moreDetailsElement) {
+          moreDetailsElement.removeEventListener('click', handleMoreDetails);
+        }
+      });
+    };
+  }, [appContext]);
+  
+  return (
+    <div className="playground-container">
+      {!isLoaded && <div className="loading">Loading playground...</div>}
+    </div>
+  );
 }
-
-export default Home;

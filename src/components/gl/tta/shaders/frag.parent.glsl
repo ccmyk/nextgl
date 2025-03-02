@@ -1,5 +1,4 @@
-// src/components/gl/tta/shaders/frag.parent.glsl
-// 👩‍⚖️
+// 👩‍⚖️ src/components/gl/tta/shaders/frag.parent.glsl
 
 precision highp float;
 

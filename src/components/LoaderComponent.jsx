@@ -1,141 +1,207 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
-export default function LoaderComponent({ onComplete }) {
-  const [progress, setProgress] = useState(0);
+export default function LoaderComponent({ main, temp, device = 0, onComplete }) {
   const loaderRef = useRef(null);
-  const bgRef = useRef(null);
-  const contentRef = useRef(null);
-  const numberRef = useRef(null);
-  const timelineRef = useRef(null);
-  const animationObj = useRef({ num: 0 });
+  const counterRef = useRef(0);
+  const indexRef = useRef(0);
+  const tempRef = useRef({ init: temp, pop: temp });
+  const deviceRef = useRef(device);
+  const DOMRef = useRef({
+    el: null,
+    bg: null,
+    cnt: null,
+    n: null
+  });
+  const objRef = useRef({ num: 0 });
+  const animRef = useRef(null);
+  const mainRef = useRef(main);
 
-  // Initialize animation
+  // Equivalent to constructor and create()
   useEffect(() => {
-    if (!loaderRef.current) return;
+    if (!temp) return;
+    
+    // Insert HTML template
+    document.querySelector('body').insertAdjacentHTML('afterbegin', tempRef.current.init);
+    
+    // Get DOM elements
+    DOMRef.current.el = document.documentElement.querySelector('.loader');
+    if (!DOMRef.current.el) return;
+    
+    DOMRef.current.bg = DOMRef.current.el.querySelector('.loader_bg');
+    DOMRef.current.cnt = DOMRef.current.el.querySelector('.loader_cnt');
+    DOMRef.current.n = DOMRef.current.el.querySelector('.loader_tp');
+    
+    // Create animations
+    createAnim();
+    
+    // Cleanup on unmount
+    return () => {
+      if (DOMRef.current.el) {
+        DOMRef.current.el.remove();
+      }
+    };
+  }, [temp]);
 
-    // Create GSAP timeline
-    timelineRef.current = gsap.timeline({ paused: true })
+  // Equivalent to createAnim()
+  const createAnim = () => {
+    objRef.current = { num: 0 };
+    
+    animRef.current = gsap.timeline({ paused: true })
       .fromTo(
-        animationObj.current,
+        objRef.current,
         { num: 0 },
         {
           num: 42,
-          ease: "none",
+          ease: 'none',
           duration: 2,
-          onUpdate: updateNumber,
+          onUpdate: () => {
+            let num = objRef.current.num.toFixed(0);
+            calcNum(num);
+          }
         },
         0
       )
       .to(
-        animationObj.current,
+        objRef.current,
         {
           num: 90,
-          ease: "power2.inOut",
+          ease: 'power2.inOut',
           duration: 8,
-          onUpdate: updateNumber,
+          onUpdate: () => {
+            let num = objRef.current.num.toFixed(0);
+            calcNum(num);
+          }
         },
         2.2
       );
 
-    // Initialize text animations
-    const animatedElements = loaderRef.current.querySelectorAll('.Awrite');
-    animatedElements.forEach(element => {
-      initializeTextAnimation(element);
-    });
-
-    // Start the animation
-    startAnimation();
-
-    // Cleanup function
-    return () => {
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-      }
-    };
-  }, []);
-
-  // Update the number display
-  const updateNumber = () => {
-    if (numberRef.current) {
-      const num = animationObj.current.num.toFixed(0).padStart(3, '0');
-      numberRef.current.innerHTML = num;
-      setProgress(animationObj.current.num);
-    }
-  };
-
-  // Initialize text animation for an element
-  const initializeTextAnimation = (element) => {
-    // This would dispatch custom animation events in the original code
-    // Here we'll use GSAP directly
-    gsap.set(element, { opacity: 0 });
-  };
-
-  // Start the animation sequence
-  const startAnimation = () => {
-    const animatedElements = loaderRef.current.querySelectorAll('.Awrite');
-    animatedElements.forEach(element => {
-      triggerTextAnimation(element);
-    });
+    // Handle text animations
+    let aw = DOMRef.current.el.querySelectorAll('.Awrite');
     
-    if (timelineRef.current) {
-      timelineRef.current.play();
+    if (mainRef.current && mainRef.current.events && mainRef.current.events.anim) {
+      // Initialize text animations using the main event system
+      mainRef.current.events.anim.detail.state = 0;
+      mainRef.current.events.anim.detail.el = aw[0];
+      document.dispatchEvent(mainRef.current.events.anim);
+
+      mainRef.current.events.anim.detail.state = 0;
+      mainRef.current.events.anim.detail.el = aw[1];
+      document.dispatchEvent(mainRef.current.events.anim);
     }
   };
 
-  // Trigger text animation for an element
-  const triggerTextAnimation = (element) => {
-    gsap.to(element, { 
-      opacity: 1, 
-      duration: 0.8, 
-      ease: "power2.out",
-      stagger: 0.05
+  // Equivalent to calcNum()
+  const calcNum = (num) => {
+    if (!DOMRef.current.n) return;
+    
+    if (num < 10) {
+      num = '00' + num;
+    } else if (num < 100) {
+      num = '0' + num;
+    }
+    
+    DOMRef.current.n.innerHTML = num;
+    counterRef.current = parseInt(num, 10);
+  };
+
+  // Equivalent to start()
+  const start = () => {
+    let aw = DOMRef.current.el.querySelectorAll('.Awrite');
+    
+    if (mainRef.current && mainRef.current.events && mainRef.current.events.anim) {
+      // Trigger text animations using the main event system
+      mainRef.current.events.anim.detail.state = 1;
+      mainRef.current.events.anim.detail.el = aw[0];
+      document.dispatchEvent(mainRef.current.events.anim);
+
+      mainRef.current.events.anim.detail.state = 1;
+      mainRef.current.events.anim.detail.el = aw[1];
+      document.dispatchEvent(mainRef.current.events.anim);
+    }
+    
+    if (animRef.current) {
+      animRef.current.play();
+    }
+  };
+
+  // Equivalent to showPop()
+  const showPop = () => {
+    if (deviceRef.current > 1) {
+      // Implementation would go here
+    }
+  };
+
+  // Equivalent to hidePop()
+  const hidePop = () => {
+    if (deviceRef.current > 1 && DOMRef.current.el) {
+      DOMRef.current.el.remove();
+    }
+  };
+
+  // Equivalent to hideIntro()
+  const hideIntro = (template = '') => {
+    if (!DOMRef.current.el || !animRef.current) return;
+    
+    animRef.current.pause();
+
+    gsap.to(objRef.current, {
+      num: 100,
+      ease: 'power2.inOut',
+      duration: 0.49,
+      onUpdate: () => {
+        let num = objRef.current.num.toFixed(0);
+        calcNum(num);
+      }
+    });
+
+    gsap.to(DOMRef.current.el, {
+      opacity: 0,
+      duration: 0.5,
+      delay: 0.2,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        if (DOMRef.current.el) {
+          DOMRef.current.el.remove();
+        }
+        if (onComplete) {
+          onComplete();
+        }
+      }
     });
   };
 
-  // Complete the loading sequence
-  const completeLoading = () => {
-    if (timelineRef.current) {
-      timelineRef.current.pause();
-      
-      gsap.to(animationObj.current, {
-        num: 100,
-        ease: "power2.inOut",
-        duration: 0.49,
-        onUpdate: updateNumber,
-        onComplete: () => {
-          gsap.to(loaderRef.current, {
-            opacity: 0,
-            duration: 0.8,
-            ease: "power2.inOut",
-            onComplete: () => {
-              if (onComplete) onComplete();
-            }
-          });
-        }
-      });
-    }
-  };
-
-  // Expose the complete method to parent components
+  // Expose methods to parent component
   useEffect(() => {
-    // Simulate completion after 5 seconds for testing
-    const timer = setTimeout(() => {
-      completeLoading();
+    if (!mainRef.current) return;
+    
+    // Attach methods to the main object if needed
+    if (mainRef.current.loader) {
+      mainRef.current.loader = {
+        start,
+        hideIntro,
+        showPop,
+        hidePop
+      };
+    }
+    
+    // Auto-start for demo purposes (remove in production)
+    const startTimer = setTimeout(() => {
+      start();
+    }, 500);
+    
+    const hideTimer = setTimeout(() => {
+      hideIntro();
     }, 5000);
+    
+    return () => {
+      clearTimeout(startTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [main]);
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div className="loader" ref={loaderRef}>
-      <div className="loader_bg" ref={bgRef}></div>
-      <div className="loader_cnt" ref={contentRef}>
-        <div className="loader_tp" ref={numberRef}>000</div>
-        <div className="Awrite">Loading Experience</div>
-      </div>
-    </div>
-  );
+  // The component doesn't render anything itself since the HTML is injected directly
+  return null;
 }

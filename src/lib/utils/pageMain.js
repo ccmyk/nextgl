@@ -1,3 +1,5 @@
+'use client';
+
 //Create
 import {
 create,
@@ -10,7 +12,7 @@ cleanWysi,
 import {
 startComps,
 stopComps
-} from '@/lib/utils/pageComponents'
+} from '@/lib/utils/pageComps'
 
 //Events
 import {
@@ -66,8 +68,16 @@ start,
 hide
 } from '@/lib/utils/pageShowHide'
 
-class Page{
-  constructor (main) {
+/**
+ * Base Page class with utility methods
+ * @deprecated This class-based approach is being phased out in favor of React functional components
+ * Use the individual utility functions directly in your React components
+ */
+class Page {
+  constructor(main) {
+    // Don't initialize on server
+    if (typeof window === 'undefined') return;
+    
     this.content = document.querySelector("#content")
     this.main = main
 
@@ -79,64 +89,67 @@ class Page{
     this.font = parseFloat(getComputedStyle(document.documentElement).fontSize)
   }
   
-  update(speed,posy) {
+  update(speed, posy) {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return false;
+    
     if(this.isVisible === 0){
       return false
     }
 
     this.speed = speed
     for(let c of this.updaters){
-      this.ios[c].class.update(this.speed,posy)
+      this.ios[c].class.update(this.speed, posy)
     }
   }
 }
 
 //Create
-Page.prototype.create=create
-Page.prototype.createComps=createComps
-Page.prototype.cleanP=cleanP
-Page.prototype.cleanWysi=cleanWysi
+Page.prototype.create = create
+Page.prototype.createComps = createComps
+Page.prototype.cleanP = cleanP
+Page.prototype.cleanWysi = cleanWysi
 //Comps
-Page.prototype.startComps=startComps
-Page.prototype.stopComps=stopComps
+Page.prototype.startComps = startComps
+Page.prototype.stopComps = stopComps
 //Events
-Page.prototype.onResize=onResize
-Page.prototype.resizeLimit=resizeLimit
-Page.prototype.onScroll=onScroll
-Page.prototype.onTouchDown=onTouchDown
-Page.prototype.onTouchMove=onTouchMove
-Page.prototype.onTouchUp=onTouchUp
-Page.prototype.onWheel=onWheel
+Page.prototype.onResize = onResize
+Page.prototype.resizeLimit = resizeLimit
+Page.prototype.onScroll = onScroll
+Page.prototype.onTouchDown = onTouchDown
+Page.prototype.onTouchMove = onTouchMove
+Page.prototype.onTouchUp = onTouchUp
+Page.prototype.onWheel = onWheel
 //ios
-Page.prototype.buildThresholdList=buildThresholdList
-Page.prototype.checkIo=checkIo
-Page.prototype.callIos=callIos
-Page.prototype.createIos=createIos
-Page.prototype.newIos=newIos
-Page.prototype.iOpage=iOpage
-Page.prototype.iO=iO
-Page.prototype.inViewAddClass=inViewAddClass
-Page.prototype.showIos=showIos
+Page.prototype.buildThresholdList = buildThresholdList
+Page.prototype.checkIo = checkIo
+Page.prototype.callIos = callIos
+Page.prototype.createIos = createIos
+Page.prototype.newIos = newIos
+Page.prototype.iOpage = iOpage
+Page.prototype.iO = iO
+Page.prototype.inViewAddClass = inViewAddClass
+Page.prototype.showIos = showIos
 //loads
-Page.prototype.timeout=timeout
-Page.prototype.loadRestApi=loadRestApi
-Page.prototype.loadImage=loadImage
-Page.prototype.loadImages=loadImages
-Page.prototype.newImages=newImages
-Page.prototype.loadVideos=loadVideos
-Page.prototype.newVideos=newVideos
-Page.prototype.loadVideo=loadVideo
-Page.prototype.scaleLoads=scaleLoads
+Page.prototype.timeout = timeout
+Page.prototype.loadRestApi = loadRestApi
+Page.prototype.loadImage = loadImage
+Page.prototype.loadImages = loadImages
+Page.prototype.newImages = newImages
+Page.prototype.loadVideos = loadVideos
+Page.prototype.newVideos = newVideos
+Page.prototype.loadVideo = loadVideo
+Page.prototype.scaleLoads = scaleLoads
 //scroll
-Page.prototype.stopScroll=stopScroll
-Page.prototype.startScroll=startScroll
-Page.prototype.animIosScroll=animIosScroll
+Page.prototype.stopScroll = stopScroll
+Page.prototype.startScroll = startScroll
+Page.prototype.animIosScroll = animIosScroll
 //showhide
-Page.prototype.getReady=getReady
-Page.prototype.show=show
-Page.prototype.animIntro=animIntro
-Page.prototype.animOut=animOut
-Page.prototype.start=start
-Page.prototype.hide=hide
+Page.prototype.getReady = getReady
+Page.prototype.show = show
+Page.prototype.animIntro = animIntro
+Page.prototype.animOut = animOut
+Page.prototype.start = start
+Page.prototype.hide = hide
 
 export default Page

@@ -1,3 +1,5 @@
+'use client';
+
 // import Selc from '@/components/atoms/Selc'
 // import Chk from '@/components/atoms/Chk'
 import Link from '@/components/atoms/Link'
@@ -5,8 +7,8 @@ import Title from '@/components/atoms/Title'
 
 
 export async function create (content,main,temp=undefined) {
-
-
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
 
     this.ios = []
     this.iosupdaters = []
@@ -42,7 +44,8 @@ export async function create (content,main,temp=undefined) {
 
 //* Función crear componentes
 export async function createComps(){
-
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
 
   if(this.main.device > 1){
     if(this.DOM.el.querySelectorAll('.footer')){
@@ -65,7 +68,10 @@ export async function createComps(){
 }
 
 
-export  function cleanP(){
+export function cleanP(){
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+    
     if(this.DOM.el.querySelector('p:empty')){
       for(let p of this.DOM.el.querySelectorAll('p:empty')){
         p.remove()
@@ -74,6 +80,9 @@ export  function cleanP(){
 }
 
 export function cleanWysi(){
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+    
     for(let a of this.DOM.el.querySelectorAll('.wysi img')){
       a.removeAttribute('loading')
       let src = a.src

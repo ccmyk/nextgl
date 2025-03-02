@@ -21,51 +21,52 @@ import mapTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.png";
 import jsonTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.json";
 
 // LOADER ⌛️
-import Loader from "@/components/gl/loader/base.js";
+// import Loader from "@/components/gl/loader/Loader.jsx";
 import LoaderF from "@/components/gl/loader/shaders/frag.main.glsl";
 import LoaderV from "@/components/gl/loader/shaders/vert.main.glsl";
 
-// OIS 🖼
-import Base from "@/components/gl/ois/base.js";
-import fractalF from "@/components/gl/ois/shaders/frag.main.glsl";
-import fractalV from "@/components/gl/ois/shaders/vert.main.glsl";
+// BASE 🖼
+//import Base from "@/components/gl/base/Base.jsx";
+import fractalF from "@/components/gl/base/shaders/frag.main.glsl";
+import fractalV from "@/components/gl/base/shaders/vert.main.glsl";
 
 // BG 🏜
-import Bg from "@/components/gl/bg/base.js";
+// import Bg from "@/components/gl/bg/Bg.jsx";
 import BgF from "@/components/gl/bg/shaders/frag.main.glsl";
 import BgV from "@/components/gl/bg/shaders/vert.main.glsl";
 
 // TEXT 💬
-import Tt from "@/components/gl/tt/base.js";
-import textF from "@/components/gl/tt/shaders/frag.msdf.glsl";
-import textV from "@/components/gl/tt/shaders/vert.msdf.glsl";
+// import Tt from "@/components/gl/title/title.jsx";
+import textF from "@/components/gl/title/shaders/frag.msdf.glsl";
+import textV from "@/components/gl/title/shaders/vert.msdf.glsl";
 
 // FLAME 🔥
-import TtF from "@/components/gl/ttf/base.js";
-import textFF from "@/components/gl/ttf/shaders/frag.msdf.glsl";
-import textpF from "@/components/gl/ttf/shaders/frag.parent.glsl";
+// import TtF from "@/components/gl/footer/Footer.jsx";
+import textFF from "@/components/gl/footer/shaders/frag.msdf.glsl";
+import textpF from "@/components/gl/footer/shaders/frag.parent.glsl";
 
 // JUDGE 👩‍⚖️
-import TtA from "@/components/gl/tta/base.js";
+// import TtA from "@/components/gl/tta/About.jsx";
 import textFA from "@/components/gl/tta/shaders/frag.msdf.glsl";
 import textpA from "@/components/gl/tta/shaders/frag.parent.glsl";
 
-// SLIDER 🎞️
-import Sl from "@/components/gl/sl/base.js";
-import SlF from "@/components/gl/sl/shaders/frag.main.glsl";
-import SlV from "@/components/gl/sl/shaders/vert.main.glsl";
-import SlPF from "@/components/gl/sl/shaders/frag.parent.glsl";
+// SLIDES 🎞️
+// import Slides from "@/components/gl/slides/Slides.jsx";
+import SlF from "@/components/gl/slides/shaders/frag.main.glsl";
+import SlV from "@/components/gl/slides/shaders/vert.main.glsl";
+import SlPF from "@/components/gl/slides/shaders/frag.parent.glsl";
 
-// ROLLER 🎢
-import Roll from "@/components/gl/roll/base.js";
+// ROLL 🎢
+// import Roll from "@/components/gl/roll/Roll.jsx";
 import SlSF from "@/components/gl/roll/shaders/frag.single.glsl";
 import SlVF from "@/components/gl/roll/shaders/vert.single.glsl";
 
-// PARTICLE GRID 🧮
-import PG from "@/components/gl/pg/base.js";
+// PG 🧮
+// import PG from "@/components/gl/pg/Pg.jsx";
 import PGs from "@/components/gl/pg/shaders/frag.main.glsl";
 import PGv from "@/components/gl/pg/shaders/vert.main.glsl";
 
+// FONT LOADING
 export async function createMSDF() {
   let mapTexSrc = mapTexSrcD;
   let jsonTexSrc = jsonTexSrcD;
@@ -76,15 +77,15 @@ export async function createMSDF() {
   }
 
   let rt = [];
-  //🔠🔠🔠🔠
+  // 🔠🔠🔠 Load font JSON
   let fJson = await (await fetch(jsonTexSrc)).json();
   rt.push(fJson);
-  //🔚🔚🔚🔚🔚
+  // 🔚🔚🔚🔚
   return rt;
 }
 
-export async function createAssets(texs) {
-  //💬💬💬💬💬💬
+export async function createAssets() {
+  // 💬💬💬 Preload font assets
   const fntAss = await createMSDF();
   this.fontMSDF = fntAss[0];
 
@@ -95,12 +96,14 @@ export async function createAssets(texs) {
 
   this.fontTex = await this.loadImage(mapTexSrc);
 }
+
+// ELEMENT CREATION
 export async function createEls(el = null, temp, canvasRef) {
   if (!el || !canvasRef?.current) return;
 
   const pos = el.dataset.oi;
 
-  // 🅰️🅰️🅰️🅰️ Renderer Setup
+  // Renderer Setup
   const renderer = new Renderer({
     alpha: true,
     dpr: Math.min(window.devicePixelRatio, 2),
@@ -110,76 +113,33 @@ export async function createEls(el = null, temp, canvasRef) {
   });
 
   const { gl } = renderer;
-  gl.canvas.classList.add('glF');
+  gl.canvas.classList.add("glF");
 
   // Ensure cCover is correctly placed
-  const cover = el.parentNode.querySelector('.cCover');
+  const cover = el.parentNode.querySelector(".cCover");
   if (cover && !canvasRef.current.parentNode.contains(cover)) {
-    cover.style.position = 'absolute';
-    cover.style.pointerEvents = 'none';
+    cover.style.position = "absolute";
+    cover.style.pointerEvents = "none";
     canvasRef.current.parentNode.appendChild(cover);
   }
 
-  // 📽️📽️📽️📽️📽️📽️📽️📽️ Camera Setup
-  const cam = this.createCamera(gl);
+  // Camera Setup
+  const cam = new Camera(gl, { fov: 45 });
 
-  // 🔠🔠🔠🔠 Text Setup
-  let text;
-  let siz = parseFloat(el.dataset.m) || 1;
+  // Text Setup
+  let textSize = parseFloat(el.dataset.m) || 1;
   const letterSpacing = parseFloat(el.dataset.l) || 0;
 
-  if (temp === 'foot') {
-    text = new Text({
-      font: this.fontMSDF,
-      text: el.dataset.text,
-      align: 'center',
-      letterSpacing,
-      size: siz,
-      lineHeight: 1,
-    });
-  } else if (temp === 'about') {
-    let br = ' ';
-    let br2 = ' ';
-    let w = (6.2 * siz) / 0.6;
-    let l = 0.995;
+  const text = new Text({
+    font: this.fontMSDF,
+    text: el.dataset.text,
+    align: "center",
+    letterSpacing,
+    size: textSize,
+    lineHeight: 1,
+  });
 
-    if (this.main.device < 2) {
-      br = '\n';
-      br2 = '\n';
-      w = 13.1;
-      l = 1.035;
-    } else if (this.main.device === 2) {
-      w = 7.5;
-      l = 1.01;
-      siz *= 0.77;
-    }
-
-    text = new Text({
-      font: this.fontMSDF,
-      text:
-        'Enthusiastic about graphic design, typography, and the dynamic areas of motion and web-based animations.' +
-        br +
-        'Specialized in translating brands into unique and immersive digital' +
-        br2 +
-        'user experiences.',
-      width: w,
-      align: 'center',
-      letterSpacing,
-      size: siz,
-      lineHeight: l,
-    });
-  } else {
-    text = new Text({
-      font: this.fontMSDF,
-      text: el.dataset.text,
-      align: 'center',
-      letterSpacing,
-      size: siz,
-      lineHeight: 1,
-    });
-  }
-
-  // 📐📐📐📐📐📐📐 Geometry Setup
+  // Geometry Setup
   const geometry = new Geometry(gl, {
     position: { size: 3, data: text.buffers.position },
     uv: { size: 2, data: text.buffers.uv },
@@ -188,78 +148,67 @@ export async function createEls(el = null, temp, canvasRef) {
   });
   geometry.computeBoundingBox();
 
-  // 📺📺📺📺📺📺📺 Texture Setup
+  // Texture Setup
   const texTx = new Texture(gl, { generateMipmaps: false });
-  texTx.image = this.fontTex;
+  texTx.image = fontTex;
 
-  // 🎨🎨🎨 Program Setup
-  let program;
-  let shaderMod;
-  if (temp === 'foot') {
-    shaderMod = textFF.replaceAll('PITO', el.parentNode.querySelector('.Oiel').innerHTML.length);
-    program = new Program(gl, {
-      vertex: textV,
-      fragment: shaderMod,
-      uniforms: {
-        uTime: { value: 0 },
-        uColor: { value: 0 },
-        tMap: { value: texTx },
-      },
-      transparent: true,
-      cullFace: null,
-      depthWrite: false,
-    });
-  } else if (temp === 'about') {
-    shaderMod = textFA.replaceAll('PITO', el.parentNode.querySelector('.Oiel').innerHTML.length);
-    program = new Program(gl, {
-      vertex: textV,
-      fragment: shaderMod,
-      uniforms: {
-        uTime: { value: 0 },
-        uStart: { value: 1 },
-        uColor: { value: 0 },
-        tMap: { value: texTx },
-      },
-      transparent: true,
-      cullFace: null,
-      depthWrite: false,
-    });
-  } else {
-    shaderMod = textF.replaceAll('PITO', el.parentNode.querySelector('.Oiel').innerHTML.length);
-    program = new Program(gl, {
-      vertex: textV,
-      fragment: shaderMod,
-      uniforms: {
-        uTime: { value: 0 },
-        uKey: { value: -2 },
-        uPower: { value: 1 },
-        uPowers: { value: [] },
-        uWidth: { value: [] },
-        uHeight: { value: [] },
-        uCols: { value: 1.5 },
-        uStart: { value: 1 },
-        uColor: { value: 0 },
-        tMap: { value: texTx },
-        uMouse: { value: new Vec2(0, 0) },
-      },
-      transparent: true,
-      cullFace: null,
-      depthWrite: false,
-    });
+  // Shader Selection
+  let vertexShader, fragmentShader;
+  switch (temp) {
+    case "loader":
+      vertexShader = LoaderV;
+      fragmentShader = LoaderF;
+      break;
+    case "bg":
+      vertexShader = BgV;
+      fragmentShader = BgF;
+      break;
+    case "pg":
+      vertexShader = PGv;
+      fragmentShader = PGs;
+      break;
+    case "title":
+      vertexShader = textV;
+      fragmentShader = textF;
+      break;
+    case "footer":
+      vertexShader = textV;
+      fragmentShader = textFF;
+      break;
+    case "tta":
+      vertexShader = textV;
+      fragmentShader = textFA;
+      break;
+    default:
+      console.warn(`No shader assigned for ${temp}`);
   }
 
-  // 🟥🟥🟥 Mesh Setup
+  // Shader Program Setup
+  const program = new Program(gl, {
+    vertex: vertexShader,
+    fragment: fragmentShader,
+    uniforms: {
+      uTime: { value: 0 },
+      uKey: { value: -2 },
+      uPower: { value: 1 },
+      tMap: { value: texTx },
+    },
+    transparent: true,
+    cullFace: null,
+    depthWrite: false,
+  });
+
+  // Mesh Setup
   const mesh = new Mesh(gl, { geometry, program });
   const scene = new Transform();
   mesh.setParent(scene);
-  mesh.position.y = text.height * 0.58;
 
-  // 📦📦📦 Post-processing Setup
+  // Post Processing Setup
   let post = null;
-  if (temp === 'foot') {
+  if (temp === "foot" || temp === "about") {
     post = new Post(gl);
     post.addPass({
-      fragment: textpF,
+      fragment: temp === "foot" ? textpF : textpA,
       uniforms: {
         uTime: { value: 0 },
         uStart: { value: 0 },
@@ -268,25 +217,9 @@ export async function createEls(el = null, temp, canvasRef) {
         uOut: { value: 1 },
       },
     });
-  } else if (temp === 'about') {
-    post = new Post(gl);
-    post.addPass({
-      fragment: textpA,
-      uniforms: {
-        uTime: { value: 0.4 },
-        uStart: { value: -1 },
-        uMouseT: { value: 0.4 },
-        uMouse: { value: -1 },
-      },
-    });
   }
 
-  // Apply color if `data-white` attribute is set
-  if (el.dataset.white) {
-    program.uniforms.uColor.value = 1;
-  }
-
-  // 📌 Object Return
+  // Return Object for Component Creation
   const obj = {
     el,
     pos,
@@ -296,139 +229,24 @@ export async function createEls(el = null, temp, canvasRef) {
     post,
     scene,
     cam,
-    touch: this.main.isTouch,
+    touch: mainDevice.isTouch,
     canvas: gl.canvas,
   };
 
-  if (temp === 'foot') return new TtF(obj);
-  if (temp === 'about') return new TtA(obj);
-  return new Tt(obj);
-
-// 📌 Utility Function: Shader Program Creation
-  function createShaderProgram(gl, vertexShader, fragmentShader, texTx, uniforms = {}) {
-    return new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uColor: { value: 0 },
-        tMap: { value: texTx },
-        ...uniforms, // Allow additional uniforms
-      },
-      transparent: true,
-      cullFace: null,
-      depthWrite: false,
-    });
+  switch (temp) {
+    case "loader":
+      return new Loader(obj);
+    case "bg":
+      return new Bg(obj);
+    case "pg":
+      return new PG(obj);
+    case "foot":
+      return new TtF(obj);
+    case "about":
+      return new TtA(obj);
+    default:
+      return new Tt(obj);
   }
-export async function createEls(el = null, temp, canvasRef) {
-  if (!el || !canvasRef?.current) return;
-
-  const pos = el.dataset.oi;
-  const renderer = new Renderer({
-    alpha: true,
-    dpr: Math.min(window.devicePixelRatio, 2),
-    canvas: canvasRef.current,
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-
-  const { gl } = renderer;
-  gl.canvas.classList.add('glF');
-
-  // 📽️ Camera Setup
-  const cam = this.createCamera(gl);
-
-  // 🔠 Text Setup
-  let shaderMod;
-  let text = new Text({
-    font: this.fontMSDF,
-    text: el.dataset.text || '',
-    align: 'center',
-    letterSpacing: parseFloat(el.dataset.l) || 0,
-    size: parseFloat(el.dataset.m) || 1,
-    lineHeight: 1,
-  });
-
-  // 📐 Geometry Setup
-  const geometry = new Geometry(gl, {
-    position: { size: 3, data: text.buffers.position },
-    uv: { size: 2, data: text.buffers.uv },
-    id: { size: 1, data: text.buffers.id },
-    index: { data: text.buffers.index },
-  });
-  geometry.computeBoundingBox();
-
-  // 📺 Texture Setup
-  const texTx = new Texture(gl, { generateMipmaps: false });
-  texTx.image = this.fontTex;
-
-  // 🎨 Shader Program Setup
-  let program;
-  const textLength = el.parentNode.querySelector('.Oiel')?.innerHTML.length || 0;
-
-  if (temp === 'about') {
-    shaderMod = textFA.replaceAll('PITO', textLength);
-    program = createShaderProgram(gl, textV, shaderMod, texTx, { uStart: { value: 1 } });
-  } else {
-    shaderMod = textF.replaceAll('PITO', textLength);
-    program = createShaderProgram(gl, textV, shaderMod, texTx, {
-      uKey: { value: -2 },
-      uPower: { value: 1 },
-      uPowers: { value: [] },
-      uWidth: { value: [] },
-      uHeight: { value: [] },
-      uCols: { value: 1.5 },
-      uStart: { value: 1 },
-      uMouse: { value: new Vec2(0, 0) },
-    });
-  }
-
-  // 🟥 Mesh Setup
-  const mesh = new Mesh(gl, { geometry, program });
-  const scene = new Transform();
-  mesh.setParent(scene);
-  mesh.position.y = text.height * 0.58;
-
-  // 📦 Post-processing Setup
-  let post = null;
-  if (temp === 'foot' || temp === 'about') {
-    post = new Post(gl);
-    post.addPass({
-      fragment: temp === 'foot' ? textpF : textpA,
-      uniforms: {
-        uTime: { value: temp === 'about' ? 0.4 : 0 },
-        uStart: { value: temp === 'about' ? -1 : 0 },
-        uMouseT: { value: temp === 'about' ? 0.4 : 0 },
-        uMouse: { value: temp === 'about' ? -1 : 0 },
-        uOut: { value: 1 },
-      },
-    });
-  }
-
-  // Apply color if `data-white` attribute is set
-  if (el.dataset.white) {
-    program.uniforms.uColor.value = 1;
-  }
-
-  // 📌 Object Return
-  const obj = {
-    el,
-    pos,
-    renderer,
-    mesh,
-    text,
-    post,
-    scene,
-    cam,
-    touch: this.main.isTouch,
-    canvas: gl.canvas,
-  };
-
-  if (temp === 'foot') return new TtF(obj);
-  if (temp === 'about') return new TtA(obj);
-  return new Tt(obj);
-}
-  return new Bg(obj);
 }
 
 // 🎢 Roll Section

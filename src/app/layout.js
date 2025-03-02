@@ -1,11 +1,9 @@
 // src/app/layout.js
 import "@/styles/globals.pcss";
 import AppInitializer from "@/components/AppInitializer";
-import WebGLApp from "@/components/WebGLApp";
-import Navigation from "@/components/NavComponent";
-// import Footer from "@/components/FooterComponent";
+import { WebGLProvider } from "@/components/gl/utils/SceneProvider";
+import Nav from "@/components/Nav";
 import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
-import { AnimationProvider } from "@/contexts/AnimationContext";
 
 export const metadata = {
   title: "Chris Hall Selected Work",
@@ -13,19 +11,36 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const settings = await fetchSiteSettings();
+  // Fetch settings with error handling
+  let settings;
+  try {
+    settings = await fetchSiteSettings();
+  } catch (error) {
+    console.error("Error in layout while fetching settings:", error);
+    // Provide fallback settings
+    settings = {
+      title: "Next GL",
+      description: "WebGL experiences with Next.js",
+      theme: {
+        colors: {
+          primary: "#ffffff",
+          secondary: "#050505",
+        },
+      },
+      device: -1,
+      webp: 1,
+      webgl: 1,
+    };
+  }
 
   return (
-    <html lang="en">
+    <html lang="en" className="loading lenis">
       <body>
-        <AppInitializer>
-          <AnimationProvider>
-            <WebGLApp>
-              <Navigation />
-              <main>{children}</main>
-              {/* <Footer /> */}
-            </WebGLApp>
-          </AnimationProvider>
+        <AppInitializer initialSettings={settings}>
+          <WebGLProvider>
+            <Nav />
+            <main className="main-content">{children}</main>
+          </WebGLProvider>
         </AppInitializer>
       </body>
     </html>

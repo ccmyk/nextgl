@@ -1,88 +1,88 @@
-import Page from '../..pageMain.js'
+"use client";
 
-//COMPS
-import Intro from './intro/page.js'
+import { useEffect, useState, useRef } from 'react';
+import { useAppContext } from '@/components/AppInitializer';
+import { loadImages, loadVideos } from '@/lib/utils/pageLoads';
+import { createIos, callIos, showIos } from '@/lib/utils/pageIos';
+import Intro from './intro/page';
 
-
-
-class Home extends Page {
-  constructor (main) {
-    super(main)
-  }
-
-  async create(content,main,temp=undefined) {
-    super.create(content,main)
-    if(temp!=undefined){
-
-      document.querySelector('#content').insertAdjacentHTML('afterbegin',temp)
-    }
-    else{
-      let data = await this.loadRestApi(this.main.base+'/wp-json/wp/v2/pages/',content.dataset.id,content.dataset.template)
-      document.querySelector('#content').insertAdjacentHTML('afterbegin',data.csskfields.main)
-    }
-    this.el = document.querySelector('main')
-    
-
-    this.DOM = {
-      el:this.el
-    }
-
-    // await this.loadImages()
-    // await this.loadVideos()
-    
-
-
-    await this.createComps()
-    await this.createIos()
-    
-
-    await this.getReady()
-  }
-  iOpage(animobj){
-   
-    
-    return animobj
-  }
-
+export default function ErrorPage() {
+  const appContext = useAppContext();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const domRef = useRef({
+    el: null,
+    images: null,
+    videos: null,
+    ios: null
+  });
+  const componentsRef = useRef({
+    intro: null
+  });
   
+  useEffect(() => {
+    const initPage = async () => {
+      try {
+        // Get main element
+        const mainElement = document.querySelector('main');
+        if (!mainElement) return;
+        
+        domRef.current = {
+          el: mainElement,
+          images: null,
+          videos: null,
+          ios: null
+        };
+        
+        // Check device capabilities
+        const { browserInfo } = appContext || {};
+        const device = browserInfo?.device || 0;
+        
+        // Initialize components
+        await createComponents();
+        
+        // Create and initialize intersection observers
+        await createIos.call({ 
+          DOM: domRef.current,
+          iOpage: (animobj) => {
+            // No specific IO animations for error page
+            return animobj;
+          }
+        });
+        
+        callIos.call({ DOM: domRef.current, isVisible: 1 });
+        showIos.call({ DOM: domRef.current });
+        
+        setIsLoaded(true);
+      } catch (error) {
+        console.error('Error initializing error page:', error);
+      }
+    };
+    
+    const createComponents = async () => {
+      // Initialize intro component if it exists
+      const introElement = domRef.current.el.querySelector('.error_intro');
+      if (introElement) {
+        componentsRef.current.intro = new Intro(
+          introElement, 
+          appContext?.browserInfo?.device || 0
+        );
+        
+        // Start intro animation
+        await componentsRef.current.intro.start();
+      }
+    };
+    
+    initPage();
+    
+    // Cleanup function
+    return () => {
+      // Any cleanup needed
+    };
+  }, [appContext]);
   
-  async createComps(){
-   
-
-
-    await super.createComps()
-    if(this.DOM.el.querySelector('.error_intro')){
-      this.components.intro = new Intro(this.DOM.el.querySelector('.error_intro'),this.main.device)
-    
-    }
-    
-    
-
-  }
-
-
-  async animIntro(val){
-
-    
-    if(this.components.intro){
-      this.components.intro.start()
-    }
-
-
-
-    return val
-   
-  }
-
-  async animOut(){
-    
-    super.animOut()
-
-  }
-
+  return (
+    <div className="error-container">
+      {!isLoaded && <div className="loading">Loading error page...</div>}
+    </div>
+  );
 }
-
-
-
-
-export default Home

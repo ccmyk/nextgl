@@ -1,7 +1,16 @@
-export default class {
-  constructor(obj, device, touch) {
-    this.el = obj.el;
+'use client';
 
+/**
+ * LazyImage class for lazy loading images with Intersection Observer
+ * @deprecated This class-based approach is being phased out in favor of Next.js Image component
+ * and React hooks for lazy loading
+ */
+export default class LazyImage {
+  constructor(obj, device, touch) {
+    // Don't initialize on server
+    if (typeof window === 'undefined') return;
+    
+    this.el = obj.el;
     this.pos = obj.pos;
     this.device = device;
     this.touch = touch;
@@ -17,16 +26,37 @@ export default class {
     this.create();
   }
 
-  create() {}
+  /**
+   * Initialize the lazy image
+   */
+  create() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+  }
+
+  /**
+   * Check if the image is in view and load it if necessary
+   * @param {IntersectionObserverEntry} entry - Intersection observer entry
+   * @param {number} pos - Position
+   * @returns {number} - Status code
+   */
   check(entry, pos) {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return false;
+    
     let vis = false;
-    if (entry.isIntersecting == undefined) {
+    if (!entry || entry.isIntersecting == undefined) {
       return false;
     }
+    
     vis = entry.isIntersecting;
     if (vis == true) {
       this.start();
       vis = entry.isIntersecting;
+
+      if (!this.DOM.img) {
+        return -1;
+      }
 
       if (this.DOM.img.getAttribute('src')) {
         return -1;
@@ -47,9 +77,16 @@ export default class {
         delete this.DOM.img.dataset.lazy;
         this.DOM.img.classList.add('Ldd');
       };
+      
       img.onload = () => {
         this.DOM.img.src = url;
       };
+      
+      img.onerror = () => {
+        // Handle image load error
+        console.error('Error loading image:', url);
+      };
+      
       img.src = url;
 
       if (gif == 1) {
@@ -64,21 +101,66 @@ export default class {
     return vis;
   }
 
+  /**
+   * Start displaying the image
+   */
   start() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+    
+    if (!this.DOM || !this.DOM.img) return;
+    
     this.DOM.img.classList.add('ivi');
     this.active = 1;
   }
 
+  /**
+   * Stop displaying the image
+   */
   stop() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+    
+    if (!this.DOM || !this.DOM.img) return;
+    
     this.DOM.img.classList.remove('ivi');
     this.active = 0;
   }
 
-  initEvents() {}
-  removeEvents() {}
-  update() {}
+  /**
+   * Initialize event listeners
+   */
+  initEvents() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+  }
 
+  /**
+   * Remove event listeners
+   */
+  removeEvents() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+  }
+
+  /**
+   * Update the image state
+   */
+  update() {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+  }
+
+  /**
+   * Handle resize events
+   * @param {number} scrollCurrent - Current scroll position
+   */
   onResize(scrollCurrent) {
+    // Don't execute if we're on the server
+    if (typeof window === 'undefined') return;
+    
+    if (!this.el) return;
+    
     this.h = window.innerHeight;
     this.max = this.el.clientHeight;
 

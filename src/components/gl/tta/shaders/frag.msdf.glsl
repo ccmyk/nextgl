@@ -1,5 +1,4 @@
-// src/components/gl/tta/shaders/frag.msdf.glsl
-// 👩‍⚖️
+// 👩‍⚖️ src/components/gl/tta/shaders/frag.msdf.glsl
 
 #version 300 es
 precision highp float;

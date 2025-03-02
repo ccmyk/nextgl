@@ -1,184 +1,323 @@
+'use client';
+
+/**
+ * Event management utilities for animations
+ * These functions are being phased out in favor of React hooks and component lifecycle methods
+ */
+
+/**
+ * Adds event listeners to the document
+ */
 export function addEvents() {
-  const main = this.main; // Ensure correct reference to `this.main`
-  const lenis = this.lenis;
-  const gl = this.gl;
-  const page = this.page;
+  // Don't execute on server-side
+  if (typeof window === 'undefined') return;
+  
+  try {
+    const main = this.main; // Ensure correct reference to `this.main`
+    const lenis = this.lenis;
+    const gl = this.gl;
+    const page = this.page;
 
-  // Define custom events
-  main.events = {
-    startscroll: new Event('startscroll'),
-    stopscroll: new Event('stopscroll'),
-    scrollto: new CustomEvent('scrollto', {
-      bubbles: true,
-      detail: { id: '' },
-    }),
-    anim: new CustomEvent('anim', {
-      detail: {
-        el: '',
-        state: 0,
-        style: 0,
-        params: [0],
-      },
-    }),
-    nextprj: new CustomEvent('nextprj', {
-      detail: {
-        el: '',
-        url: '',
-      },
-    }),
-    newlinks: new Event('newlinks'),
-    openmenu: new Event('openmenu'),
-    closemenu: new Event('closemenu'),
-  };
+    if (!main) return;
 
-  // Event listeners
-  document.addEventListener('startscroll', () => {
-    this.controlScroll(1);
-  });
+    // Define custom events
+    main.events = {
+      startscroll: new Event('startscroll'),
+      stopscroll: new Event('stopscroll'),
+      scrollto: new CustomEvent('scrollto', {
+        bubbles: true,
+        detail: { id: '' },
+      }),
+      anim: new CustomEvent('anim', {
+        detail: {
+          el: '',
+          state: 0,
+          style: 0,
+          params: [0],
+        },
+      }),
+      nextprj: new CustomEvent('nextprj', {
+        detail: {
+          el: '',
+          url: '',
+        },
+      }),
+      newlinks: new Event('newlinks'),
+      openmenu: new Event('openmenu'),
+      closemenu: new Event('closemenu'),
+    };
 
-  document.addEventListener('stopscroll', () => {
-    this.controlScroll(0);
-  });
-
-  document.addEventListener('newlinks', () => {
-    this.addLinks();
-  });
-
-  document.addEventListener('scrollto', (e) => {
-    if (lenis) {
-      lenis.scrollTo('#' + e.detail.id, { offset: -100 });
-    }
-  });
-
-  document.addEventListener('openmenu', () => {
-    this.controlScroll(0);
-  });
-
-  document.addEventListener('closemenu', () => {
-    this.controlScroll(1);
-  });
-
-  document.addEventListener('nextprj', async (e) => {
-    if (!lenis || !page) return;
-
-    lenis.stop();
-    lenis.scrollTo(page.DOM.el.querySelector('.project_nxt'), { duration: 0.3, force: true });
-
-    await this.timeout(300);
-
-    this.onChange({
-      url: e.detail.url,
-      link: e.detail.el,
-    });
-  });
-
-  document.addEventListener('anim', async (e) => {
-    if (e.detail.style === 0) {
-      if (e.detail.el.classList.contains('nono')) return;
-      this.writeFn(e.detail.el, e.detail.state);
-    } else if (e.detail.style === 1) {
-      lenis.scrollTo(0);
-      await this.timeout(600);
-      this.controlScroll(0);
-
-      Promise.all([gl?.changeSlides(e.detail.state)]).then(() => {
+    // Event listeners
+    document.addEventListener('startscroll', () => {
+      if (this.controlScroll) {
         this.controlScroll(1);
+      }
+    });
+
+    document.addEventListener('stopscroll', () => {
+      if (this.controlScroll) {
+        this.controlScroll(0);
+      }
+    });
+
+    document.addEventListener('newlinks', () => {
+      if (this.addLinks) {
+        this.addLinks();
+      }
+    });
+
+    document.addEventListener('scrollto', (e) => {
+      if (lenis && e.detail && e.detail.id) {
+        lenis.scrollTo('#' + e.detail.id, { offset: -100 });
+      }
+    });
+
+    document.addEventListener('openmenu', () => {
+      if (this.controlScroll) {
+        this.controlScroll(0);
+      }
+    });
+
+    document.addEventListener('closemenu', () => {
+      if (this.controlScroll) {
+        this.controlScroll(1);
+      }
+    });
+
+    document.addEventListener('nextprj', async (e) => {
+      if (!lenis || !e.detail || !e.detail.url || !e.detail.el) return;
+      
+      try {
+        lenis.stop();
+        
+        if (this.page && this.page.DOM && this.page.DOM.el) {
+          const nextProject = this.page.DOM.el.querySelector('.project_nxt');
+          if (nextProject) {
+            lenis.scrollTo(nextProject, { duration: 0.3, force: true });
+          }
+        }
+        
+        if (window.waiter) {
+          await window.waiter(300);
+        } else {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+
+        if (this.onChange) {
+          this.onChange({
+            url: e.detail.url,
+            link: e.detail.el
+          });
+        }
+      } catch (error) {
+        console.error('Error in nextprj event handler:', error);
+      }
+    });
+
+    document.addEventListener('anim', async (e) => {
+      if (!e.detail) return;
+      
+      try {
+        if (e.detail.style === 0) {
+          if (e.detail.el && e.detail.el.classList && e.detail.el.classList.contains('nono')) {
+            return false;
+          }
+          
+          if (this.writeFn && e.detail.el) {
+            this.writeFn(e.detail.el, e.detail.state);
+          }
+        } else if (e.detail.style === 1) {
+          if (lenis) {
+            lenis.scrollTo(0);
+          }
+          
+          if (window.waiter) {
+            await window.waiter(600);
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 600));
+          }
+          
+          if (this.controlScroll) {
+            this.controlScroll(0);
+          }
+          
+          if (this.gl && this.gl.changeSlides) {
+            await this.gl.changeSlides(e.detail.state);
+            
+            if (this.controlScroll) {
+              this.controlScroll(1);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error in anim event handler:', error);
+      }
+    });
+
+    document.addEventListener('visibilitychange', (e) => {
+      if (this.isload === 1) {
+        return false;
+      }
+      
+      if (document.visibilityState === 'hidden') {
+        if (lenis) {
+          lenis.stop();
+        }
+        
+        if (this.upid) {
+          window.cancelAnimationFrame(this.upid);
+        }
+      } else {
+        if (lenis) {
+          lenis.start();
+        }
+        
+        if (this.update) {
+          this.update(performance.now());
+        }
+      }
+    });
+
+    window.addEventListener('popstate', (e) => {
+      if (this.onPopState) {
+        this.onPopState(e);
+      }
+    }, { passive: true });
+
+    window.onresize = () => {
+      if (this.res) {
+        clearTimeout(this.res);
+      }
+      
+      this.res = setTimeout(() => {
+        if (this.onResize) {
+          this.onResize();
+        }
+      }, 400);
+    };
+
+    // Handle orientation change on touch devices
+    if (this.main && this.main.isTouch) {
+      window.addEventListener("orientationchange", function(event) {
+        location.reload();
       });
     }
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (this.isload === 1) return;
-
-    if (document.visibilityState === 'hidden') {
-      lenis.stop();
-      window.cancelAnimationFrame(this.upid);
-    } else {
-      lenis.start();
-      this.update(performance.now());
-    }
-  });
-
-  window.addEventListener('popstate', (e) => this.onPopState(e), { passive: true });
-
-  window.onresize = () => {
-    clearTimeout(this.res);
-    this.res = setTimeout(() => this.onResize(), 400);
-  };
-
-  if (main.isTouch) {
-    window.addEventListener('orientationchange', () => {
-      location.reload();
-    });
+  } catch (error) {
+    console.error('Error in addEvents:', error);
   }
 }
 
-// Resize Event
+/**
+ * Handles resize events
+ */
 export function onResize() {
-  const main = this.main;
-
-  main.design.L.total = (main.design.L.w / window.innerWidth) * 10;
-  main.design.L.total = 10 - (10 - main.design.L.total) * main.design.L.multi;
-  main.design.L.total = Math.min(10, main.design.L.total);
-
-  main.design.P.total = (main.design.P.w / window.innerWidth) * 10;
-  main.design.P.total = 10 - (10 - main.design.P.total) * main.design.P.multi;
-  main.design.P.total = Math.min(10, main.design.P.total);
-
-  document.documentElement.style.setProperty('--ck_multiL', main.design.L.total);
-  document.documentElement.style.setProperty('--ck_multiP', main.design.P.total);
-
-  if (main.isTouch) {
-    document.documentElement.style.setProperty('--ck_hscr', `${window.screen.height}px`);
-    document.documentElement.style.setProperty('--ck_hmin', `${document.documentElement.clientHeight}px`);
-
-    gsap.to(document.documentElement, { '--ck_hvar': `${window.innerHeight}px`, duration: 0.4 });
-
-    if (!isTouchDevice()) {
-      location.reload();
+  // Don't execute on server-side
+  if (typeof window === 'undefined') return;
+  
+  try {
+    if (!this.main || !this.main.design) return;
+    
+    // Calculate responsive design values
+    if (this.main.design.L) {
+      this.main.design.L.total = ((this.main.design.L.w / window.innerWidth) * 10);
+      this.main.design.L.total = 10 - ((10 - this.main.design.L.total) * this.main.design.L.multi);
+      this.main.design.L.total = Math.min(10, this.main.design.L.total);
     }
-  } else {
-    document.documentElement.style.setProperty('--ck_hscr', `${window.innerHeight}px`);
-    document.documentElement.style.setProperty('--ck_hvar', `${window.innerHeight}px`);
-    document.documentElement.style.setProperty('--ck_hmin', `${window.innerHeight}px`);
-
-    if (isTouchDevice()) {
-      location.reload();
+    
+    if (this.main.design.P) {
+      this.main.design.P.total = ((this.main.design.P.w / window.innerWidth) * 10);
+      this.main.design.P.total = 10 - ((10 - this.main.design.P.total) * this.main.design.P.multi);
+      this.main.design.P.total = Math.min(10, this.main.design.P.total);
     }
-  }
 
-  // Update screen sizes across main components
-  main.screen.w = window.innerWidth;
-  main.screen.h = window.innerHeight;
+    // Update CSS variables
+    if (this.main.design.L) {
+      document.documentElement.style.setProperty("--ck_multiL", this.main.design.L.total);
+    }
+    
+    if (this.main.design.P) {
+      document.documentElement.style.setProperty("--ck_multiP", this.main.design.P.total);
+    }
 
-  if (this.gl && this.gl.onResize) {
-    this.gl.main.screen.w = window.innerWidth;
-    this.gl.main.screen.h = window.innerHeight;
-    this.gl.onResize();
-  }
+    // Handle touch devices
+    if (this.main.isTouch) {
+      document.documentElement.style.setProperty("--ck_hscr", window.screen.height + 'px');
+      document.documentElement.style.setProperty("--ck_hmin", document.documentElement.clientHeight + 'px');
+      
+      if (window.gsap) {
+        window.gsap.to(document.documentElement, {"--ck_hvar": window.innerHeight + "px", duration: 0.4});
+      }
+      
+      const isTouch = isTouchDevice();
+      if (!isTouch) {
+        location.reload();
+      }
+    } else {
+      document.documentElement.style.setProperty("--ck_hscr", window.innerHeight + 'px');
+      document.documentElement.style.setProperty("--ck_hvar", window.innerHeight + 'px');
+      document.documentElement.style.setProperty("--ck_hmin", window.innerHeight + 'px');
+      
+      const isTouch = isTouchDevice();
+      if (isTouch) {
+        location.reload();
+      }
+    }
 
-  if (this.page) {
-    this.page.main.screen.w = window.innerWidth;
-    this.page.main.screen.h = window.innerHeight;
-    this.page.onResize();
-  }
+    // Update screen dimensions
+    if (this.main) {
+      this.main.screen = {
+        w: window.innerWidth,
+        h: window.innerHeight
+      };
+    }
 
-  if (this.mouse) {
-    this.mouse.main.screen.w = window.innerWidth;
-    this.mouse.main.screen.h = window.innerHeight;
-  }
-
-  if (this.nav) {
-    this.nav.main.screen.w = window.innerWidth;
-    this.nav.main.screen.h = window.innerHeight;
-    this.nav.onResize();
+    // Update components
+    if (this.gl && this.gl.onResize) {
+      if (this.gl.main) {
+        this.gl.main.screen = {
+          w: window.innerWidth,
+          h: window.innerHeight
+        };
+      }
+      this.gl.onResize();
+    }
+    
+    if (this.page && this.page.onResize) {
+      if (this.page.main) {
+        this.page.main.screen = {
+          w: window.innerWidth,
+          h: window.innerHeight
+        };
+      }
+      this.page.onResize();
+    }
+    
+    if (this.mouse && this.mouse.main) {
+      this.mouse.main.screen = {
+        w: window.innerWidth,
+        h: window.innerHeight
+      };
+    }
+    
+    if (this.nav && this.nav.onResize) {
+      if (this.nav.main) {
+        this.nav.main.screen = {
+          w: window.innerWidth,
+          h: window.innerHeight
+        };
+      }
+      this.nav.onResize();
+    }
+  } catch (error) {
+    console.error('Error in onResize:', error);
   }
 }
 
-// Helper function to check for touch devices
-function isTouchDevice() {
-  return (
-    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
-  );
+/**
+ * Helper function to check for touch devices
+ * @returns {boolean} True if the device is a touch device
+ */
+export function isTouchDevice() {
+  return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
