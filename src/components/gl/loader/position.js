@@ -1,3 +1,4 @@
+"use client";
 // src/components/gl/loader/position.js
 
 export function check(entry){

@@ -1,4 +1,5 @@
 // 🖼 src/components/gl/base/position.js
+"use client";
 
 export function check(entry) {
   let vis = entry.isIntersecting;

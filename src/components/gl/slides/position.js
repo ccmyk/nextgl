@@ -1,3 +1,4 @@
+"use client";
 // 🎞 src/components/gl/slides/position.js
 export function check(entry){
   let vis = false

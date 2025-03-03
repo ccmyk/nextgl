@@ -1,4 +1,5 @@
 // src/components/gl/els.js
+"use client";
 
 import { useWebGLCanvas } from "@/components/gl/utils/SceneProvider";
 import {
@@ -20,6 +21,17 @@ import {
 import mapTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.png";
 import jsonTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.json";
 
+// Import position utilities for each component
+import * as basePosition from "@/components/gl/base/position";
+import * as bgPosition from "@/components/gl/bg/position";
+import * as footerPosition from "@/components/gl/footer/position";
+import * as loaderPosition from "@/components/gl/loader/position";
+import * as pgPosition from "@/components/gl/pg/position";
+import * as rollPosition from "@/components/gl/roll/position";
+import * as slidesPosition from "@/components/gl/slides/position";
+import * as titlePosition from "@/components/gl/title/position";
+import * as ttaPosition from "@/components/gl/tta/position";
+
 // LOADER ⌛️
 // import Loader from "@/components/gl/loader/Loader.jsx";
 import LoaderF from "@/components/gl/loader/shaders/frag.main.glsl";
@@ -30,22 +42,22 @@ import LoaderV from "@/components/gl/loader/shaders/vert.main.glsl";
 import fractalF from "@/components/gl/base/shaders/frag.main.glsl";
 import fractalV from "@/components/gl/base/shaders/vert.main.glsl";
 
-// BG 🏜
+// BACKGROUND 🏜
 // import Bg from "@/components/gl/bg/Bg.jsx";
 import BgF from "@/components/gl/bg/shaders/frag.main.glsl";
 import BgV from "@/components/gl/bg/shaders/vert.main.glsl";
 
-// TEXT 💬
+// TITLE 💬
 // import Tt from "@/components/gl/title/title.jsx";
 import textF from "@/components/gl/title/shaders/frag.msdf.glsl";
 import textV from "@/components/gl/title/shaders/vert.msdf.glsl";
 
-// FLAME 🔥
+// FOOTER 🔥
 // import TtF from "@/components/gl/footer/Footer.jsx";
 import textFF from "@/components/gl/footer/shaders/frag.msdf.glsl";
 import textpF from "@/components/gl/footer/shaders/frag.parent.glsl";
 
-// JUDGE 👩‍⚖️
+// ABOOUT 👩‍⚖️
 // import TtA from "@/components/gl/tta/About.jsx";
 import textFA from "@/components/gl/tta/shaders/frag.msdf.glsl";
 import textpA from "@/components/gl/tta/shaders/frag.parent.glsl";
@@ -58,13 +70,21 @@ import SlPF from "@/components/gl/slides/shaders/frag.parent.glsl";
 
 // ROLL 🎢
 // import Roll from "@/components/gl/roll/Roll.jsx";
-import SlSF from "@/components/gl/roll/shaders/frag.single.glsl";
-import SlVF from "@/components/gl/roll/shaders/vert.single.glsl";
+import SlSF from "@/components/gl/roll/shaders/frag.main.glsl";
+import SlVF from "@/components/gl/roll/shaders/vert.main.glsl";
 
-// PG 🧮
-// import PG from "@/components/gl/pg/Pg.jsx";
-import PGs from "@/components/gl/pg/shaders/frag.main.glsl";
-import PGv from "@/components/gl/pg/shaders/vert.main.glsl";
+// Map of position modules for each component type
+const positionModules = {
+  base: basePosition,
+  bg: bgPosition,
+  footer: footerPosition,
+  loader: loaderPosition,
+  pg: pgPosition,
+  roll: rollPosition,
+  slides: slidesPosition,
+  title: titlePosition,
+  tta: ttaPosition
+};
 
 // FONT LOADING
 export async function createMSDF() {
@@ -164,8 +184,8 @@ export async function createEls(el = null, temp, canvasRef) {
       fragmentShader = BgF;
       break;
     case "pg":
-      vertexShader = PGv;
-      fragmentShader = PGs;
+      vertexShader = pgV;
+      fragmentShader = pgF;
       break;
     case "title":
       vertexShader = textV;
@@ -219,6 +239,9 @@ export async function createEls(el = null, temp, canvasRef) {
     });
   }
 
+  // Get the appropriate position module based on template type
+  const positionModule = positionModules[temp] || basePosition;
+
   // Return Object for Component Creation
   const obj = {
     el,
@@ -231,6 +254,13 @@ export async function createEls(el = null, temp, canvasRef) {
     cam,
     touch: mainDevice.isTouch,
     canvas: gl.canvas,
+    check: positionModule.check,
+    start: positionModule.start,
+    stop: positionModule.stop,
+    updateX: positionModule.updateX,
+    updateY: positionModule.updateY,
+    updateScale: positionModule.updateScale,
+    updateAnim: positionModule.updateAnim
   };
 
   switch (temp) {
@@ -400,166 +430,158 @@ if (temp === 'slider') {
       },
     });
   }
-}
-    const obj = {
-      el,
-      pos,
-      renderer,
-      scene,
-      meshes,
-      medias,
-      textures,
-      post,
-      cam,
-      canvas: gl.canvas,
-      dev: this.main.device,
-      // singledad,
-      // singlewatch,
-      // renderersingle,
-      // meshsingle,
-      // texturesingle,
-    };
-    return new Sl(obj);
-  } else if (temp === 'pg') {
-    //🧮🧮🧮🧮🧮🧮
+  const obj = {
+    el,
+    pos,
+    renderer,
+    scene,
+    meshes,
+    medias,
+    textures,
+    post,
+    cam,
+    canvas: gl.canvas,
+    dev: this.main.device,
+  };
+  return new Sl(obj);
+} else if (temp === 'pg') {
+  //🧮🧮🧮🧮🧮🧮
 
-    const renderer = new Renderer({
-      alpha: true,
-      dpr: Math.max(window.devicePixelRatio, 2),
+  const renderer = new Renderer({
+    alpha: true,
+    dpr: Math.max(window.devicePixelRatio, 2),
 
-      width: window.innerWidth,
-      height: el.innerHeight,
-    });
-    //📐📐📐📐📐📐📐
+    width: window.innerWidth,
+    height: el.innerHeight,
+  });
+  //📐📐📐📐📐📐📐
 
-    const canvasRef = useWebGLCanvas();
+  const canvasRef = useWebGLCanvas();
 
-    const { gl } = renderer;
+  const { gl } = renderer;
 
-    gl.canvas = canvasRef.current;
-    gl.canvas.classList.add('glPlay');;
+  gl.canvas = canvasRef.current;
+  gl.canvas.classList.add('glPlay');;
 
-    //📽️📽️📽️📽️📽️📽️📽️📽️
-    const cam = this.createCamera(gl);
-    const scene = new Transform();
+  //📽️📽️📽️📽️📽️📽️📽️📽️
+  const cam = this.createCamera(gl);
+  const scene = new Transform();
 
-    const geometry = new Plane(gl, {
-      heightSegments: 1,
-      widthSegments: 1,
-    });
+  const geometry = new Plane(gl, {
+    heightSegments: 1,
+    widthSegments: 1,
+  });
 
-    //📺📺📺📺📺📺📺
-    const texture = new Texture(gl, {
-      generateMipmaps: false,
-    });
+  //📺📺📺📺📺📺📺
+  const texture = new Texture(gl, {
+    generateMipmaps: false,
+  });
 
-    const obj = {
-      el,
-      pos,
-      cam,
-      // mesh,
-      renderer,
-      texture,
-      scene,
-      geometry,
-      // program,
-      canvas: gl.canvas,
-      touch: this.main.isTouch,
-      device: this.main.device,
-      rev: this.main.events.anim,
-    };
+  const obj = {
+    el,
+    pos,
+    cam,
+    renderer,
+    texture,
+    scene,
+    geometry,
+    canvas: gl.canvas,
+    touch: this.main.isTouch,
+    device: this.main.device,
+    rev: this.main.events.anim,
+  };
 
-    return new PG(obj);
-  } else if (temp === 'pgel') {
-    const obj = {
-      el,
-      pgid: el.dataset.pg,
-      pos: document.querySelector('.Oi-pg').dataset.oi,
-    };
-    return obj;
-  } else {
-    //🖼️🖼️🖼️🖼️🖼️🖼️
+  return new PG(obj);
+} else if (temp === 'pgel') {
+  const obj = {
+    el,
+    pgid: el.dataset.pg,
+    pos: document.querySelector('.Oi-pg').dataset.oi,
+  };
+  return obj;
+} else {
+  //🖼️🖼️🖼️🖼️🖼️🖼️
 
-    const renderer = new Renderer({
-      alpha: true,
-      dpr: Math.max(window.devicePixelRatio, 2),
+  const renderer = new Renderer({
+    alpha: true,
+    dpr: Math.max(window.devicePixelRatio, 2),
 
-      width: el.offsetWidth,
-      height: el.offsetHeight,
-    });
-    //📐📐📐📐📐📐📐
+    width: el.offsetWidth,
+    height: el.offsetHeight,
+  });
+  //📐📐📐📐📐📐📐
 
-      const { gl } = renderer;
-      gl.canvas = canvasRef.current; //
-      gl.canvas.classList.add('glMedia');
+  const { gl } = renderer;
+  gl.canvas = canvasRef.current; //
+  gl.canvas.classList.add('glMedia');
 
-      if (!el.parentNode.contains(gl.canvas)) {
-        el.parentNode.appendChild(gl.canvas); //
-      }
-
-    const geometry = new Triangle(gl, {
-      heightSegments: 1,
-      widthSegments: 1,
-    });
-
-    //📺📺📺📺📺📺📺
-    const texture = new Texture(gl, {
-      generateMipmaps: false,
-    });
-
-    let url = el.dataset.src;
-
-    let exists = this.texs.find((element) => element.src === url);
-
-    if (process.env.NODE_ENV === 'development') {
-      if (url.includes('.mp4')) {
-        exists = this.texs[0];
-      } else {
-        exists = this.texs[2];
-      }
-    }
-
-    if (url.includes('.mp4')) {
-      if (exists) {
-        texture.image = exists;
-      } else {
-        console.log('no fun');
-        texture.image = await this.loadVideo(el.parentNode.querySelector('video'), url);
-      }
-    } else {
-      if (exists) {
-        texture.image = exists;
-      } else {
-        console.log('no fun');
-        texture.image = await this.loadImage(url);
-      }
-    }
-
-    const program = new Program(gl, {
-      vertex: fractalV,
-      fragment: fractalF,
-      uniforms: {
-        uTime: { value: 0 },
-        uStart: { value: 0 },
-        uStart1: { value: 0.5 },
-        tMap: { value: texture },
-        uCover: { value: new Vec2(0, 0) },
-        uTextureSize: { value: new Vec2(texture.image.naturalWidth, texture.image.naturalHeight) },
-        uMouse: { value: new Vec2(0, 0) },
-      },
-    });
-    const mesh = new Mesh(gl, { geometry, program });
-
-    const obj = {
-      el,
-      pos,
-      mesh,
-      renderer,
-      texture,
-      canvas: gl.canvas,
-      touch: this.main.isTouch,
-    };
-
-    return new Base(obj);
+  if (!el.parentNode.contains(gl.canvas)) {
+    el.parentNode.appendChild(gl.canvas); //
   }
+
+  const geometry = new Triangle(gl, {
+    heightSegments: 1,
+    widthSegments: 1,
+  });
+
+  //📺📺📺📺📺📺📺
+  const texture = new Texture(gl, {
+    generateMipmaps: false,
+  });
+
+  let url = el.dataset.src;
+
+  let exists = this.texs.find((element) => element.src === url);
+
+  if (process.env.NODE_ENV === 'development') {
+    if (url.includes('.mp4')) {
+      exists = this.texs[0];
+    } else {
+      exists = this.texs[2];
+    }
+  }
+
+  if (url.includes('.mp4')) {
+    if (exists) {
+      texture.image = exists;
+    } else {
+      console.log('no fun');
+      texture.image = await this.loadVideo(el.parentNode.querySelector('video'), url);
+    }
+  } else {
+    if (exists) {
+      texture.image = exists;
+    } else {
+      console.log('no fun');
+      texture.image = await this.loadImage(url);
+    }
+  }
+
+  const program = new Program(gl, {
+    vertex: fractalV,
+    fragment: fractalF,
+    uniforms: {
+      uTime: { value: 0 },
+      uStart: { value: 0 },
+      uStart1: { value: 0.5 },
+      tMap: { value: texture },
+      uCover: { value: new Vec2(0, 0) },
+      uTextureSize: { value: new Vec2(texture.image.naturalWidth, texture.image.naturalHeight) },
+      uMouse: { value: new Vec2(0, 0) },
+    },
+  });
+  const mesh = new Mesh(gl, { geometry, program });
+
+  const obj = {
+    el,
+    pos,
+    mesh,
+    renderer,
+    texture,
+    canvas: gl.canvas,
+    touch: this.main.isTouch,
+  };
+
+  return new Base(obj);
+}
 }

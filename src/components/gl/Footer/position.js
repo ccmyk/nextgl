@@ -1,3 +1,4 @@
+"use client";
 // src/components/gl/footer/position.js
 
 

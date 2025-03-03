@@ -3,7 +3,15 @@ const nextConfig = {
   experimental: {
     turbo: {
       resolveAlias: {
-        "@/shaders": "./src/public/shaders"
+        "@/shaders/base": "./src/components/gl/base/shaders",
+        "@/shaders/bg": "./src/components/gl/bg/shaders",
+        "@/shaders/footer": "./src/components/gl/footer/shaders",
+        "@/shaders/loader": "./src/components/gl/loader/shaders",
+        "@/shaders/pg": "./src/components/gl/pg/shaders",
+        "@/shaders/roll": "./src/components/gl/roll/shaders",
+        "@/shaders/slides": "./src/components/gl/slides/shaders",
+        "@/shaders/title": "./src/components/gl/title/shaders",
+        "@/shaders/tta": "./src/components/gl/tta/shaders"
       },
       loaders: {
         ".glsl": [{ loader: "raw-loader", options: {} }],
@@ -11,8 +19,12 @@ const nextConfig = {
         ".parent.glsl": [{ loader: "raw-loader", options: {} }],
         ".single.glsl": [{ loader: "raw-loader", options: {} }],
         ".main.glsl": [{ loader: "raw-loader", options: {} }],
-        ".🩻main.glsl": [{ loader: "raw-loader", options: {} }],
-        ".🧪main.glsl": [{ loader: "raw-loader", options: {} }],
+        "frag.main.glsl": [{ loader: "raw-loader", options: {} }],
+        "vert.main.glsl": [{ loader: "raw-loader", options: {} }],
+        "frag.msdf.glsl": [{ loader: "raw-loader", options: {} }],
+        "vert.msdf.glsl": [{ loader: "raw-loader", options: {} }],
+        "frag.parent.glsl": [{ loader: "raw-loader", options: {} }],
+        "vert.parent.glsl": [{ loader: "raw-loader", options: {} }],
       },
       rules: {
         glsl: [{ loader: "raw-loader", options: {} }],
@@ -20,28 +32,8 @@ const nextConfig = {
         "parent.glsl": [{ loader: "raw-loader", options: {} }],
         "single.glsl": [{ loader: "raw-loader", options: {} }],
         "main.glsl": [{ loader: "raw-loader", options: {} }],
-        "🩻main.glsl": [{ loader: "raw-loader", options: {} }],
-        "🧪main.glsl": [{ loader: "raw-loader", options: {} }],
       },
     },
-  },
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.glsl$/,
-      use: 'raw-loader',
-    });
-    
-    // Add support for .pcss files
-    config.module.rules.push({
-      test: /\.pcss$/,
-      use: [
-        'style-loader',
-        'css-loader',
-        'postcss-loader',
-      ],
-    });
-    
-    return config;
   },
   reactStrictMode: true,
   eslint: {

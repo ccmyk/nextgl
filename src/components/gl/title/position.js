@@ -1,3 +1,4 @@
+"use client";
 // 💬 src/components/gl/title/position.js
 
 export function check(entry){
