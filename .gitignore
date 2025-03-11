@@ -42,3 +42,19 @@ next-env.d.ts
 # Editor/IDE
 .vscode/
 .idea/
+
+# Large font files
+*.ttf
+*.woff
+*.woff2
+*.json
+
+# Specific large files
+nextgl_src.txt
+
+# Large assets
+*.mp4
+*.mov
+*.psd
+*.ai
+*.zip
