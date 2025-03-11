@@ -1,4 +1,8 @@
-// import SplitType from 'split-type'
+"use client";
+
+import { lerp } from '@/lib/utils/animationUtils';
+import gsap from 'gsap';
+import SplitType from 'split-type';
 
 export default class {
   constructor(obj, device) {

@@ -7,6 +7,8 @@ import { createIos, callIos, showIos } from '@/lib/utils/pageIos';
 import ProjectIntro from '@/app/project/intro/page';
 import In from '@/app/project/intro/ioin';
 import Nxt from '@/app/project/intro/io';
+import { setupGlobalUtils, waiter } from '@/lib/utils/animationUtils';
+import gsap from 'gsap';
 
 export default function Project() {
   const appContext = useAppContext();
@@ -22,6 +24,9 @@ export default function Project() {
   });
   
   useEffect(() => {
+    // Setup global utilities for legacy compatibility
+    setupGlobalUtils();
+    
     const initPage = async () => {
       try {
         // Get main element
@@ -67,6 +72,15 @@ export default function Project() {
         callIos.call({ DOM: domRef.current, isVisible: 1 });
         showIos.call({ DOM: domRef.current });
         
+        // Initialize intro animation if needed
+        if (componentsRef.current.intro) {
+          if (document.querySelector('.faketit')) {
+            componentsRef.current.intro.set();
+          } else {
+            await componentsRef.current.intro.start();
+          }
+        }
+        
         setIsLoaded(true);
       } catch (error) {
         console.error('Error initializing project page:', error);
@@ -107,10 +121,45 @@ export default function Project() {
       // Handle navigation to next project
       console.log('Navigate to next project:', event.detail.project);
       
-      // Navigation logic would go here
+      // Get next project element
+      const nextProjectElement = document.querySelector('.nxtPr');
+      if (nextProjectElement) {
+        // Get name and title elements for animation
+        const nameElement = nextProjectElement.querySelector('.cnt_n');
+        const titleElement = nextProjectElement.querySelector('.cnt_t');
+        
+        if (nameElement && titleElement) {
+          // Add animation classes
+          nameElement.classList.add('nfo_n');
+          titleElement.classList.add('nfo_t');
+          
+          // Set initial position for title on smaller devices
+          if (appContext?.browserInfo?.device < 2) {
+            gsap.set(titleElement, { x: '34.4rem' });
+          }
+          
+          // Navigate to next project
+          const projectId = nextProjectElement.dataset.ids;
+          if (projectId) {
+            window.location.href = `/project?id=${projectId}`;
+          }
+        }
+      }
+    };
+    
+    // Handle page exit animation
+    const handleBeforeUnload = () => {
+      // Remove loading classes from elements
+      const loadedElements = domRef.current.el.querySelectorAll('.ivi.Ldd');
+      loadedElements.forEach(element => {
+        element.classList.remove('Ldd');
+      });
     };
     
     initPage();
+    
+    // Add event listener for navigation
+    window.addEventListener('beforeunload', handleBeforeUnload);
     
     // Cleanup function
     return () => {
@@ -121,6 +170,10 @@ export default function Project() {
       }
       
       document.removeEventListener('nextproject', handleNextProject);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // Run exit animation
+      handleBeforeUnload();
     };
   }, [appContext]);
   

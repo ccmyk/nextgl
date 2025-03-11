@@ -1,9 +1,10 @@
 // src/app/layout.js
-import "@/styles/globals.pcss";
+import "@/styles/globals.css";
 import AppInitializer from "@/components/AppInitializer";
 import { WebGLProvider } from "@/components/gl/utils/SceneProvider";
 import Nav from "@/components/Nav";
 import { fetchSiteSettings } from "@/lib/startup/fetchSiteSettings";
+import { montreal, montrealBook } from "@/app/fonts";
 
 export const metadata = {
   title: "Chris Hall Selected Work",
@@ -34,7 +35,7 @@ export default async function RootLayout({ children }) {
   }
 
   return (
-    <html lang="en" className="loading lenis">
+    <html lang="en" className={`loading lenis ${montreal.variable} ${montrealBook.variable}`}>
       <body>
         <AppInitializer initialSettings={settings}>
           <WebGLProvider>

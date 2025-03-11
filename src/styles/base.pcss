@@ -1,5 +1,20 @@
 /* src/styles/base.pcss - Combined reset and base styles */
 
+/* Define CSS Variables */
+:root {
+  --swiper-theme-color: #1B2126;
+  --primary-font: "Neue Montreal Mono", sans-serif;
+  --background-color: #f8f6f2;
+  --text-color: #000;
+  --button-color: #333;
+  --focus-color: #4A90E2;
+  --transition-fast: 0.2s ease;
+  --line-height-normal: 1;
+  --focus-outline-color: #4A90E2;
+  --focus-outline-width: 2px;
+  --focus-outline-offset: 2px;
+}
+
 /* Reset Default Browser Styles */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -74,14 +89,14 @@ a {
 }
 
 /* Forms and buttons */
-button, input, select, textarea {
+button, input, optgroup, select, textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
   appearance: none;
   background: none;
   border: none;
   outline: none;
-  color: inherit;
-  font: inherit;
-  margin: 0;
 }
 
 /* Style focus for better accessibility */
@@ -90,8 +105,21 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--focus-color, #4A90E2);
-  outline-offset: 2px;
+  outline: var(--focus-outline-width) solid var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Number Input Reset */
+input {
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  &[type=number] {
+    -moz-appearance: textfield;
+  }
 }
 
 /* Default input behavior */
@@ -100,34 +128,28 @@ input, textarea {
   user-select: text;
 }
 
-/* Remove spinner/arrows from number inputs */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+/* Button Reset */
+button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
 }
 
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-/* Prevent hidden elements from being displayed */
+/* Hidden Elements */
 [hidden], template {
   display: none !important;
 }
 
-/* Reset image and SVG behavior */
-img {
-  height: auto;
+/* Media Elements Reset */
+img, svg {
   max-width: 100%;
-  vertical-align: middle;
-  border-style: none;
-}
-
-svg {
-  max-width: 100%;
-  overflow: hidden;
-  vertical-align: middle;
+  
+  &:where(img) {
+    height: auto;
+    vertical-align: middle;
+  }
 }
 
 /* Default layout elements */
@@ -141,16 +163,4 @@ svg {
 
 #content {
   z-index: 3;
-}
-
-/* Define CSS Variables */
-:root {
-  --swiper-theme-color: #1B2126;
-  --primary-font: "Neue Montreal Mono", sans-serif;
-  --background-color: #f8f6f2;
-  --text-color: #000;
-  --button-color: #333;
-  --focus-color: #4A90E2;
-  --transition-fast: 0.2s ease;
-  --line-height-normal: 1;
 }

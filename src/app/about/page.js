@@ -6,6 +6,8 @@ import { loadImages, loadVideos } from '@/lib/utils/pageLoads';
 import { createIos, callIos, showIos } from '@/lib/utils/pageIos';
 import AboutIntro from '@/app/about/intro/page';
 import Scr from '@/app/about/dual/io';
+import { setupGlobalUtils } from '@/lib/utils/animationUtils';
+import gsap from 'gsap';
 
 export default function About() {
   const appContext = useAppContext();
@@ -21,6 +23,9 @@ export default function About() {
   });
   
   useEffect(() => {
+    // Setup global utilities for legacy compatibility
+    setupGlobalUtils();
+    
     const initPage = async () => {
       try {
         // Get main element
@@ -80,25 +85,57 @@ export default function About() {
       
       // Clone and append icons to list items
       const i = domRef.current.el.querySelector('.about_list .Awrite i');
-      for(let a of domRef.current.el.querySelectorAll('.about_dual .cnt_t a')){
-        a.insertAdjacentElement('beforeend',i.cloneNode(true))
+      if (i) {
+        for(let a of domRef.current.el.querySelectorAll('.about_dual .cnt_t a')){
+          a.insertAdjacentElement('beforeend', i.cloneNode(true));
+        }
       }
 
       // Remove icons from list items on larger devices
       if(appContext?.browserInfo?.device > 1){
         for(let a of domRef.current.el.querySelectorAll('.about_list .Awrite .iO')){
-          a.parentNode.classList.add('ivi')
-          a.parentNode.classList.add('nono')
-          a.remove()
+          a.parentNode.classList.add('ivi');
+          a.parentNode.classList.add('nono');
+          a.remove();
         }
+      }
+    };
+    
+    // Handle page exit animation
+    const handleBeforeUnload = () => {
+      // Find any active animations and stop them
+      const gooutElement = document.querySelector('.iO.goout');
+      if (gooutElement && domRef.current.ios) {
+        const ioIndex = gooutElement.dataset.io;
+        if (domRef.current.ios[ioIndex] && domRef.current.ios[ioIndex].class) {
+          domRef.current.ios[ioIndex].class.active = 0;
+          gsap.to(domRef.current.ios[ioIndex].class.anim, {
+            progress: 0,
+            duration: 0.8,
+            ease: 'Power2.inOut'
+          });
+        }
+      } else {
+        // Fade out content if no specific animation is active
+        gsap.to('.about_dual .cnt_t', {
+          opacity: 0,
+          duration: 0.8,
+          ease: 'Power2.inOut'
+        });
       }
     };
     
     initPage();
     
+    // Add event listener for navigation
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
     // Cleanup function
     return () => {
-      // Any cleanup needed
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // Run exit animation
+      handleBeforeUnload();
     };
   }, [appContext]);
   

@@ -1,33 +1,38 @@
 /* src/styles/globals.pcss */
 
 /* Import Variables First */
-@import url("variables.pcss");
+@import "./variables.pcss";
 
 /* Base Styles */
-@import url("base.pcss");
-@import url("accessibility.pcss");
-@import url("layout.pcss");
-
-/* Component Styles */
-@import url("components/background-grid.pcss");
-@import url("components/buttons.pcss");
-@import url("components/footer.pcss");
-@import url("components/loader.pcss");
-@import url("components/mouse.pcss");
-@import url("components/nav.pcss");
-@import url("components/scrollbar.pcss");
-@import url("components/swiper.module.pcss");
-
-/* Typography */
-@import url("typography/typography.pcss");
-@import url("typography/wysiwyg.pcss");
+@import "./base.pcss";
+@import "./accessibility.pcss";
+@import "./layout.pcss";
+@import "./uitils.pcss";
 
 /* Animations */
-@import url("animations/animations.pcss");
-@import url("animations/gsap.module.pcss");
-@import url("animations/lenis.module.pcss");
-@import url("animations/interactions.pcss");
+@import "./animations/animations.pcss";
+@import "./animations/gsap.module.pcss";
+@import "./animations/interactions.pcss";
+
+/* Component Styles */
+@import "./components/background-grid.pcss";
+@import "./components/buttons.pcss";
+@import "./components/details-toggle.pcss";
+@import "./components/device-rotation.pcss";
+@import "./components/footer.pcss";
+@import "./components/loader.pcss";
+@import "./components/nav.pcss";
+@import "./components/swiper.module.pcss";
+@import "./components/ui-elements.pcss";
+
+/* Typography */
+@import "./typography/typography.pcss";
+@import "./typography/wysiwyg.pcss";
 
 /* Page-Specific Styles */
-@import url("pages/about.module.pcss");
-@import url("pages/home.pcss");
+@import "./pages/about.module.pcss";
+@import "./pages/error.module.pcss";
+@import "./pages/home.module.pcss";
+@import "./pages/playground.module.pcss";
+@import "./pages/projects.module.pcss";
+@import "./pages/project.module.pcss";

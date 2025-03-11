@@ -14,7 +14,6 @@
       "@/startup/*": ["./src/lib/startup/*"],
       "@/animations/*": ["./src/lib/animations/*"],
       "@/public/*": ["./src/public/*"],
-      "@/assets/*": ["./public/assets/*"]
     },
     "allowJs": true,
     "checkJs": true,

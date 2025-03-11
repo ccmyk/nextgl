@@ -1,4 +1,8 @@
-// import SplitType from 'split-type'
+"use client";
+
+import { lerp } from '@/lib/utils/animationUtils';
+import gsap from 'gsap';
+import SplitType from 'split-type';
 
 export default class {
   constructor(obj, device, touch) {
@@ -26,7 +30,7 @@ export default class {
   async create() {
     this.anim = gsap.timeline({ paused: true });
 
-    let spty = new window.SplitType(this.el.parentNode.querySelectorAll('p'), { types: 'lines' });
+    let spty = new SplitType(this.el.parentNode.querySelectorAll('p'), { types: 'lines' });
 
     for (let [i, a] of spty.lines.entries()) {
       this.anim.fromTo(a, { y: 1.2 + 'rem', opacity: 0 }, { y: 0 + 'rem', opacity: 1, duration: 0.3 }, i * 0.2);
@@ -78,9 +82,8 @@ export default class {
       return false;
     }
     this.ctr.current = y - this.ctr.start + this.h;
-    // this.ctr.current = window.clamp(0, this.ctr.limit, this.ctr.current)
     this.ctr.progt = this.ctr.current / this.ctr.limit;
-    this.ctr.prog = window.lerp(this.ctr.prog, this.ctr.progt, 0.01);
+    this.ctr.prog = lerp(this.ctr.prog, this.ctr.progt, 0.01);
 
     this.anim.progress(Math.max(this.ctr.prog, this.ctr.stop));
   }

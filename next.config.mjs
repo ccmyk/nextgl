@@ -25,14 +25,17 @@ const nextConfig = {
         "vert.msdf.glsl": [{ loader: "raw-loader", options: {} }],
         "frag.parent.glsl": [{ loader: "raw-loader", options: {} }],
         "vert.parent.glsl": [{ loader: "raw-loader", options: {} }],
-      },
-      rules: {
-        glsl: [{ loader: "raw-loader", options: {} }],
-        "msdf.glsl": [{ loader: "raw-loader", options: {} }],
-        "parent.glsl": [{ loader: "raw-loader", options: {} }],
-        "single.glsl": [{ loader: "raw-loader", options: {} }],
-        "main.glsl": [{ loader: "raw-loader", options: {} }],
-      },
+        ".pcss": [
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                config: true
+              }
+            }
+          }
+        ]
+      }
     },
   },
   reactStrictMode: true,

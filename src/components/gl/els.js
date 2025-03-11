@@ -92,7 +92,7 @@ export async function createMSDF() {
   let jsonTexSrc = jsonTexSrcD;
 
   if (process.env.NODE_ENV === "production") {
-    mapTexSrc = "@/public/assets/fonts/PPNeueMontreal-Medium.png";
+    mapTexSrc = "/assets/fonts/PPNeueMontreal-Medium.png";
     jsonTexSrc = "@/public/assets/fonts/PPNeueMontreal-Medium.json";
   }
 

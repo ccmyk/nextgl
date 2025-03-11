@@ -3,12 +3,8 @@ import "@/components/footer/";
 import browser from "/browser.js";
 import loadRestApi from "./firstload.js";
 
-import FontFaceObserver from 'fontfaceobserver';
-
 import gsap from "gsap";
 import SplitType from 'split-type';
-
-
 
 import { Power2,Power4 } from "./ease.js";
 
@@ -16,15 +12,12 @@ if (window.history.scrollRestoration) {
   window.history.scrollRestoration = 'manual'
 }
 
-
-
 document.documentElement.style.setProperty("--ck_hvar", window.innerHeight+'px')
 document.documentElement.classList.add('lenis-stopped')
 
 if(import.meta.env.DEV == true){
 
   document.documentElement.classList.add('dev')
-  
   
 }
 // browser.revCheck()
@@ -111,8 +104,7 @@ else{
       template:content.dataset.template,
       webgl:global.webgl,
     }),
-		new FontFaceObserver('montrealbook').load(),
-		new FontFaceObserver('montreal').load(),
+    // Fonts are now handled by Next.js font optimization
     
 	]).then((loaded) => {
 
