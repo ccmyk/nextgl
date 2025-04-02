@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Scroll control functions for page animations

@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/lazyImage.js
+"use client";
 
 /**
  * LazyImage class for lazy loading images with Intersection Observer

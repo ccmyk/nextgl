@@ -1,3 +1,4 @@
+// src/components/gl/tta/position.js
 "use client";
 
 export function check(entry){
@@ -5,11 +6,11 @@ export function check(entry){
       
     vis = entry.isIntersecting
     
-    if(vis == 1){
+    if(vis === 1){
       this.start()
 
     }
-    else if(vis == 0){
+    else if(vis === 0){
       this.stop()
     }
     return vis
@@ -19,11 +20,11 @@ export function check(entry){
 
 export function start(){
 
-    if(this.active == 1){
+    if(this.active === 1){
       return false
     }
 
-    if(this.active == -1){
+    if(this.active === -1){
       // let arr = [.8,2,2]
       this.animstart = gsap.timeline({paused:true})
       .set(this.canvas,{opacity:1},0)

@@ -1,4 +1,5 @@
 // src/lib/startup/ease.js
+"use client";
 
 export const Power2 = {
   easeIn: (t) => t * t,

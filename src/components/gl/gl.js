@@ -1,143 +1,70 @@
-// src/components/gl/gl.js
 "use client";
 
-import {
-  create,
-  createScene,
-  createCamera,
-  cleanTemp,
-  createTemp,
-  createIos,
-  show,
-} from './create.js';
-
-import {
-  createEls,
-  createMSDF,
-  createTex,
-  createAssets
-} from './els.js';
-
-import {
-  callIos,
-  loadIos,
-  showIos,
-  checkIo
-} from './ios.js';
-
-import {
-  onResize,
-  update,
-  timeout,
-  loadImage,
-  loadVideo
-} from './events.js';
+import * as CreateMethods from "./create.js";
+import * as ElsMethods from "./els.js";
+import * as IOSMethods from "./ios.js";
+import * as EventMethods from "./events.js";
 
 /**
- * Canvas class for managing WebGL elements
+ * WebGL Canvas Manager
  */
 class Canvas {
-  /**
-   * Create a new Canvas instance
-   * @param {Object} main - Main application object
-   */
   constructor(main) {
     this.main = main;
-    
-    this.viewport = {
-      w: 1,
-      h: 1
-    };
-    
-    this.isVisible = 0;
-    
+    this.viewport = { width: 1, height: 1 };
+    this.isVisible = false;
     this.ios = [];
-    this.iosmap = new Map();
+    this.iosMap = new Map();
   }
-  
-  /**
-   * Promise-based timeout function
-   * @param {number} ms - Milliseconds to wait
-   * @returns {Promise} - Resolves after the specified time
-   */
-  timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+
+  delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  
-  /**
-   * Change slide state
-   * @param {number} st - State (0 or 1)
-   * @returns {Promise<void>}
-   */
-  async changeSlides(st = 0) {
-    let foot = null;
-    
-    if (st === 1) {
-      // Handle state 1 (showing slides)
-      for (let [i, a] of this.iosmap.entries()) {
-        if (a.name === 'Slides') {
-          a.changeState(st);
+
+  async changeSlides(state = 0) {
+    let footer = null;
+
+    const updateElements = (name, callback) => {
+      this.updateIosElements(name, state, (element) => {
+        if (element.name === "Footer") {
+          footer = element;
         }
-      }
-      
+      });
+    };
+
+    if (state === 1) {
+      this.updateIosElements("Slides", state);
       await window.waiter(1400);
-      
-      for (let [i, a] of this.iosmap.entries()) {
-        if (a.name === 'Roll') {
-          a.changeState(st);
-        } else if (a.name === 'Footer') {
-          foot = a;
-        }
-      }
+      updateElements("Roll");
     } else {
-      // Handle state 0 (hiding slides)
-      for (let [i, a] of this.iosmap.entries()) {
-        if (a.name === 'Roll') {
-          a.changeState(st);
-        }
-      }
-      
-      for (let [i, a] of this.iosmap.entries()) {
-        if (a.name === 'Slides') {
-          a.changeState(st);
-        } else if (a.name === 'Footer') {
-          foot = a;
-        }
-      }
-      
+      updateElements("Roll");
+      this.updateIosElements("Slides", state);
       await window.waiter(800);
     }
-    
-    // Update footer if found
-    if (foot) {
-      foot.onResize(this.viewport, this.main.screen);
+
+    if (footer) {
+      footer.onResize(this.viewport, this.main.screen);
+    }
+  }
+
+
+  updateIosElements(name, state, callback) {
+    for (let [, element] of this.iosMap.entries()) {
+      if (element.name === name) {
+        element.changeState(state);
+      } else if (callback) {
+        callback(element);
+      }
     }
   }
 }
 
-// Prototype assignments
-Canvas.prototype.create = create;
-Canvas.prototype.createScene = createScene;
-Canvas.prototype.createCamera = createCamera;
-Canvas.prototype.cleanTemp = cleanTemp;
-Canvas.prototype.createTemp = createTemp;
-Canvas.prototype.createIos = createIos;
-Canvas.prototype.show = show;
-
-Canvas.prototype.createMSDF = createMSDF;
-Canvas.prototype.createAssets = createAssets;
-Canvas.prototype.createEls = createEls;
-Canvas.prototype.createTex = createTex;
-
-Canvas.prototype.callIos = callIos;
-Canvas.prototype.loadIos = loadIos;
-Canvas.prototype.showIos = showIos;
-Canvas.prototype.checkIo = checkIo;
-
-Canvas.prototype.onResize = onResize;
-Canvas.prototype.update = update;
-Canvas.prototype.timeout = timeout;
-Canvas.prototype.loadImage = loadImage;
-Canvas.prototype.loadVideo = loadVideo;
+Object.assign(
+  Canvas.prototype,
+  CreateMethods,
+  ElsMethods,
+  IOSMethods,
+  EventMethods
+);
 
 export default Canvas;

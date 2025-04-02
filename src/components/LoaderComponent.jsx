@@ -1,207 +1,101 @@
+// Path: src/components/LoaderComponent.jsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
-export default function LoaderComponent({ main, temp, device = 0, onComplete }) {
-  const loaderRef = useRef(null);
-  const counterRef = useRef(0);
-  const indexRef = useRef(0);
-  const tempRef = useRef({ init: temp, pop: temp });
-  const deviceRef = useRef(device);
-  const DOMRef = useRef({
-    el: null,
-    bg: null,
-    cnt: null,
-    n: null
-  });
-  const objRef = useRef({ num: 0 });
-  const animRef = useRef(null);
-  const mainRef = useRef(main);
+/**
+ * A modern Loader Component integrated with main.events for handling animations and interactivity.
+ */
+const LoaderComponent = ({ template = "", onComplete, mainEvents }) => {
+  const [isLoading, setIsLoading] = useState(true); // Track loading state
+  const loaderRef = useRef(null); // Reference to the loader element for animations
+  const objRef = useRef({ num: 0 }); // Reference for GSAP animation object
 
-  // Equivalent to constructor and create()
-  useEffect(() => {
-    if (!temp) return;
-    
-    // Insert HTML template
-    document.querySelector('body').insertAdjacentHTML('afterbegin', tempRef.current.init);
-    
-    // Get DOM elements
-    DOMRef.current.el = document.documentElement.querySelector('.loader');
-    if (!DOMRef.current.el) return;
-    
-    DOMRef.current.bg = DOMRef.current.el.querySelector('.loader_bg');
-    DOMRef.current.cnt = DOMRef.current.el.querySelector('.loader_cnt');
-    DOMRef.current.n = DOMRef.current.el.querySelector('.loader_tp');
-    
-    // Create animations
-    createAnim();
-    
-    // Cleanup on unmount
-    return () => {
-      if (DOMRef.current.el) {
-        DOMRef.current.el.remove();
-      }
-    };
-  }, [temp]);
+  /**
+   * Updates the number displayed in the loader.
+   * @param {number} num - The current number in the animation.
+   */
+  const updateDisplayedNumber = (num) => {
+    const formattedNum = num < 10 ? `00${num}` : num < 100 ? `0${num}` : num;
+    const numberElement = loaderRef.current?.querySelector(".loader_tp");
+    if (numberElement) {
+      numberElement.textContent = formattedNum;
+    }
+  };
 
-  // Equivalent to createAnim()
-  const createAnim = () => {
-    objRef.current = { num: 0 };
-    
-    animRef.current = gsap.timeline({ paused: true })
+  /**
+   * Creates and returns the GSAP timeline for the loader.
+   */
+  const createAnimation = () => {
+    return gsap.timeline({ paused: true })
       .fromTo(
         objRef.current,
         { num: 0 },
         {
           num: 42,
-          ease: 'none',
           duration: 2,
-          onUpdate: () => {
-            let num = objRef.current.num.toFixed(0);
-            calcNum(num);
-          }
-        },
-        0
+          ease: "none",
+          onUpdate: () => updateDisplayedNumber(objRef.current.num),
+        }
       )
       .to(
         objRef.current,
         {
-          num: 90,
-          ease: 'power2.inOut',
+          num: 100,
           duration: 8,
-          onUpdate: () => {
-            let num = objRef.current.num.toFixed(0);
-            calcNum(num);
-          }
+          ease: "power2.inOut",
+          onUpdate: () => updateDisplayedNumber(objRef.current.num),
         },
-        2.2
+        "+=0.5" // Delay before next animation
       );
-
-    // Handle text animations
-    let aw = DOMRef.current.el.querySelectorAll('.Awrite');
-    
-    if (mainRef.current && mainRef.current.events && mainRef.current.events.anim) {
-      // Initialize text animations using the main event system
-      mainRef.current.events.anim.detail.state = 0;
-      mainRef.current.events.anim.detail.el = aw[0];
-      document.dispatchEvent(mainRef.current.events.anim);
-
-      mainRef.current.events.anim.detail.state = 0;
-      mainRef.current.events.anim.detail.el = aw[1];
-      document.dispatchEvent(mainRef.current.events.anim);
-    }
   };
 
-  // Equivalent to calcNum()
-  const calcNum = (num) => {
-    if (!DOMRef.current.n) return;
-    
-    if (num < 10) {
-      num = '00' + num;
-    } else if (num < 100) {
-      num = '0' + num;
-    }
-    
-    DOMRef.current.n.innerHTML = num;
-    counterRef.current = parseInt(num, 10);
-  };
-
-  // Equivalent to start()
-  const start = () => {
-    let aw = DOMRef.current.el.querySelectorAll('.Awrite');
-    
-    if (mainRef.current && mainRef.current.events && mainRef.current.events.anim) {
-      // Trigger text animations using the main event system
-      mainRef.current.events.anim.detail.state = 1;
-      mainRef.current.events.anim.detail.el = aw[0];
-      document.dispatchEvent(mainRef.current.events.anim);
-
-      mainRef.current.events.anim.detail.state = 1;
-      mainRef.current.events.anim.detail.el = aw[1];
-      document.dispatchEvent(mainRef.current.events.anim);
-    }
-    
-    if (animRef.current) {
-      animRef.current.play();
-    }
-  };
-
-  // Equivalent to showPop()
-  const showPop = () => {
-    if (deviceRef.current > 1) {
-      // Implementation would go here
-    }
-  };
-
-  // Equivalent to hidePop()
-  const hidePop = () => {
-    if (deviceRef.current > 1 && DOMRef.current.el) {
-      DOMRef.current.el.remove();
-    }
-  };
-
-  // Equivalent to hideIntro()
-  const hideIntro = (template = '') => {
-    if (!DOMRef.current.el || !animRef.current) return;
-    
-    animRef.current.pause();
-
-    gsap.to(objRef.current, {
-      num: 100,
-      ease: 'power2.inOut',
-      duration: 0.49,
-      onUpdate: () => {
-        let num = objRef.current.num.toFixed(0);
-        calcNum(num);
-      }
-    });
-
-    gsap.to(DOMRef.current.el, {
-      opacity: 0,
-      duration: 0.5,
-      delay: 0.2,
-      ease: 'power2.inOut',
-      onComplete: () => {
-        if (DOMRef.current.el) {
-          DOMRef.current.el.remove();
-        }
-        if (onComplete) {
-          onComplete();
-        }
-      }
-    });
-  };
-
-  // Expose methods to parent component
   useEffect(() => {
-    if (!mainRef.current) return;
-    
-    // Attach methods to the main object if needed
-    if (mainRef.current.loader) {
-      mainRef.current.loader = {
-        start,
-        hideIntro,
-        showPop,
-        hidePop
+    if (!template) return;
+
+    // Inject the loader template into the DOM
+    const el = document.createElement("div");
+    el.innerHTML = template.trim();
+    document.body.prepend(el);
+    loaderRef.current = el.querySelector(".loader");
+
+    // Prepare the GSAP animation
+    const loaderAnimation = createAnimation();
+
+    // Integrate with main.events for additional animations
+    if (mainEvents?.anim) {
+      const animatedElements = loaderRef.current.querySelectorAll(".Awrite");
+      const triggerAnimation = (el, state) => {
+        mainEvents.anim.detail.state = state;
+        mainEvents.anim.detail.el = el;
+        document.dispatchEvent(mainEvents.anim);
+      };
+
+      // Trigger initial animations
+      animatedElements.forEach((el) => triggerAnimation(el, 0));
+
+      // Cleanup animations on unmount
+      return () => {
+        animatedElements.forEach((el) => triggerAnimation(el, -1)); // Reset state
+        el.remove();
       };
     }
-    
-    // Auto-start for demo purposes (remove in production)
-    const startTimer = setTimeout(() => {
-      start();
-    }, 500);
-    
-    const hideTimer = setTimeout(() => {
-      hideIntro();
-    }, 5000);
-    
-    return () => {
-      clearTimeout(startTimer);
-      clearTimeout(hideTimer);
-    };
-  }, [main]);
 
-  // The component doesn't render anything itself since the HTML is injected directly
-  return null;
-}
+    // Play GSAP animation and mark loading complete
+    loaderAnimation.play().then(() => {
+      setIsLoading(false);
+      if (typeof onComplete === "function") {
+        onComplete(); // Notify parent when loading completes
+      }
+    });
+
+    return () => {
+      el.remove(); // Clean up loader template from the DOM
+    };
+  }, [template, mainEvents]);
+
+  return isLoading ? <div className="loader-wrapper" /> : null; // Renderless component
+};
+
+export default LoaderComponent;

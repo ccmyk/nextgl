@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/pageMain.js
+"use client";
 
 //Create
 import {

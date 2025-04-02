@@ -1,6 +1,9 @@
+// src/lib/startup/firstload.js
+"use client";
+
 async function loadRestApi({url='',device=0,webp=0,id='',template='',logged=0,visible=0,webgl=1}){
   
-  if(import.meta.env.DEV == true){
+  if(import.meta.env.DEV === true){
 
     console.log(url+'?device='+device+'&id='+id+'&webp='+webp+'&template='+template+'&logged='+logged+'&visible='+visible)
   }

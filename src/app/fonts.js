@@ -6,7 +6,7 @@ import localFont from 'next/font/local'
 export const montreal = localFont({
   src: [
     {
-      path: '/fonts/PPNeueMontreal-Medium.woff2',
+      path: '../../public/fonts/PPNeueMontreal-Medium.woff2',
       weight: '500',
       style: 'normal',
     },
@@ -18,7 +18,7 @@ export const montreal = localFont({
 export const montrealBook = localFont({
   src: [
     {
-      path: './fonts/PPNeueMontrealMono-Book.woff2',
+      path: '../../public/fonts/PPNeueMontrealMono-Book.woff2',
       weight: '400',
       style: 'normal',
     },
@@ -30,7 +30,7 @@ export const montrealBook = localFont({
 export const air = localFont({
   src: [
     {
-      path: './fonts/PPAir-Medium.woff2',
+      path: '../../public/fonts/PPAir-Medium.woff2',
       weight: '500',
       style: 'normal',
     },

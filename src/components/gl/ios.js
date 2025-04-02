@@ -1,74 +1,33 @@
-// src/components/gl/ios.js
 "use client";
 
-/**
- * Initialize intersection observer for WebGL elements
- */
 export function callIos() {
-  let root = null;
-  let opts = {
-    root: root,
-    threshold: [0]
-  };
-  
-  this.callback = (entries, observer) => {
-    entries.forEach(entry => {
-      if (!entry.target.dataset.oi || this.isVisible === 0) {
-        return false;
-      }
-      
-      const pos = entry.target.dataset.oi;
-      if (this.iosmap.get(parseInt(pos))) {
-        this.checkIo(pos, entry);
+  this.obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (this.iosmap.has(entry.target.dataset.oi)) {
+        this.checkIo(entry.target.dataset.oi, entry);
       }
     });
-  };
-  
-  this.obs = new IntersectionObserver(this.callback, opts);
-  
-  if (this.ios) {
-    for (let [i, a] of this.iosmap.entries()) {
-      this.obs.observe(a.el);
-    }
-  }
+  });
+
+  this.ios.forEach((element) => {
+    this.obs.observe(element);
+  });
 }
 
-/**
- * Load all WebGL elements
- * @returns {Promise<void>}
- */
 export async function loadIos() {
-  for (let [i, a] of this.iosmap.entries()) {
-    if (a.load) {
-      await a.load(this.loadImage, this.loadVideo);
-    }
-  }
+  await Promise.all(
+    Array.from(this.iosmap.values()).map((element) => element.load())
+  );
 }
 
-/**
- * Make all WebGL elements visible
- */
 export function showIos() {
-  for (let [i, a] of this.iosmap.entries()) {
-    a.el.style.visibility = 'visible';
-  }
-}
-
-/**
- * Check if an element is in view and trigger its check method
- * @param {string} pos - Position index
- * @param {IntersectionObserverEntry} entry - Intersection observer entry
- */
-export function checkIo(pos, entry) {
-  let check = false;
-  if (this.iosmap.get(parseInt(pos)).check) {
-    check = this.iosmap.get(parseInt(pos)).check(entry);
-  }
+  this.iosmap.forEach((element) => {
+    element.el.style.visibility = "visible";
+  });
 }
 
 export default {
   callIos,
   loadIos,
   showIos,
-  checkIo
 };

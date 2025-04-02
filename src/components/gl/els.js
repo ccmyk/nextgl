@@ -1,6 +1,7 @@
 // src/components/gl/els.js
 "use client";
 
+// Consolidate imports
 import { useWebGLCanvas } from "@/components/gl/utils/SceneProvider";
 import {
   Camera,
@@ -18,8 +19,14 @@ import {
 } from "ogl";
 
 // ASSETS
-import mapTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.png";
-import jsonTexSrcD from "@/assets/fonts/PPNeueMontreal-Medium.json";
+const ASSET_PATH = "/public/assets/fonts/";
+const FONT_NAME = "PPNeueMontreal-Medium";
+const FONT_EXT = {
+  json: ".json",
+  png: "-msdf.png",
+};
+const mapTexSrcD = `${ASSET_PATH}${FONT_NAME}${FONT_EXT.png}`;
+const jsonTexSrcD = `${ASSET_PATH}${FONT_NAME}${FONT_EXT.json}`;
 
 // Import position utilities for each component
 import * as basePosition from "@/components/gl/base/position";
@@ -42,36 +49,28 @@ import LoaderV from "@/components/gl/loader/shaders/vert.main.glsl";
 import fractalF from "@/components/gl/base/shaders/frag.main.glsl";
 import fractalV from "@/components/gl/base/shaders/vert.main.glsl";
 
-// BACKGROUND 🏜
-// import Bg from "@/components/gl/bg/Bg.jsx";
-import BgF from "@/components/gl/bg/shaders/frag.main.glsl";
-import BgV from "@/components/gl/bg/shaders/vert.main.glsl";
+// PG 📄
+import pgF from "@/components/gl/pg/shaders/frag.main.glsl";
+import pgV from "@/components/gl/pg/shaders/vert.main.glsl";
 
-// TITLE 💬
-// import Tt from "@/components/gl/title/title.jsx";
-import textF from "@/components/gl/title/shaders/frag.msdf.glsl";
-import textV from "@/components/gl/title/shaders/vert.msdf.glsl";
+import BgF from "@/shaders/bg/frag.main.glsl";
+import BgV from "@/shaders/bg/vert.main.glsl";
 
-// FOOTER 🔥
-// import TtF from "@/components/gl/footer/Footer.jsx";
-import textFF from "@/components/gl/footer/shaders/frag.msdf.glsl";
-import textpF from "@/components/gl/footer/shaders/frag.parent.glsl";
+import textF from "@/shaders/title/frag.msdf.glsl";
+import textV from "@/shaders/title/vert.msdf.glsl";
 
-// ABOOUT 👩‍⚖️
-// import TtA from "@/components/gl/tta/About.jsx";
-import textFA from "@/components/gl/tta/shaders/frag.msdf.glsl";
-import textpA from "@/components/gl/tta/shaders/frag.parent.glsl";
+import textFF from "@/shaders/footer/frag.msdf.glsl";
+import textpF from "@/shaders/footer/frag.parent.glsl";
 
-// SLIDES 🎞️
-// import Slides from "@/components/gl/slides/Slides.jsx";
-import SlF from "@/components/gl/slides/shaders/frag.main.glsl";
-import SlV from "@/components/gl/slides/shaders/vert.main.glsl";
-import SlPF from "@/components/gl/slides/shaders/frag.parent.glsl";
+import textFA from "@/shaders/tta/frag.msdf.glsl";
+import textpA from "@/shaders/tta/frag.parent.glsl";
 
-// ROLL 🎢
-// import Roll from "@/components/gl/roll/Roll.jsx";
-import SlSF from "@/components/gl/roll/shaders/frag.main.glsl";
-import SlVF from "@/components/gl/roll/shaders/vert.main.glsl";
+import SlF from "@/shaders/slides/frag.main.glsl";
+import SlV from "@/shaders/slides/vert.main.glsl";
+import SlPF from "@/shaders/slides/frag.parent.glsl";
+
+import SlSF from "@/shaders/roll/frag.single.glsl";
+import SlVF from "@/shaders/roll/vert.single.glsl";
 
 // Map of position modules for each component type
 const positionModules = {
@@ -83,22 +82,21 @@ const positionModules = {
   roll: rollPosition,
   slides: slidesPosition,
   title: titlePosition,
-  tta: ttaPosition
+  tta: ttaPosition,
 };
 
 // FONT LOADING
 export async function createMSDF() {
-  let mapTexSrc = mapTexSrcD;
-  let jsonTexSrc = jsonTexSrcD;
+  const mapTexSrc = process.env.NODE_ENV === "production"
+    ? `${ASSET_PATH}${FONT_NAME}${FONT_EXT.png}`
+    : mapTexSrcD;
+  const jsonTexSrc = process.env.NODE_ENV === "production"
+    ? `${ASSET_PATH}${FONT_NAME}${FONT_EXT.json}`
+    : jsonTexSrcD;
 
-  if (process.env.NODE_ENV === "production") {
-    mapTexSrc = "/assets/fonts/PPNeueMontreal-Medium.png";
-    jsonTexSrc = "@/public/assets/fonts/PPNeueMontreal-Medium.json";
-  }
-
-  let rt = [];
+  const rt = [];
   // 🔠🔠🔠 Load font JSON
-  let fJson = await (await fetch(jsonTexSrc)).json();
+  const fJson = await (await fetch(jsonTexSrc)).json();
   rt.push(fJson);
   // 🔚🔚🔚🔚
   return rt;
@@ -109,11 +107,9 @@ export async function createAssets() {
   const fntAss = await createMSDF();
   this.fontMSDF = fntAss[0];
 
-  let mapTexSrc = mapTexSrcD;
-  if (process.env.NODE_ENV === "production") {
-    mapTexSrc = "@/public/assets/fonts/PPNeueMontreal-Medium.png";
-  }
-
+  const mapTexSrc = process.env.NODE_ENV === "production"
+    ? `${ASSET_PATH}${FONT_NAME}${FONT_EXT.png}`
+    : mapTexSrcD;
   this.fontTex = await this.loadImage(mapTexSrc);
 }
 
@@ -147,7 +143,7 @@ export async function createEls(el = null, temp, canvasRef) {
   const cam = new Camera(gl, { fov: 45 });
 
   // Text Setup
-  let textSize = parseFloat(el.dataset.m) || 1;
+  const textSize = parseFloat(el.dataset.m) || 1;
   const letterSpacing = parseFloat(el.dataset.l) || 0;
 
   const text = new Text({
@@ -170,77 +166,79 @@ export async function createEls(el = null, temp, canvasRef) {
 
   // Texture Setup
   const texTx = new Texture(gl, { generateMipmaps: false });
-  texTx.image = fontTex;
+  texTx.image = this.fontTex;
 
-  // Shader Selection
-  let vertexShader, fragmentShader;
+  // Shaders Setup
+  let vertexShader = null;
+  let fragmentShader = [];
   switch (temp) {
     case "loader":
       vertexShader = LoaderV;
-      fragmentShader = LoaderF;
+      fragmentShader = [LoaderF];
       break;
     case "bg":
       vertexShader = BgV;
-      fragmentShader = BgF;
+      fragmentShader = [BgF];
       break;
     case "pg":
       vertexShader = pgV;
-      fragmentShader = pgF;
+      fragmentShader = [pgF];
       break;
     case "title":
       vertexShader = textV;
-      fragmentShader = textF;
+      fragmentShader = [textF];
       break;
     case "footer":
       vertexShader = textV;
-      fragmentShader = textFF;
+      fragmentShader = [textFF, textpF];
       break;
     case "tta":
       vertexShader = textV;
-      fragmentShader = textFA;
+      fragmentShader = [textFA, textpA];
+      break;
+    case "slides":
+      vertexShader = SlV;
+      fragmentShader = [SlF, SlPF];
+      break;
+    case "roll":
+      vertexShader = SlVF;
+      fragmentShader = [SlSF];
       break;
     default:
-      console.warn(`No shader assigned for ${temp}`);
+      console.warn("Unknown template type: ", temp);
   }
 
-  // Shader Program Setup
   const program = new Program(gl, {
     vertex: vertexShader,
-    fragment: fragmentShader,
+    fragment: fragmentShader.join('\n'),
     uniforms: {
-      uTime: { value: 0 },
-      uKey: { value: -2 },
-      uPower: { value: 1 },
-      tMap: { value: texTx },
+      uTexture: { value: texTx },
+      uColor: { value: [1, 1, 1] },
     },
-    transparent: true,
-    cullFace: null,
-    depthWrite: false,
   });
 
   // Mesh Setup
   const mesh = new Mesh(gl, { geometry, program });
-  const scene = new Transform();
-  mesh.setParent(scene);
+  mesh.setParent(cam);
+
+  // Transform Setup
+  const transform = new Transform();
+  transform.addChild(mesh);
 
   // Post Processing Setup
-  let post = null;
-  if (temp === "foot" || temp === "about") {
-    post = new Post(gl);
-    post.addPass({
-      fragment: temp === "foot" ? textpF : textpA,
-      uniforms: {
-        uTime: { value: 0 },
-        uStart: { value: 0 },
-        uMouseT: { value: 0 },
-        uMouse: { value: 0 },
-        uOut: { value: 1 },
-      },
-    });
-  }
+  const post = new Post(gl);
+  post.addPass({
+    fragment: "",
+  });
 
-  // Get the appropriate position module based on template type
-  const positionModule = positionModules[temp] || basePosition;
+  // Add to scene
+  cam.addChild(transform);
+
+  // Set position
+  const position = positionModules[temp]?.getPosition(pos);
+  if (position) {
+    transform.position.set(position.x, position.y, position.z);
+  }
 
   // Return Object for Component Creation
   const obj = {
@@ -250,17 +248,17 @@ export async function createEls(el = null, temp, canvasRef) {
     mesh,
     text,
     post,
-    scene,
+    scene: transform,
     cam,
-    touch: mainDevice.isTouch,
+    touch: this.mainDevice.isTouch,
     canvas: gl.canvas,
-    check: positionModule.check,
-    start: positionModule.start,
-    stop: positionModule.stop,
-    updateX: positionModule.updateX,
-    updateY: positionModule.updateY,
-    updateScale: positionModule.updateScale,
-    updateAnim: positionModule.updateAnim
+    check: positionModules[temp]?.check,
+    start: positionModules[temp]?.start,
+    stop: positionModules[temp]?.stop,
+    updateX: positionModules[temp]?.updateX,
+    updateY: positionModules[temp]?.updateY,
+    updateScale: positionModules[temp]?.updateScale,
+    updateAnim: positionModules[temp]?.updateAnim
   };
 
   switch (temp) {

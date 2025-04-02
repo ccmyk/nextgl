@@ -1,5 +1,4 @@
 // src/lib/controllers/ScrollController.js
-'use client';
 
 import { create } from 'zustand';
 

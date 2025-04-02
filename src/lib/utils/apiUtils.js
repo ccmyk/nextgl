@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/apiUtils.js
+"use server";
 
 /**
  * API utilities for making requests

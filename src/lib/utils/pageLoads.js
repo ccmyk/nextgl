@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/pageLoads.js
+"use client";
 
 /**
  * Asset loading utilities for images and videos

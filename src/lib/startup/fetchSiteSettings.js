@@ -1,3 +1,5 @@
+// src/lib/startup/fetchSiteSettings.js
+"use server";
 /**
  * Fetches site settings from the API
  * This is a server component function for use in Next.js

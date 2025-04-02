@@ -1,31 +1,39 @@
+// eslint.config.mjs
+
 export default {
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'next/core-web-vitals',
-    'plugin:prettier/recommended', // Ensure Prettier is integrated
+    'plugin:prettier/recommended',
+    'plugin:jsdoc/recommended'
   ],
+  plugins: ['prettier', 'jsdoc', 'import'],
   rules: {
-    'react/react-in-jsx-scope': 'off', // Not needed in React 17+
-    'react/prop-types': 'off', // Disable prop-types if using TypeScript
-    'prettier/prettier': 'error', // Enforce Prettier rules
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off',
+    'prettier/prettier': 'error',
+    'import/order': ['error', { 'groups': ['builtin', 'external', 'internal'] }],
+    'jsdoc/check-alignment': 'error', 
+    'jsdoc/check-indentation': 'error',
+    'jsdoc/check-param-names': 'error'
   },
   settings: {
     react: {
-      version: 'detect', // Automatically detect the React version
+      version: 'detect',
     },
   },
   env: {
     browser: true,
     node: true,
-    es2024: true, // Use the latest ECMAScript version
+    es2024: true,
   },
   parserOptions: {
-    ecmaVersion: 'latest', // Use the latest supported version
-    sourceType: 'module', // Use ES modules
+    ecmaVersion: 'latest',
+    sourceType: 'module',
     ecmaFeatures: {
-      jsx: true, // Enable JSX
+      jsx: true,
     },
   },
 };

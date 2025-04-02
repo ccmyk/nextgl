@@ -1,4 +1,4 @@
-'use client';
+// src/lib/utils/pageCreate.js
 
 // import Selc from '@/components/atoms/Selc'
 // import Chk from '@/components/atoms/Chk'

@@ -1,3 +1,6 @@
+// src/lib/startup/browser.js
+"use client";
+
 function browserCheck(){
   //No memoria scroll
   if (window.history.scrollRestoration) {

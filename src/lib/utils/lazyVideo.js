@@ -1,3 +1,5 @@
+// src/lib/utils/lazyVideo.js
+"use client";
 /**
  * LazyVideo class for lazy loading videos with Intersection Observer
  * @deprecated This class-based approach is being phased out in favor of Next.js Video component

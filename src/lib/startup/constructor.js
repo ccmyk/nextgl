@@ -1,6 +1,9 @@
+// src/lib/startup/constructor.js
+"use client";
+
 import "@/components/footer/";
 
-import browser from "/browser.js";
+import browser from "./browser.js";
 import loadRestApi from "./firstload.js";
 
 import gsap from "gsap";
@@ -15,7 +18,7 @@ if (window.history.scrollRestoration) {
 document.documentElement.style.setProperty("--ck_hvar", window.innerHeight+'px')
 document.documentElement.classList.add('lenis-stopped')
 
-if(import.meta.env.DEV == true){
+if(import.meta.env.DEV === true){
 
   document.documentElement.classList.add('dev')
   
@@ -23,7 +26,7 @@ if(import.meta.env.DEV == true){
 // browser.revCheck()
 
 const global = browser.browserCheck()
-if(browser.glCheck()==false){
+if(browser.glCheck()===false){
   global.webgl = 0
   document.documentElement.classList.add('AND')
 }
@@ -77,7 +80,7 @@ document.documentElement.style.setProperty("--ck_accent", '#fff')
 document.documentElement.style.setProperty("--ck_other", '#050505')
 
 // SIZES
-if(global.isTouch == 1){
+if(global.isTouch === 1){
 
   document.documentElement.style.setProperty("--ck_hscr", window.screen.height+'px')
   document.documentElement.style.setProperty("--ck_hvar", window.innerHeight+'px')

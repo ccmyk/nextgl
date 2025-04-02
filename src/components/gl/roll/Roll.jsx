@@ -2,72 +2,43 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useAppContext } from "@/components/AppInitializer";
 import gsap from "gsap";
-import { check, start, stop, updateY, updateScale, updateAnim } from "./position";
 
 const Roll = ({ obj }) => {
-  const { el, renderer, mesh, canvas, textures } = obj;
+  const { fontReady } = useAppContext(); // Check rendering readiness
 
-  // State & References
-  const [active, setActive] = useState(-1);
-  const isReady = useRef(false);
+  const { renderer, mesh, canvas } = obj;
   const norm = useRef([0, 0]);
   const end = useRef([0, 0]);
-  const ease = useRef(0.06);
-  const ctr = useRef({ actual: 0, stop: 0 });
 
   useEffect(() => {
-    initEvents();
-    return () => removeEvents();
-  }, []);
+    if (!fontReady) return; // Only initialize when fonts are ready
 
-  // **Initialize Event Listeners**
-  const initEvents = () => {
-    searchTex(0, 1);
-  };
+    const timeline = gsap.timeline({ paused: true })
+      .fromTo(
+        canvas,
+        { opacity: 0 },
+        { opacity: 1, duration: 1, ease: "power1.inOut" }
+      );
 
-  // **Set Texture Sizes**
-  const searchTex = (i, u) => {
-    if (textures[i].image.tagName === "VIDEO") {
-      mesh.program.uniforms.uTextureSize.value = [textures[i].width, textures[i].height];
-    }
-  };
+    timeline.play();
 
-  // **Update Function**
-  const update = (time, speed, pos) => {
-    if (!renderer) return false;
+    const update = () => {
+      // Perform any render updates
+      end.current[0] = gsap.utils.interpolate(end.current[0], norm.current[0], 0.1); // Smooth interpolation
+      mesh.program.uniforms.uMouse.value = end.current;
+      renderer.render({ scene: mesh });
+    };
 
-    end.current[0] = lerp(end.current[0], norm.current[0], ease.current);
-    mesh.program.uniforms.uMouse.value = end.current;
-
-    if (ctr.current.actual !== pos) {
-      ctr.current.actual = pos;
-      updateY(pos);
-    }
-
-    if (ctr.current.stop !== 1) {
-      updateAnim();
-    }
-
-    renderer.render({ scene: mesh });
-    return true;
-  };
-
-  // **Cleanup Function**
-  const removeEvents = () => {
-    setActive(-2);
-    gsap.timeline({
-      onUpdate: () => renderer.render({ scene: mesh }),
-      onComplete: () => {
-        renderer.gl.getExtension("WEBGL_lose_context").loseContext();
-        canvas.remove();
-      },
-    }).to(canvas, { opacity: 0, duration: 0.6, ease: "power2.inOut" });
-  };
-
-  // **Lerp Helper Function**
-  const lerp = (value1, value2, t) => value1 * (1 - t) + value2 * t;
+    const animationFrameId = requestAnimationFrame(update); // Animation frame loop
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      renderer?.gl.getExtension("WEBGL_lose_context")?.loseContext();
+      canvas?.remove();
+    };
+  }, [fontReady, renderer, mesh, canvas]);
 
   return null; // WebGL handles rendering
 };

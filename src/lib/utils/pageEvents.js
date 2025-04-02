@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/pageEvents.js
+"use client";
 
 export function onResize () {
     // Don't execute if we're on the server

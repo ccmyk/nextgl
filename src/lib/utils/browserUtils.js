@@ -1,4 +1,4 @@
-'use client';
+// src/lib/utils/browserUtils.js
 
 /**
  * Browser detection and capability utilities

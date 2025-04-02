@@ -1,4 +1,5 @@
-'use client';
+// src/lib/uitils/pageIos.js
+"use client";
 
 // import Write from '@/lib/utils/Write'
 

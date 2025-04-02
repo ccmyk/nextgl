@@ -32,17 +32,7 @@ export function clamp(min, max, value) {
  * @returns {Promise} Promise that resolves after the specified time
  */
 export function waiter(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * Add global window utilities for legacy compatibility
- * This should be called in a client component
- */
-export function setupGlobalUtils() {
-  if (typeof window !== 'undefined') {
-    window.lerp = lerp;
-    window.clamp = clamp;
-    window.waiter = waiter;
-  }
-}
+// NOTE: Remove setupGlobalUtils. It is no longer necessary.

@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/pageComps.js
+"use client";
 
 /**
  * Component management utilities for page components

@@ -1,4 +1,5 @@
-'use client';
+// src/lib/utils/pageShowHide.js
+"use client";
 
 /**
  * Page transition and animation functions
