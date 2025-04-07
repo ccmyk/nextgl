@@ -1,6 +1,6 @@
 // src/context/EventsContext.js
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import { useCustomEvent } from "../hooks/useEvents";
+import { useCustomEvent } from '@/hooks/useEvents";
 
 // Define all reusable event instances
 export const eventDefinitions = {

@@ -5,18 +5,7 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/components/gl/base/shaders/*": ["./src/components/gl/base/shaders/*"],
-      "@/components/gl/bg/shaders/*": ["./src/components/gl/bg/shaders/*"],
-      "@/components/gl/footer/shaders/*": ["./src/components/gl/footer/shaders/*"],
-      "@/components/gl/loader/shaders/*": ["./src/components/gl/loader/shaders/*"],
-      "@/components/gl/pg/shaders/*": ["./src/components/gl/pg/shaders/*"],
-      "@/components/gl/roll/shaders/*": ["./src/components/gl/roll/shaders/*"],
-      "@/components/gl/slides/shaders/*": ["./src/components/gl/slides/shaders/*"],
-      "@/components/gl/title/shaders/*": ["./src/components/gl/title/shaders/*"],
-      "@/components/gl/tta/shaders/*": ["./src/components/gl/tta/shaders/*"]
+      "@/*": ["./src/*"]
     },
     "allowJs": true,
     "checkJs": true,

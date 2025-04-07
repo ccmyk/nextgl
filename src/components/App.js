@@ -5,7 +5,7 @@ import {
   useEvents,
   useGlobalEventHandlers,
   eventDefinitions,
-} from "../context/EventsContext";
+} from '@/context/EventsContext";
 
 const App = () => {
   return (

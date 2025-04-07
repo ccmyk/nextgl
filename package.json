@@ -14,7 +14,6 @@
     "defaults": "^3.0.0",
     "gsap": "^3.12.7",
     "lenis": "^1.2.3",
-    "msdf-bmfont": "^1.1.0",
     "msdf-bmfont-xml": "^2.7.0",
     "next": "15.1.6",
     "ogl": "^1.0.11",

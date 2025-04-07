@@ -14,8 +14,8 @@ import gl from "@/lib/webgl/webgl_core.js";
 import Mouse from "@/components/MouseComponent";
 
 // Views & Events
-import { createViews } from "@/lib/views";
-import { onPopState, onChange, onRequest, newView, resetLinks } from "@/lib/interactions/pop";
+import { createViews } from "@/lib/animations/createViews";
+import { onPopState, onChange, onRequest, newView, resetLinks } from "@/lib/animations/pop";
 import { addEvents, onResize } from "@/lib/animations/events";
 
 // Animations

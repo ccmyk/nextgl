@@ -1,93 +1,101 @@
 // src/hooks/useScrollAnimation.js
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
-import { useScroll } from '@/hooks/useScroll';
-import { gsap } from 'gsap';
+import { useEffect } from 'react';
+import gsap from 'gsap';
+import SplitType from 'split-type';
 
 /**
- * Hook for scroll-based animations
- * @param {Object} options - Animation options
- * @returns {Object} Animation controls and ref
- */
-export function useScrollAnimation(options = {}) {
-  const {
-    start = 'top bottom',
-    end = 'bottom top',
-    scrub = true,
-    markers = false,
-    animation = {},
-    pin = false,
-  } = options;
-  
-  const elementRef = useRef(null);
-  const { scrollY } = useScroll();
-  const [timeline, setTimeline] = useState(null);
-  
-  // Load ScrollTrigger dynamically to avoid SSR issues
+ * Refactored from: /main🐙🐙🐙/anims.js and /views👁️👁️👁️/**/*projects.js
+* Controls scroll-triggered GSAP animations for text and section elements.
+*/
+export default function useScrollAnimation(ref, options = {}) {
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    let ScrollTrigger;
-    import('gsap/ScrollTrigger')
-      .then(module => {
-        ScrollTrigger = module.ScrollTrigger;
-        gsap.registerPlugin(ScrollTrigger);
-        
-        // Create animation once ScrollTrigger is loaded
-        if (elementRef.current) {
-          const tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: elementRef.current,
-              start,
-              end,
-              scrub,
-              markers,
-              pin,
-            },
-          });
-          
-          tl.to(elementRef.current, animation);
-          setTimeline(tl);
-        }
-      })
-      .catch(error => {
-        console.warn('Error loading ScrollTrigger, using basic animation:', error);
-        
-        // Fallback to basic animation
-        if (elementRef.current) {
-          const tl = gsap.timeline();
-          tl.to(elementRef.current, animation);
-          setTimeline(tl);
-        }
+    const el = ref?.current;
+    if (!el || typeof window === 'undefined') return;
+
+    // === TEXT PREP ===
+    if (el.classList.contains('Atext')) {
+      new SplitType(el.querySelectorAll('.Atext_el, p'), { types: 'lines' });
+      el.querySelectorAll('.line').forEach((line, i) => {
+        line.dataset.params = i * 0.15;
+        splitAndFakeChars(line);
       });
-      
-    return () => {
-      if (timeline) {
-        timeline.kill();
-        if (timeline.scrollTrigger) {
-          timeline.scrollTrigger.kill();
-        }
-      }
-    };
-  }, [start, end, scrub, markers, pin, animation]);
-  
-  // Update animation on scroll if no ScrollTrigger
-  useEffect(() => {
-    if (!timeline || timeline.scrollTrigger) return;
-    
-    // If we're using the fallback animation (no ScrollTrigger),
-    // manually update progress based on scroll position
-    if (elementRef.current) {
-      const rect = elementRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const progress = Math.max(0, Math.min(1, 
-        1 - (rect.top / windowHeight)
-      ));
-      
-      timeline.progress(progress);
+    } else {
+      new SplitType(el, { types: 'chars,words' });
+      splitAndFakeChars(el);
     }
-  }, [scrollY, timeline]);
-  
-  return { ref: elementRef };
+
+    // === TEXT ANIM ===
+    const chars = el.querySelectorAll('.char');
+    if (!chars.length) return;
+
+    const anim = gsap.timeline({
+      paused: true,
+      onComplete: () => el.classList.add('ivi'),
+    });
+
+    const params = parseParams(el.dataset.params || '0,3');
+    const baseDelay = params[0];
+    const times = [0.3, 0.05, 0.16, 0.05, 0.016];
+
+    anim.set(el, { opacity: 1 }, 0);
+
+    chars.forEach((char, i) => {
+      const n = char.querySelector('.n');
+      const fEls = char.querySelectorAll('.f');
+
+      anim.set(char, { opacity: 1 }, 0);
+      if (n) {
+        anim.to(n, {
+          opacity: 1,
+          duration: times[0],
+          ease: 'power4.inOut',
+          immediateRender: false,
+        }, i * times[1] + baseDelay);
+      }
+
+      fEls.forEach((f, u) => {
+        anim
+          .set(f, { opacity: 0, display: 'block' }, 0)
+          .fromTo(
+            f,
+            { scaleX: 1, opacity: 1 },
+            {
+              scaleX: 0,
+              opacity: 0,
+              duration: times[2],
+              ease: 'power4.inOut',
+              immediateRender: false,
+            },
+            baseDelay + i * times[3] + (u + 1) * times[4]
+          )
+          .set(f, { display: 'none' }, '>');
+      });
+    });
+
+    anim.play();
+  }, [ref]);
+}
+
+function splitAndFakeChars(el, l = 2) {
+  const fakes = '##·$%&/=€|()@+09*+]}{[';
+  const fakesLength = fakes.length - 1;
+
+  el.querySelectorAll('.char').forEach((char) => {
+    char.innerHTML = `<span class="n">${char.innerHTML}</span>`;
+    for (let u = 0; u < l; u++) {
+      const rnd = Math.floor(Math.random() * fakesLength);
+      char.insertAdjacentHTML(
+        'afterbegin',
+        `<span class="f" aria-hidden="true">${fakes[rnd]}</span>`
+      );
+    }
+  });
+
+  el.style.opacity = 0;
+}
+
+function parseParams(str) {
+  return str.split(',').map((v) => parseFloat(v) || 0);
 }
