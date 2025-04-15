@@ -1,20 +1,21 @@
-import { useEffect, useRef } from 'react';
+// hooks/useBaseComponent.js
+import { useEffect, useRef, useState } from 'react'
 
-const useBaseComponent = (device) => {
-  const elRef = useRef(null); // Replaces `this.DOM.el`
-  const isActive = useRef(false); // Replaces `this.active`
+export default function useBaseComponent() {
+  const ref = useRef(null)
+  const [el, setEl] = useState(null)
+  const [active, setActive] = useState(false)
 
   useEffect(() => {
-    console.log('Base component initialized for device:', device);
-    isActive.current = true;
+    if (ref.current) {
+      setEl(ref.current)
+    }
+  }, [])
 
-    return () => {
-      console.log('Base component cleanup');
-      isActive.current = false;
-    };
-  }, [device]);
-
-  return { elRef };
-};
-
-export default useBaseComponent;
+  return {
+    ref,
+    el,
+    active,
+    setActive,
+  }
+}

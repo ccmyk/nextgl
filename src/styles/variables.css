@@ -1,0 +1,20 @@
+:root {
+  /* Colors */
+  --color-background: #F8F6F2;
+  --color-text: #000;
+
+  /* Typography */
+  --font-family-montreal: var(--font-montreal);
+  --font-family-montrealbook: var(--font-montrealbook);
+  --font-family-ppair: var(--font-ppair);
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-medium: -0.01em;
+
+  /* Font Sizes */
+  --font-size-tt3: 1.6rem;
+
+  /* Transitions */
+  --transition-standard: 0.45s cubic-bezier(0.55, 0, 0.1, 1);
+} 

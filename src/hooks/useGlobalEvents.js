@@ -1,129 +1,84 @@
 // src/hooks/useGlobalEvents.js
-'use client';
 
-import { useEffect } from 'react';
+'use client'
 
-/**
- * Binds all legacy global event listeners in a React-safe, modular way.
- * Fully refactored from legacy `events.js` logic.
- *
- * @param {object} refs - Object containing { mainRef, glRef, pageRef }
- */
-export function useGlobalEvents({ mainRef, glRef, pageRef }) {
+import { useEffect } from 'react'
+import { useAppContext } from '@/context/AppContext'
+import { useResizeEvents } from '@/hooks/useResizeEvents'
+import { useTouchScrollControl } from '@/hooks/useTouchScrollControl'
+
+export function useGlobalEvents() {
+  const { main, pHide, isload } = useAppContext()
+
+  useResizeEvents()
+  useTouchScrollControl()
+
   useEffect(() => {
-    if (!mainRef?.current) return;
+    // Custom global events (replaces addEvents)
 
-    // -- Handlers (must be hoisted to remove properly) --
-    const controlScroll = (state) => {
-      mainRef?.current?.controlScroll?.(state);
-    };
-
-    const onStartScroll = () => controlScroll(1);
-    const onStopScroll = () => controlScroll(0);
-    const onNewLinks = () => mainRef?.current?.addLinks?.();
-    const onOpenMenu = () => controlScroll(0);
-    const onCloseMenu = () => controlScroll(1);
-
-    const onScrollTo = (e) => {
-      const id = e.target?.dataset?.goto;
-      if (id && mainRef?.current?.lenis) {
-        mainRef.current.lenis.scrollTo(`#${id}`, { offset: -100 });
-      }
-    };
-
-    const onNextPrj = async (e) => {
-      if (!mainRef?.current?.lenis || !pageRef?.current) return;
-      const el = pageRef.current.DOM?.el?.querySelector('.project_nxt');
-      if (!el) return;
-      mainRef.current.lenis.stop();
-      mainRef.current.lenis.scrollTo(el, { duration: 0.3, force: true });
-      await window.waiter(300);
-
-      mainRef.current?.onChange?.({
-        url: e.detail?.url,
-        link: e.detail?.el,
-      });
-    };
-
-    const onAnim = async (e) => {
-      const detail = e.detail;
-      if (!detail?.el) return;
-
-      if (detail.style === 0) {
-        if (detail.el.classList.contains('nono')) return;
-        mainRef.current?.writeFn?.(detail.el, detail.state);
-      } else if (detail.style === 1) {
-        if (mainRef?.current?.lenis && glRef?.current?.changeSlides) {
-          mainRef.current.lenis.scrollTo(0);
-          await window.waiter(600);
-          controlScroll(0);
-          await Promise.all([glRef.current.changeSlides(detail.state)]);
-          controlScroll(1);
-        }
-      }
-    };
-
-    const onVisibilityChange = () => {
-      if (mainRef?.current?.isload === 1) return;
-
-      if (document.visibilityState === 'hidden') {
-        mainRef.current?.lenis?.stop();
-        cancelAnimationFrame(mainRef.current?.upid);
-      } else {
-        mainRef.current?.lenis?.start();
-        mainRef.current?.update?.(performance.now());
-      }
-    };
-
-    const onPopState = (e) => {
-      mainRef.current?.onPopState?.(e);
-    };
-
-    const onResize = () => {
-      mainRef.current?.onResize?.();
-    };
-
-    const resizeHandler = () => {
-      clearTimeout(mainRef.current?.res);
-      mainRef.current.res = setTimeout(onResize, 400);
-    };
-
-    // -- Add listeners --
-    document.addEventListener('startscroll', onStartScroll);
-    document.addEventListener('stopscroll', onStopScroll);
-    document.addEventListener('newlinks', onNewLinks);
-    document.addEventListener('scrollto', onScrollTo);
-    document.addEventListener('openmenu', onOpenMenu);
-    document.addEventListener('closemenu', onCloseMenu);
-    document.addEventListener('nextprj', onNextPrj);
-    document.addEventListener('anim', onAnim);
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('popstate', onPopState, { passive: true });
-    window.addEventListener('resize', resizeHandler);
-
-    // -- Orientationchange for touch devices --
-    let orientationHandler = null;
-    if (mainRef?.current?.isTouch) {
-      orientationHandler = () => location.reload();
-      window.addEventListener('orientationchange', orientationHandler);
+    const startScroll = () => {
+      document.documentElement.classList.remove('scroll-stop')
     }
 
-    // -- Cleanup --
-    return () => {
-      document.removeEventListener('startscroll', onStartScroll);
-      document.removeEventListener('stopscroll', onStopScroll);
-      document.removeEventListener('newlinks', onNewLinks);
-      document.removeEventListener('scrollto', onScrollTo);
-      document.removeEventListener('openmenu', onOpenMenu);
-      document.removeEventListener('closemenu', onCloseMenu);
-      document.removeEventListener('nextprj', onNextPrj);
-      document.removeEventListener('anim', onAnim);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('popstate', onPopState);
-      window.removeEventListener('resize', resizeHandler);
-      if (orientationHandler) {
-        window.removeEventListener('orientationchange', orientationHandler);
+    const stopScroll = () => {
+      document.documentElement.classList.add('scroll-stop')
+    }
+
+    const scrollToHandler = (e) => {
+      const id = e.detail?.id || e.target.dataset.goto
+      const el = document.getElementById(id)
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    }
+
+    const newLinks = () => {
+      // LEGACY: replaces resetLinks in pop.js
+    }
+
+    const nextprj = async (e) => {
+      // LEGACY: replaces next project scroll logic
+    }
+
+    const animHandler = (e) => {
+      const el = e.detail.el
+      const state = e.detail.state
+      const style = e.detail.style
+
+      if (el?.classList.contains('nono')) return
+
+      if (style === 0) {
+        main.current?.writeFn(el, state)
+      } else if (style === 1) {
+        main.current?.gl?.changeSlides?.(state)
       }
-    };
-  }, [mainRef, glRef, pageRef]);
+    }
+
+    const onPopState = (e) => {
+      main.current?.onPopState?.(e)
+    }
+
+    const onVisibility = () => {
+      // Pause or resume animation loop / scroll
+    }
+
+    // Attach listeners
+    document.addEventListener('startscroll', startScroll)
+    document.addEventListener('stopscroll', stopScroll)
+    document.addEventListener('scrollto', scrollToHandler)
+    document.addEventListener('newlinks', newLinks)
+    document.addEventListener('nextprj', nextprj)
+    document.addEventListener('anim', animHandler)
+    document.addEventListener('visibilitychange', onVisibility)
+    window.addEventListener('popstate', onPopState)
+
+    return () => {
+      document.removeEventListener('startscroll', startScroll)
+      document.removeEventListener('stopscroll', stopScroll)
+      document.removeEventListener('scrollto', scrollToHandler)
+      document.removeEventListener('newlinks', newLinks)
+      document.removeEventListener('nextprj', nextprj)
+      document.removeEventListener('anim', animHandler)
+      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('popstate', onPopState)
+    }
+  }, [main, pHide, isload])
 }

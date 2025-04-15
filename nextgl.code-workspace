@@ -1,11 +1,9 @@
 {
 	"folders": [
 		{
-			"name": "refactor",
 			"path": "."
 		},
 		{
-			"name": "legacy",
 			"path": "../../evasanchez-portfolio"
 		}
 	],

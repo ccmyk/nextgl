@@ -1,101 +1,88 @@
 // src/hooks/useScrollAnimation.js
-'use client';
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
 
-import { useEffect } from 'react';
-import gsap from 'gsap';
-import SplitType from 'split-type';
+export default function useScrollAnimation(targetRef, {
+  state = 0,
+  params = [0],
+  bucle = false,
+  onComplete = null
+} = {}) {
+  const timelineRef = useRef(null)
 
-/**
- * Refactored from: /main🐙🐙🐙/anims.js and /views👁️👁️👁️/**/*projects.js
-* Controls scroll-triggered GSAP animations for text and section elements.
-*/
-export default function useScrollAnimation(ref, options = {}) {
   useEffect(() => {
-    const el = ref?.current;
-    if (!el || typeof window === 'undefined') return;
+    if (!targetRef.current) return
+    const el = targetRef.current
 
-    // === TEXT PREP ===
-    if (el.classList.contains('Atext')) {
-      new SplitType(el.querySelectorAll('.Atext_el, p'), { types: 'lines' });
-      el.querySelectorAll('.line').forEach((line, i) => {
-        line.dataset.params = i * 0.15;
-        splitAndFakeChars(line);
-      });
-    } else {
-      new SplitType(el, { types: 'chars,words' });
-      splitAndFakeChars(el);
+    if (state === -1) {
+      // Hide animation (reverse)
+      const splits = el.querySelectorAll('.char')
+      const chars = [...splits].reverse()
+      const tl = gsap.timeline({ paused: true })
+
+      chars.forEach((char, i) => {
+        const n = char.querySelector('.n')
+        const f = char.querySelector('.f')
+        tl.to(f, { opacity: 1, scaleX: 1, duration: 0.12, ease: 'power4.inOut' }, i * 0.04)
+          .to(char, { opacity: 0, duration: 0.2, ease: 'power4.inOut' }, i * 0.04)
+      })
+
+      tl.to(el, { opacity: 0, duration: 0.4, ease: 'power4.inOut' }, 0.4)
+      tl.play()
+      return
     }
 
-    // === TEXT ANIM ===
-    const chars = el.querySelectorAll('.char');
-    if (!chars.length) return;
+    const chars = el.querySelectorAll('.char')
+    const tl = gsap.timeline({ paused: true })
 
-    const anim = gsap.timeline({
-      paused: true,
-      onComplete: () => el.classList.add('ivi'),
-    });
+    el.style.opacity = 1
+    el.classList.add('ivi')
 
-    const params = parseParams(el.dataset.params || '0,3');
-    const baseDelay = params[0];
-    const times = [0.3, 0.05, 0.16, 0.05, 0.016];
-
-    anim.set(el, { opacity: 1 }, 0);
+    if (el.classList.contains('Awrite-inv')) {
+      tl.to(el, { opacity: 1, ease: 'power4.inOut' }, params[0])
+    } else {
+      tl.set(el, { opacity: 1 }, 0)
+    }
 
     chars.forEach((char, i) => {
-      const n = char.querySelector('.n');
-      const fEls = char.querySelectorAll('.f');
+      const n = char.querySelector('.n')
+      const fakes = char.querySelectorAll('.f')
 
-      anim.set(char, { opacity: 1 }, 0);
-      if (n) {
-        anim.to(n, {
+      tl.set(char, { opacity: 1 }, 0)
+        .to(n, {
           opacity: 1,
-          duration: times[0],
-          ease: 'power4.inOut',
-          immediateRender: false,
-        }, i * times[1] + baseDelay);
-      }
+          duration: 0.3,
+          ease: 'power4.inOut'
+        }, i * 0.05 + params[0])
 
-      fEls.forEach((f, u) => {
-        anim
-          .set(f, { opacity: 0, display: 'block' }, 0)
-          .fromTo(
-            f,
-            { scaleX: 1, opacity: 1 },
-            {
-              scaleX: 0,
-              opacity: 0,
-              duration: times[2],
-              ease: 'power4.inOut',
-              immediateRender: false,
-            },
-            baseDelay + i * times[3] + (u + 1) * times[4]
-          )
-          .set(f, { display: 'none' }, '>');
-      });
-    });
+      fakes.forEach((f, u) => {
+        tl.set(f, { opacity: 0 }, 0)
+        tl.fromTo(f, {
+          scaleX: 1,
+          opacity: 1
+        }, {
+          scaleX: 0,
+          opacity: 0,
+          duration: 0.16,
+          ease: 'power4.inOut'
+        }, params[0] + (i * 0.05 + (1 + u) * 0.016))
+      })
+    })
 
-    anim.play();
-  }, [ref]);
-}
-
-function splitAndFakeChars(el, l = 2) {
-  const fakes = '##·$%&/=€|()@+09*+]}{[';
-  const fakesLength = fakes.length - 1;
-
-  el.querySelectorAll('.char').forEach((char) => {
-    char.innerHTML = `<span class="n">${char.innerHTML}</span>`;
-    for (let u = 0; u < l; u++) {
-      const rnd = Math.floor(Math.random() * fakesLength);
-      char.insertAdjacentHTML(
-        'afterbegin',
-        `<span class="f" aria-hidden="true">${fakes[rnd]}</span>`
-      );
+    if (params[1] === -1) {
+      tl.progress(1)
+    } else {
+      tl.play()
     }
-  });
 
-  el.style.opacity = 0;
-}
+    if (onComplete) tl.eventCallback('onComplete', onComplete)
 
-function parseParams(str) {
-  return str.split(',').map((v) => parseFloat(v) || 0);
+    timelineRef.current = tl
+
+    return () => {
+      if (timelineRef.current) timelineRef.current.kill()
+    }
+  }, [targetRef, state])
+
+  return timelineRef
 }

@@ -1,18 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "allowJs": true,
-    "checkJs": true,
-    "jsx": "preserve",
-    "strict": true,
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*", "src/types/*.d.ts"],
-  "exclude": ["node_modules", "dist", "build"]
+    }
+  }
 }

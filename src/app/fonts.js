@@ -1,40 +1,25 @@
-// src/app/fonts.js
-
 import localFont from 'next/font/local'
 
-// For local fonts (equivalent to your montreal and montrealbook)
 export const montreal = localFont({
-  src: [
-    {
-      path: '../../public/fonts/PPNeueMontreal-Medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-  ],
+  src: '../assets/fonts/PPNeueMontreal-Medium.woff2',
   variable: '--font-montreal',
   display: 'swap',
+  weight: '400',
+  style: 'normal'
 })
 
-export const montrealBook = localFont({
-  src: [
-    {
-      path: '../../public/fonts/PPNeueMontrealMono-Book.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-montreal-book',
+export const montrealbook = localFont({
+  src: '../assets/fonts/PPNeueMontrealMono-Book.woff2',
+  variable: '--font-montrealbook',
   display: 'swap',
+  weight: '400',
+  style: 'normal'
 })
 
-export const air = localFont({
-  src: [
-    {
-      path: '../../public/fonts/PPAir-Medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-air',
+export const ppAir = localFont({
+  src: '../assets/fonts/PPAir-Medium.woff2',
+  variable: '--font-ppair',
   display: 'swap',
-})
+  weight: '500',
+  style: 'normal'
+}) 
