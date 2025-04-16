@@ -1,4 +1,5 @@
 // hooks/useIntersectionObservers.js
+
 import { useEffect } from 'react'
 
 export default function useIntersectionObservers(targets, callback, options = {}) {

@@ -1,127 +1,67 @@
-import { useEffect, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
-import { gsap } from 'gsap';
+// src/components/webgl/Background/Background.jsx
 
-// Import shader code
-import mainShader from './shaders/main.frag.glsl';
+'use client'
 
-// Utility functions
-const lerp = (start, end, t) => start * (1 - t) + end * t;
-const clamp = (min, max, value) => Math.max(min, Math.min(max, value));
+import { useEffect, useRef } from 'react'
+import { Renderer, Camera, Transform, Mesh } from 'ogl'
+import { useAppContext } from '@/context/AppProvider'
+import createBackgroundGeometry from '@/lib/webgl/createBackgroundGeometry'
 
-export function Background() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isActive, setIsActive] = useState(-1);
-  const [isReady, setIsReady] = useState(0);
-  
-  const programRef = useRef(null);
-  const canvasRef = useRef(null);
-  const animRef = useRef(null);
-  
-  // Intersection observer setup
-  const { ref, inView } = useInView({
-    threshold: 0.5,
-    triggerOnce: false
-  });
-  
-  // Handle visibility changes
+export default function Background({ el }) {
+  const canvasRef = useRef(null)
+  const rendererRef = useRef(null)
+  const meshRef = useRef(null)
+  const sceneRef = useRef(new Transform())
+  const cameraRef = useRef(new Camera())
+
+  const { gl } = useAppContext()
+
   useEffect(() => {
-    if (inView) {
-      setIsVisible(true);
-      start();
-    } else {
-      setIsVisible(false);
-      stop();
+    if (!el) return
+
+    // Create canvas and attach to DOM
+    const canvas = document.createElement('canvas')
+    canvas.classList.add('webgl-bg-canvas')
+    el.appendChild(canvas)
+    canvasRef.current = canvas
+
+    // Set up renderer
+    const renderer = new Renderer({ canvas, alpha: true })
+    rendererRef.current = renderer
+
+    // Set size and camera
+    renderer.setSize(el.clientWidth, el.clientHeight)
+    const camera = cameraRef.current
+    camera.perspective({ aspect: el.clientWidth / el.clientHeight })
+    camera.position.z = 5
+
+    // Create mesh from geometry util
+    const { geometry, program } = createBackgroundGeometry()
+    const mesh = new Mesh(renderer.gl, { geometry, program })
+    mesh.setParent(sceneRef.current)
+    meshRef.current = mesh
+
+    // Render loop
+    const render = (t) => {
+      program.uniforms.uTime.value = t * 0.001
+      renderer.render({ scene: sceneRef.current, camera })
+      requestAnimationFrame(render)
     }
-  }, [inView]);
-  
-  // Initialize WebGL
-  const handleInit = ({ gl, shaderManager, canvas }) => {
-    canvasRef.current = canvas;
-    
-    // Create shader program
-    const program = shaderManager.createProgram(
-      `#version 300 es
-       precision highp float;
-       attribute vec2 position;
-       attribute vec2 uv;
-       varying vec2 vUv;
-       
-       void main() {
-         vUv = uv;
-         gl_Position = vec4(position, 0.0, 1.0);
-       }`,
-      mainShader,
-      'background'
-    );
-    
-    // Set up animation timeline with correct easing type
-    animRef.current = gsap.timeline({ paused: true })
-      .fromTo(program.uniforms.uTime,
-        { value: 0 },
-        {
-          value: 1,
-          duration: 10,
-          ease: 'power2.inOut' // Using power2.inOut as specified
-        },
-        0
-      );
-    
-    // Store reference
-    programRef.current = program;
-    
-    // Set up initial state
-    setIsReady(1);
-  };
-  
-  // Start animation
-  const start = () => {
-    if (isActive === 1) return false;
-    
-    if (isActive === -1) {
-      animRef.current.play();
+    requestAnimationFrame(render)
+
+    gl.current.background = mesh
+
+    const handleResize = () => {
+      renderer.setSize(el.clientWidth, el.clientHeight)
+      camera.perspective({ aspect: el.clientWidth / el.clientHeight })
     }
-    
-    setIsActive(1);
-  };
-  
-  // Stop animation
-  const stop = () => {
-    if (isActive < 1) return false;
-    
-    setIsActive(0);
-  };
-  
-  // Animation loop
-  useEffect(() => {
-    if (!isReady) return;
-    
-    let animationFrameId;
-    
-    const animate = (time) => {
-      // Update time uniform
-      if (programRef.current && programRef.current.uniforms.uTime) {
-        programRef.current.uniforms.uTime.value = time * 0.001;
-      }
-      
-      // Continue animation loop
-      animationFrameId = requestAnimationFrame(animate);
-    };
-    
-    animationFrameId = requestAnimationFrame(animate);
-    
+    window.addEventListener('resize', handleResize)
+
     return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [isReady]);
-  
-  return (
-    <div ref={ref} className="background-component">
-      <WebGLCanvas
-        width="100%"
-        height="100%"
-        onInit={handleInit}
-      />
-    </div>
-  );
-} 
+      window.removeEventListener('resize', handleResize)
+      canvas.remove()
+    }
+  }, [el, gl])
+
+  return null
+}

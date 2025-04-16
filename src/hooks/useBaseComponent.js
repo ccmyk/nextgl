@@ -1,4 +1,5 @@
-// hooks/useBaseComponent.js
+// src/hooks/useBaseComponent.js
+
 import { useEffect, useRef, useState } from 'react'
 
 export default function useBaseComponent() {

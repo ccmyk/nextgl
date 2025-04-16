@@ -1,4 +1,5 @@
-// hooks/useSplitType.js
+// src/hooks/useSplitType.js
+
 import { useEffect } from 'react'
 import SplitType from 'split-type'
 

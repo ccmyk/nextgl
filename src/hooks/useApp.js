@@ -2,8 +2,8 @@
 
 'use client'
 
-import { useContext, useEffect } from 'react'
-import { AppContext } from '@/context/AppProvider'
+import { useEffect } from 'react'
+import { useAppContext } from '@/context/AppProvider'
 import { useLenisScroll } from '@/hooks/useLenisScroll'
 import { useGlobalEvents } from '@/hooks/useGlobalEvents'
 import { useNavigation } from '@/hooks/useNavigation'
@@ -25,7 +25,7 @@ export function useApp() {
     loaderRef,
     glRef,
     mouseRef
-  } = useContext(AppContext)
+  } = useAppContext()
 
   const lenis = useLenisScroll(setLenis)
   useGlobalEvents(mainRef)

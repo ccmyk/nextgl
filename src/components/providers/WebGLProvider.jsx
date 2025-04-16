@@ -1,4 +1,5 @@
 // components/providers/WebGLProvider.jsx
+
 import { createContext, useContext, useEffect, useRef } from 'react';
 import { createWebGLContext } from '@/lib/webgl/context';
 

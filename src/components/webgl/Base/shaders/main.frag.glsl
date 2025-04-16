@@ -1,3 +1,5 @@
+// src/components/webgl/Base/shaders/main.frag.glsl
+
 precision highp float;
 
 uniform vec2 uResolution;

@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/AppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export function useTouchScrollControl() {
   const { main } = useAppContext()

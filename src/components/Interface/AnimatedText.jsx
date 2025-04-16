@@ -1,4 +1,4 @@
-//                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+// src/components/Interface/AnimatedText.jsx
 
 'use client'
 

@@ -17,7 +17,6 @@ const LoaderDOM = forwardRef((props, ref) => {
   }))
 
   useEffect(() => {
-    // Optional: Expose global for legacy compatibility only if needed
     window.__loaderDom = {
       start,
       hideIntro,

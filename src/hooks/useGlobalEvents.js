@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/AppContext'
+import { useAppContext } from '@/context/AppProvider'
 import { useResizeEvents } from '@/hooks/useResizeEvents'
 import { useTouchScrollControl } from '@/hooks/useTouchScrollControl'
 
