@@ -1,5 +1,6 @@
-// src/components/webgl/Slides/Slides.jsx
+// ✅ SLIDES COMPONENT BATCH
 
+// src/components/webgl/Slides/Slides.jsx
 'use client'
 
 import { useEffect, useRef } from 'react'
@@ -26,17 +27,8 @@ export default function Slides({ elRef, dataset }) {
   const texturesRef = useRef([])
   const slideAnimRef = useRef(null)
   const objPos = useRef({ x: 0, target: 0, timer: 0 })
-  const ctrRef = useRef({
-    actual: 0,
-    current: 0,
-    limit: 0,
-    start: 0,
-    prog: 0,
-    progt: 0,
-    stop: 0,
-  })
+  const ctrRef = useRef({ actual: 0, current: 0, limit: 0, start: 0, prog: 0, progt: 0, stop: 0 })
 
-  // Geometry setup (returns meshes, textures, etc)
   useEffect(() => {
     if (!gl || !camera || !post || !canvas) return
 
@@ -52,7 +44,6 @@ export default function Slides({ elRef, dataset }) {
     texturesRef.current = textures
   }, [gl, camera, post, canvas, elRef, dataset])
 
-  // Scroll & Resize Logic
   useSlidesState({
     elRef,
     ctrRef,
@@ -69,7 +60,6 @@ export default function Slides({ elRef, dataset }) {
     slideAnimRef,
   })
 
-  // GSAP Timelines (animin, animctr, animsinglectr)
   useSlidesTimeline({
     canvas,
     dataset,
@@ -79,7 +69,6 @@ export default function Slides({ elRef, dataset }) {
     post,
   })
 
-  // DOM events (hover, visibilitychange, video updates)
   useSlidesEvents({
     elRef,
     slideAnimRef,

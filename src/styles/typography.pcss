@@ -1,0 +1,42 @@
+// src/styles/typography.pcss
+
+@import './variables.pcss';
+
+/* Universal typography containers */
+.Awrite,
+.Oiel,
+.ttj,
+.Atitle {
+  font-family: 'PP Neue Montreal', sans-serif;
+  font-weight: 400;
+  display: inline-block;
+  overflow: hidden;
+}
+
+/* Headings */
+.tt1 {
+  font-size: var(--fs-tt1);
+  font-weight: 700;
+}
+
+.tt2 {
+  font-size: var(--fs-tt2);
+  font-weight: 600;
+}
+
+.tt3 {
+  font-size: var(--fs-tt3);
+  font-weight: 500;
+}
+
+/* SplitType-like wrappers (created dynamically in JS) */
+.word {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.char {
+  display: inline-block;
+  transform: translate3d(0, 0, 0);
+}

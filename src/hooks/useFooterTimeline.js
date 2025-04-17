@@ -1,37 +1,34 @@
 // src/hooks/useFooterTimeline.js
 
-import { useEffect, useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 
-export default function useFooterTimeline(postRef, canvasRef) {
-  const animCtrRef = useRef(null)
-  const animMouseRef = useRef(null)
+export default function useFooterTimeline({ post }) {
+  const animmouse = useRef(null)
 
   useEffect(() => {
-    if (!postRef.current || !canvasRef.current) return
+    const tl = gsap.timeline({ paused: true })
+    tl.fromTo(
+      post.passes[0].program.uniforms.uMouseT,
+      { value: 0.2 },
+      { value: 2, duration: 0.3, ease: 'power2.inOut' },
+      0.1
+    )
+      .fromTo(
+        post.passes[0].program.uniforms.uMouseT,
+        { value: 2 },
+        { value: 0, duration: 0.3, ease: 'power2.inOut' },
+        0.7
+      )
+      .fromTo(
+        post.passes[0].program.uniforms.uMouse,
+        { value: 0.39 },
+        { value: 0.8, duration: 0.9, ease: 'none' },
+        0.1
+      )
 
-    const pass = postRef.current.passes[0]
+    animmouse.current = tl
+  }, [post])
 
-    // Timeline for scroll-based transition
-    animCtrRef.current = gsap.timeline({ paused: true })
-      .fromTo(pass.program.uniforms.uTime, { value: 0 }, { value: 2, duration: 0.3, ease: 'power2.inOut' }, 0)
-      .fromTo(pass.program.uniforms.uTime, { value: 2 }, { value: 0, duration: 0.3, ease: 'power2.inOut' }, 0.7)
-      .fromTo(pass.program.uniforms.uStart, { value: 0.39 }, { value: 0.8, duration: 1, ease: 'power2.inOut' }, 0)
-
-    // Timeline for pointer/mouse interaction
-    animMouseRef.current = gsap.timeline({ paused: true })
-      .fromTo(pass.program.uniforms.uMouseT, { value: 0.2 }, { value: 2, duration: 0.3, ease: 'power2.inOut' }, 0.1)
-      .fromTo(pass.program.uniforms.uMouseT, { value: 2 }, { value: 0, duration: 0.3, ease: 'power2.inOut' }, 0.7)
-      .fromTo(pass.program.uniforms.uMouse, { value: 0.39 }, { value: 0.8, duration: 0.9, ease: 'none' }, 0.1)
-
-    return () => {
-      animCtrRef.current?.kill()
-      animMouseRef.current?.kill()
-    }
-  }, [postRef, canvasRef])
-
-  return {
-    animCtr: animCtrRef,
-    animMouse: animMouseRef,
-  }
+  return animmouse
 }

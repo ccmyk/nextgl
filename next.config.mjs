@@ -1,11 +1,11 @@
+// next.config.mjs
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        "@": "./src",
-      }
-    }
+  turbopack: {
+    resolveAlias: {
+      "@": "./src",
+    },
   },
   reactStrictMode: true,
   eslint: {
@@ -21,9 +21,9 @@ const nextConfig = {
         test: /\.pcss$/,
         use: ["postcss-loader"],
       }
-    );
-    return config;
+    )
+    return config
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

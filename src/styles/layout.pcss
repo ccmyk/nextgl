@@ -1,0 +1,46 @@
+// src/styles/layout.pcss
+
+@import './variables.pcss';
+
+main {
+  width: 100%;
+  position: relative;
+  z-index: 0;
+}
+
+section {
+  position: relative;
+  width: 100%;
+  padding: var(--gutter) 0;
+}
+
+.c-vw {
+  width: 100vw;
+  padding: 0 var(--gutter);
+  box-sizing: border-box;
+}
+
+.cnt {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.cnt_hold {
+  position: relative;
+  width: 100%;
+}
+
+.cnt_bt {
+  margin-top: 4rem;
+}
+
+.cnt_lk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.Size {
+  padding-top: var(--gutter);
+}

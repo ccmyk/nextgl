@@ -1,0 +1,32 @@
+// src/styles/backgrounds.pcss
+
+@import './variables.pcss';
+
+.Mbg {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.Mbg_col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.Mbg_col_el {
+  flex: 1;
+  transition: background 0.3s ease;
+}
+
+.Mbg_col_el-1 {
+  background-color: #ddd;
+}
+.Mbg_col_el-2 {
+  background-color: #bbb;
+}

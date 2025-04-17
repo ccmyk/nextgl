@@ -1,12 +1,24 @@
 // src/app/layout.js
 
-import { useEffect } from 'react';
-import { initClient } from '@/lib/startup/initClient.mjs';
+import '@/styles/index.pcss'
+import { AppProvider } from '@/context/AppProvider'
+import { LenisProvider } from '@/context/LenisProvider'
+import { WebGLProvider } from '@/context/WebGLContext'
+import Nav from '@/components/Interface/Nav'
 
-export default function AppInitializer() {
-  useEffect(() => {
-    initClient();
-  }, []);
-
-  return null;
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <AppProvider>
+          <LenisProvider>
+            <WebGLProvider>
+              <Nav />
+              {children}
+            </WebGLProvider>
+          </LenisProvider>
+        </AppProvider>
+      </body>
+    </html>
+  )
 }
