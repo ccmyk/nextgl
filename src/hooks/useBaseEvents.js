@@ -1,5 +1,7 @@
 // src/hooks/useBaseEvents.js
 
+'use client'
+
 import { useEffect } from 'react'
 
 export default function useBaseEvents({ meshRef }) {

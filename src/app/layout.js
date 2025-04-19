@@ -1,6 +1,6 @@
 // src/app/layout.js
 
-import '@/styles/index.pcss'
+import '@/styles/index.css'
 import { AppProvider } from '@/context/AppProvider'
 import { LenisProvider } from '@/context/LenisProvider'
 import { WebGLProvider } from '@/context/WebGLContext'

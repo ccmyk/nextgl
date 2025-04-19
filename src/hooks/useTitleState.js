@@ -1,5 +1,7 @@
 // src/hooks/useTitleState.js
 
+'use client'
+
 import { useRef, useEffect } from 'react'
 
 export default function useTitleState({ elRef, programRef, device }) {

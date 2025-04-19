@@ -3,16 +3,16 @@
 'use client'
 
 import { useEffect } from 'react'
-import { writeFn, writeCt } from '@/lib/animations/anims'
+import { animateDefault, animateCompressed } from '@/lib/utils/textAnimations'
 
 export function useTextAnimation(ref, style = 0, state = 1) {
   useEffect(() => {
-    if (!ref.current) return
+    if (!ref?.current) return
 
     if (style === 0) {
-      writeFn(ref.current, state)
+      animateDefault(ref.current, state)
     } else if (style === 1) {
-      writeCt(ref.current, state)
+      animateCompressed(ref.current, state)
     }
   }, [ref, style, state])
 }

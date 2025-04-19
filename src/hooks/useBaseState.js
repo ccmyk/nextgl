@@ -1,5 +1,7 @@
 // src/hooks/useBaseState.js
 
+'use client'
+
 import { useEffect } from 'react'
 
 export default function useBaseState({ meshRef, screen, viewport }) {

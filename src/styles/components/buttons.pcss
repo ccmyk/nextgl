@@ -1,0 +1,35 @@
+/* Interactive elements (links and buttons) */
+
+button,
+html input[type=button],
+input[type=reset],
+input[type=submit] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+button {
+  overflow: visible;
+  background: none;
+  border: none;
+  border-radius: none;
+  color: inherit;
+  font: inherit;
+  pointer-events: auto;
+}

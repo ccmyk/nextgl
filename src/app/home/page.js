@@ -37,20 +37,20 @@ export default function HomePage() {
                   <div className="cCover">
                     <canvas className="glF" />
                   </div>
-                  <div className="Oi Oi-tt" data-text="Eva" />
+                  <div className="Oi Oi-tt" data-text="Chris" />
                   <div className="ttj Oiel act" ref={ttRef} />
                 </div>
                 <div className="Atitle">
                   <div className="cCover">
                     <canvas className="glF" />
                   </div>
-                  <div className="Oi Oi-tt" data-text="Sánchez" />
+                  <div className="Oi Oi-tt" data-text="Hall" />
                   <div className="ttj Oiel act" ref={ttRef} />
                 </div>
               </h2>
 
               <div className="cnt_bt inview stview">
-                <h3 className="tt3">Interactive Designer<br />Based in Barcelona</h3>
+                <h3 className="tt3">Designer + Art Director<br />Living in Los Angeles</h3>
                 <h4 className="Awrite inview stview" ref={textRef}>
                   <div className="word">
                     <div className="char">Portfolio</div>

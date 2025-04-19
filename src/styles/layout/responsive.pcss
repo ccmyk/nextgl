@@ -1,0 +1,60 @@
+/* Responsive global styles */
+
+@media (min-aspect-ratio: 1/1) {
+  .touch .rotatedev {
+    display: flex
+  }
+}
+
+html.lenis {
+  height: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none
+}
+
+html.lenis::-webkit-scrollbar {
+  display: none
+}
+
+html.lenis:scrollbar {
+  display: none
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none
+}
+
+.scrBar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 600;
+  opacity: .2
+}
+
+.scrBar_prg {
+  position: absolute;
+  width: 3px;
+  right: 0;
+  top: 0;
+  background: #000
+}
+
+html.touch body main {
+  position: relative;
+  overflow: clip
+}
+

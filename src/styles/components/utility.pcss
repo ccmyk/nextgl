@@ -1,0 +1,72 @@
+/* Misc utility classes */
+
+.scr_read {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+  word-wrap: normal !important;
+  word-break: normal;
+}
+
+.rotatedev {
+  z-index: 500;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  display: none;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .touch .rotatedev {
+    display: flex;
+  }
+}
+
+/* Development checks */
+
+.checkBG {
+  position: fixed;
+  z-index: 123481231;
+  background: black;
+  top: 0;
+  right: 0;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  display: none !important
+}
+
+.checkBG input[type=checkbox] {
+  background: Red;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+  appearance: auto
+}
+
+.checkBG input[type=number] {
+  color: #000;
+  background: white
+}
+
+.checkBG span {
+  display: block;
+  margin-bottom: .6rem;
+  margin-top: .6rem
+}
+
+.ctrsCK {
+  display: none !important
+}

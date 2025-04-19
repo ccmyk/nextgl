@@ -1,5 +1,7 @@
 // src/hooks/useBackgroundState.js
 
+'use client'
+
 import { useEffect } from 'react'
 
 export default function useBackgroundState({ meshRef, viewport, screen }) {

@@ -1,6 +1,5 @@
-// ✅ SLIDES COMPONENT BATCH
-
 // src/components/webgl/Slides/Slides.jsx
+
 'use client'
 
 import { useEffect, useRef } from 'react'

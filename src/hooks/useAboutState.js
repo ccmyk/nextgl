@@ -1,5 +1,7 @@
 // src/hooks/useAboutState.js
 
+'use client'
+
 import { useEffect, useRef } from 'react'
 import { clamp, lerp } from '@/lib/utils/math'
 

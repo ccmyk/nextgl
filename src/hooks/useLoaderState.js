@@ -1,5 +1,7 @@
 // src/hooks/useLoaderState.js
 
+'use client'
+
 import { useEffect } from 'react'
 
 export default function useLoaderState({ meshRef }) {

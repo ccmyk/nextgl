@@ -1,5 +1,7 @@
 // src/hooks/useTitleEvents.js
 
+'use client'
+
 import { useEffect } from 'react'
 
 export default function useTitleEvents({ elRef, meshRef, programRef, canvasRef, device }) {

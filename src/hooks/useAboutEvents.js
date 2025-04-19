@@ -1,5 +1,7 @@
 // src/hooks/useAboutEvents.js
 
+'use client'
+
 import { useEffect } from 'react'
 import SplitType from 'split-type'
 

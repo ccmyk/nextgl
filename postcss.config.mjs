@@ -1,15 +1,22 @@
+import postcss from 'postcss';
 import postcssImport from 'postcss-import';
-import postcssMixins from 'postcss-mixins';
 import postcssPresetEnv from 'postcss-preset-env';
-import postcssNested from 'postcss-nested';
 import cssnano from 'cssnano';
+import postcssNesting from 'postcss-nesting';
 
-export default {
-  plugins: {
-    'postcss-import': {},
-    'postcss-mixins': {},
-    'postcss-preset-env': {
-      stage: 0,
-    },
-  },
+const config = {
+  plugins: [
+    postcssImport(),
+    postcssPresetEnv({
+      browsers: 'last 2 versions',
+      stage: 2,
+      features: {
+        'nesting-rules': true,
+      },
+    }),
+    postcssNesting(),
+    cssnano(),
+  ],
 };
+
+export default config;

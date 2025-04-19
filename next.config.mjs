@@ -2,26 +2,25 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+
   turbopack: {
     resolveAlias: {
-      "@": "./src",
+      '@': './src',
     },
+    // No "loaders" key – not supported
   },
-  reactStrictMode: true,
+
   eslint: {
     ignoreDuringBuilds: true,
   },
+  
   webpack: (config) => {
-    config.module.rules.push(
-      {
-        test: /\.(glsl)$/,
-        use: "raw-loader",
-      },
-      {
-        test: /\.pcss$/,
-        use: ["postcss-loader"],
-      }
-    )
+    config.module.rules.push({
+      test: /\.(glsl|vs|fs|vert|frag)$/,
+      exclude: /node_modules/,
+      use: ['raw-loader', 'glslify-loader'],
+    })
     return config
   },
 }

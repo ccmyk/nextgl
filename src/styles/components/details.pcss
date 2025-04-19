@@ -1,0 +1,38 @@
+/* Accordion/details component */
+
+details {
+  overflow: hidden;
+  position: relative;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details .detX_hold, details .detX_box {
+  transition: .45s cubic-bezier(.55, 0, .1, 1);
+}
+
+details .detX_hold {
+  display: grid;
+  grid-template-rows: 0fr;
+}
+
+details .detX_box {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .6s cubic-bezier(.55, 0, .1, 1);
+}
+
+details.act .detX_click_i {
+  transform: scaleY(-1);
+}
+
+details.act .detX_hold {
+  grid-template-rows: 1fr;
+}
+
+details.act .detX_box {
+  opacity: 1;
+  transition-delay: .45s;
+}

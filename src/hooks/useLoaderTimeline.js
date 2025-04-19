@@ -1,5 +1,6 @@
 // src/hooks/useLoaderTimeline.js
 
+'use client'
 import { useEffect } from 'react'
 import gsap from 'gsap'
 

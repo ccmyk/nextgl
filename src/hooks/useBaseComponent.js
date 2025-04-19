@@ -1,5 +1,7 @@
 // src/hooks/useBaseComponent.js
 
+'use client'
+
 import { useEffect, useRef, useState } from 'react'
 
 export default function useBaseComponent() {

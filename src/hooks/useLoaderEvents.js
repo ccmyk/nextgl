@@ -1,5 +1,6 @@
 // src/hooks/useLoaderEvents.js
 
+'use client'
 import { useEffect } from 'react'
 
 export default function useLoaderEvents({ meshRef }) {

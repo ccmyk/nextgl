@@ -1,5 +1,7 @@
 // src/hooks/useTitleTimeline.js
 
+'use client'
+
 import { useRef, useEffect } from 'react'
 import gsap from 'gsap'
 

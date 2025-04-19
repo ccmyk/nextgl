@@ -1,5 +1,6 @@
 // src/hooks/usePgState.js
 
+'use client'
 import { useEffect } from 'react'
 
 export default function usePgState({ meshRef, elRef, camera }) {

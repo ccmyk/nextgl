@@ -1,5 +1,7 @@
 // src/hooks/useScrollAnimation.js
 
+'use client'
+
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 

@@ -1,5 +1,7 @@
 // src/hooks/useLenisScroll.js
 
+'use client'
+
 import { useEffect, useRef } from 'react'
 import Lenis from 'lenis'
 

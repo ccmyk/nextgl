@@ -1,5 +1,6 @@
 // src/hooks/usePgTimeline.js
 
+'use client'
 import { useEffect } from 'react'
 import gsap from 'gsap'
 

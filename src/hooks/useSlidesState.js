@@ -1,4 +1,7 @@
 // src/hooks/useSlidesState.js
+
+'use client'
+
 import { useEffect } from 'react'
 import { clamp, lerp } from '@/lib/utils/math'
 
