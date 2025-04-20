@@ -27,6 +27,17 @@ export default class WebGLManager {
     this.iosmap = new Map()
   }
 
+  addToIosMap(key, value) {
+    if (!value.name) {
+      throw new Error("Each entry in iosmap must have a defined 'name' property.")
+    }
+    if (this.iosmap.has(key)) {
+      console.warn(`Overwriting existing entry in iosmap with key: ${key}`)
+    }
+    console.log(`Adding to iosmap: ${value.name}`)
+    this.iosmap.set(key, value)
+  }
+
   timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }

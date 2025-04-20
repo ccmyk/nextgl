@@ -3,7 +3,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import useAboutState from '@/hooks/useAboutState'
 import useAboutTimeline from '@/hooks/useAboutTimeline'
 import useAboutEvents from '@/hooks/useAboutEvents'

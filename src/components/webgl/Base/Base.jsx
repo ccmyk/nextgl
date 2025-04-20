@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import createBaseGeometry from '@/lib/webgl/createBaseGeometry'
 import useBaseState from '@/hooks/useBaseState'
 import useBaseTimeline from '@/hooks/useBaseTimeline'

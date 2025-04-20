@@ -1,3 +1,5 @@
+/* .prettierrc */
+
 {
   "plugins": ["prettier-plugin-glsl"],
   "semi": true,

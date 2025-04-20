@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useCallback, useRef } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import { useResizeEvents } from '@/hooks/useResizeEvents'
 import { useTouchScrollControl } from '@/hooks/useTouchScrollControl'
 import { useLenis } from '@/context/LenisProvider'

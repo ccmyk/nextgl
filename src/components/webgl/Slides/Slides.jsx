@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import createSlidesGeometry from '@/lib/webgl/createSlidesGeometry'
 import useSlidesState from '@/hooks/useSlidesState'
 import useSlidesTimeline from '@/hooks/useSlidesTimeline'

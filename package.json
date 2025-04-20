@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -14,20 +15,30 @@
     "msdf-bmfont-xml": "^2.7.0",
     "next": "15.3.0",
     "ogl": "^1.0.11",
-    "postcss-cli": "^11.0.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "split-type": "^0.3.4",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "cssnano": "^7.0.6",
+    "@eslint/js": "^9.25.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.25.0",
     "eslint-config-next": "15.3.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "glslify": "^7.1.1",
+    "glslify-loader": "^2.0.0",
     "postcss": "^8.5.3",
     "postcss-import": "^16.1.0",
-    "postcss-nested": "^7.0.2",
+    "postcss-nesting": "^13.0.1",
     "postcss-preset-env": "^10.1.6",
-    "prettier": "^3.5.3"
-  }
+    "prettier": "^3.5.3",
+    "prettier-plugin-glsl": "^0.2.1",
+    "raw-loader": "^4.0.2"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ]
 }

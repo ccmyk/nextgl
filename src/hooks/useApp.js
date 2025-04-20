@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import { useLenisScroll } from '@/hooks/useLenisScroll'
 import { useGlobalEvents } from '@/hooks/useGlobalEvents'
 import { useNavigation } from '@/hooks/useNavigation'

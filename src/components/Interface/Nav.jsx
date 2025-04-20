@@ -3,13 +3,19 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useAppContext } from '@/context/useAppContext'
 import gsap from 'gsap'
 
-export default function Nav({ main }) {
+export default function Nav() {
+  const { main } = useAppContext()
   const navRef = useRef()
   const state = useRef({ isOpen: 0, clockact: 0, time: performance.now() })
 
   useEffect(() => {
+    if (!main || !main.current || !main.current.events) {
+      console.error("Nav: main or main.current.events is undefined!", { main })
+      return
+    }
     const el = navRef.current
     const DOM = {
       el,
@@ -29,9 +35,9 @@ export default function Nav({ main }) {
 
     // Dispatch initial animation events
     ;['c', 'city', 'h', 'm', 'a'].forEach((k) => {
-      main.events.anim.detail.state = 0
-      main.events.anim.detail.el = DOM[k]
-      document.dispatchEvent(main.events.anim)
+      main.current.events.anim.detail.state = 0
+      main.current.events.anim.detail.el = DOM[k]
+      document.dispatchEvent(main.current.events.anim)
     })
 
     // DOM.m.innerHTML = m
@@ -64,9 +70,9 @@ export default function Nav({ main }) {
       DOM.m.querySelectorAll('.char')[1].querySelector('.n').innerHTML = m[1]
 
       if (state.current.clockact === 1) {
-        main.events.anim.detail.state = 1
-        main.events.anim.detail.el = DOM.m
-        document.dispatchEvent(main.events.anim)
+        main.current.events.anim.detail.state = 1
+        main.current.events.anim.detail.el = DOM.m
+        document.dispatchEvent(main.current.events.anim)
       }
     }
 
@@ -95,9 +101,9 @@ export default function Nav({ main }) {
       if (h === actualh) return h
 
       if (state.current.clockact === 1) {
-        main.events.anim.detail.state = 1
-        main.events.anim.detail.el = DOM.h
-        document.dispatchEvent(main.events.anim)
+        main.current.events.anim.detail.state = 1
+        main.current.events.anim.detail.el = DOM.h
+        document.dispatchEvent(main.current.events.anim)
       }
 
       return h
@@ -105,44 +111,44 @@ export default function Nav({ main }) {
 
     async function openMenu() {
       document.documentElement.classList.add('act-menu')
-      document.dispatchEvent(main.events.openmenu)
+      document.dispatchEvent(main.current.events.openmenu)
     }
 
     async function closeMenu() {
       document.documentElement.classList.remove('act-menu')
-      document.dispatchEvent(main.events.closemenu)
+      document.dispatchEvent(main.current.events.closemenu)
     }
 
     async function show() {
       DOM.el.style.opacity = 1
-      main.events.anim.detail.state = 1
-      main.events.anim.detail.el = DOM.c
-      document.dispatchEvent(main.events.anim)
+      main.current.events.anim.detail.state = 1
+      main.current.events.anim.detail.el = DOM.c
+      document.dispatchEvent(main.current.events.anim)
 
       DOM.c.onmouseenter = () => {
-        main.events.anim.detail.state = 1
-        main.events.anim.detail.el = DOM.c
-        document.dispatchEvent(main.events.anim)
+        main.current.events.anim.detail.state = 1
+        main.current.events.anim.detail.el = DOM.c
+        document.dispatchEvent(main.current.events.anim)
       }
 
       DOM.el.querySelector('.nav_clock_s').style.opacity = 1
       ;['city', 'h', 'm', 'a'].forEach((k) => {
-        main.events.anim.detail.state = 1
-        main.events.anim.detail.el = DOM[k]
-        document.dispatchEvent(main.events.anim)
+        main.current.events.anim.detail.state = 1
+        main.current.events.anim.detail.el = DOM[k]
+        document.dispatchEvent(main.current.events.anim)
       })
 
       for (let [i, a] of DOM.els.entries()) {
-        main.events.anim.detail.el = a
-        main.events.anim.detail.state = 0
-        document.dispatchEvent(main.events.anim)
-        main.events.anim.detail.state = 1
-        document.dispatchEvent(main.events.anim)
+        main.current.events.anim.detail.el = a
+        main.current.events.anim.detail.state = 0
+        document.dispatchEvent(main.current.events.anim)
+        main.current.events.anim.detail.state = 1
+        document.dispatchEvent(main.current.events.anim)
 
         a.onmouseenter = () => {
-          main.events.anim.detail.el = a
-          main.events.anim.detail.state = 1
-          document.dispatchEvent(main.events.anim)
+          main.current.events.anim.detail.el = a
+          main.current.events.anim.detail.state = 1
+          document.dispatchEvent(main.current.events.anim)
         }
       }
 

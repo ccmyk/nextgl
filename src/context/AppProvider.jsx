@@ -2,47 +2,49 @@
 
 'use client'
 
-import { createContext, useContext, useRef, useState } from 'react'
+import { createContext, useContext, useRef, useState } from 'react';
 
-export const AppContext = createContext(null)
+const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  // refs replacing legacy this.* assignments
-  const main = useRef({})
-  const page = useRef(null)
-  const gl = useRef(null)
-  const mouse = useRef(null)
-  const nav = useRef(null)
-  const lenis = useRef(null)
-  const pHide = useRef(null)
-  const isload = useRef(0)
-  const content = useRef(null)
-  const template = useRef(null)
+  const [appState, setAppState] = useState({ isLoaded: false, page: null });
+  const mainRef = useRef();
+  const glRef = useRef();
+  const pageRef = useRef();
+  const contentRef = useRef();
+  const navRef = useRef();
+  const loaderRef = useRef();
+  const mouseRef = useRef();
+  const lenisRef = useRef();
 
-  const [isReady, setIsReady] = useState(false)
+  const setMain = (main) => (mainRef.current = main);
+  const setGL = (gl) => (glRef.current = gl);
+  const setPage = (page) => (pageRef.current = page);
+  const setLenis = (lenis) => (lenisRef.current = lenis);
 
   return (
     <AppContext.Provider
       value={{
-        main,
-        page,
-        gl,
-        mouse,
-        nav,
-        lenis,
-        pHide,
-        isload,
-        content,
-        template,
-        isReady,
-        setIsReady,
+        appState,
+        setAppState,
+        setMain,
+        setGL,
+        setPage,
+        setLenis,
+        mainRef,
+        glRef,
+        pageRef,
+        contentRef,
+        navRef,
+        loaderRef,
+        mouseRef,
       }}
     >
       {children}
     </AppContext.Provider>
-  )
+  );
 }
 
 export function useAppContext() {
-  return useContext(AppContext)
+  return useContext(AppContext);
 }

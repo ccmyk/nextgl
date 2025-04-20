@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import { useComponentFactory } from '@/hooks/useComponentFactory'
 import { useScrollAnimation } from '@/hooks/useScrollAnimation'
 import { useIOS } from '@/hooks/useIOS'

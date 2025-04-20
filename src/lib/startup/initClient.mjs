@@ -2,7 +2,7 @@
 
 import { browserCheck, glCheck } from './browser.js';
 import { loadRestApi } from './loadRestApi.mjs';
-import App from '@/lib/animations/index.js'; // or wherever App class is
+import App from '@/lib/animations/index.js';
 
 import gsap from 'gsap';
 import SplitType from 'split-type';

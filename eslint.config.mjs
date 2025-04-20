@@ -1,39 +1,40 @@
-// eslint.config.mjs
+import js from '@eslint/js';
+import prettierPlugin from 'eslint-plugin-prettier';
+import next from 'eslint-config-next';
 
-export default {
-  extends: [
-    'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'next/core-web-vitals',
-    'plugin:prettier/recommended',
-    'plugin:jsdoc/recommended'
-  ],
-  plugins: ['prettier', 'jsdoc', 'import'],
-  rules: {
-    'react/react-in-jsx-scope': 'off',
-    'react/prop-types': 'off',
-    'prettier/prettier': 'error',
-    'import/order': ['error', { 'groups': ['builtin', 'external', 'internal'] }],
-    'jsdoc/check-alignment': 'error', 
-    'jsdoc/check-indentation': 'error',
-    'jsdoc/check-param-names': 'error'
-  },
-  settings: {
-    react: {
-      version: 'detect',
+/** @type {import("eslint").Linter.FlatConfig[]} */
+export default [
+  js.configs.recommended,
+  ...next(),
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      prettier: prettierPlugin,
+    },
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        React: 'readonly',
+      },
+    },
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'prettier/prettier': 'error',
+      'import/order': [
+        'error',
+        {
+          groups: ['builtin', 'external', 'internal'],
+          'newlines-between': 'always',
+        },
+      ],
     },
   },
-  env: {
-    browser: true,
-    node: true,
-    es2024: true,
-  },
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    ecmaFeatures: {
-      jsx: true,
-    },
-  },
-};
+];

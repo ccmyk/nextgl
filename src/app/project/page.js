@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/AppProvider'
+import { useAppContext } from '@/context/useAppContext'
 import ProjectIntro from './Intro'
 import IOIn from './IOIn'
 import IONext from './IONext'
