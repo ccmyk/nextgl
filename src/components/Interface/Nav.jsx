@@ -2,183 +2,432 @@
 
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useEffect, useRef, useState } from 'react'
+import { useAppContext, useAppState } from '@/context/AppProvider'
+import Link from 'next/link'
 import gsap from 'gsap'
+import SplitType from 'split-type'
 
 export default function Nav() {
-  const { main } = useAppContext()
-  const navRef = useRef()
-  const state = useRef({ isOpen: 0, clockact: 0, time: performance.now() })
-
+  // Get references and state from context
+  const { navRef } = useAppContext()
+  const { menuOpen, setMenuOpen, currentPage } = useAppState()
+  
+  // Refs for elements
+  const burgerRef = useRef(null)
+  const navLinksRef = useRef(null)
+  const menuContainerRef = useRef(null)
+  const clockRef = useRef(null)
+  const cityRef = useRef(null)
+  const hourRef = useRef(null)
+  const minuteRef = useRef(null)
+  const ampmRef = useRef(null)
+  const logoRef = useRef(null)
+  
+  // State for time
+  const [time, setTime] = useState(() => {
+    const now = new Date()
+    const hours = now.getHours()
+    const minutes = now.getMinutes()
+    return {
+      hours: hours > 12 ? hours - 12 : hours === 0 ? 12 : hours,
+      minutes: minutes < 10 ? `0${minutes}` : minutes,
+      ampm: hours >= 12 ? 'PM' : 'AM'
+    }
+  })
+  
+  // References for animations and timers
+  const timeIntervalRef = useRef(null)
+  const textSplitsRef = useRef({})
+  const animationsRef = useRef({})
+  const timelineRef = useRef(null)
+  
+  // Toggle menu state
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen)
+  }
+  
+  // Handle menu animations
   useEffect(() => {
-    if (!main || !main.current || !main.current.events) {
-      console.error("Nav: main or main.current.events is undefined!", { main })
-      return
-    }
-    const el = navRef.current
-    const DOM = {
-      el,
-      burger: el.querySelector('.nav_burger'),
-      els: el.querySelectorAll('.nav_right a'),
-      city: el.querySelector('.nav_clock_p'),
-      c: el.querySelector('.nav_logo'),
-      h: el.querySelector('.nav_clock_h'),
-      m: el.querySelector('.nav_clock_m'),
-      a: el.querySelector('.nav_clock_a'),
-    }
-
-    DOM.el.style.opacity = 0
-    const date = new Date()
-    const h = date.getHours()
-    const m = date.getMinutes()
-
-    // Dispatch initial animation events
-    ;['c', 'city', 'h', 'm', 'a'].forEach((k) => {
-      main.current.events.anim.detail.state = 0
-      main.current.events.anim.detail.el = DOM[k]
-      document.dispatchEvent(main.current.events.anim)
-    })
-
-    // DOM.m.innerHTML = m
-    setTime(h, m)
-    initEvents()
-
-    function setTime(hour = null, minute = null) {
-      let m = minute
-      if (minute === null) {
-        m = parseInt(
-          DOM.m.querySelectorAll('.char')[0].querySelector('.n').innerHTML +
-            DOM.m.querySelectorAll('.char')[1].querySelector('.n').innerHTML
-        )
-        m++
-        const mi = new Date().getMinutes()
-        if (mi !== m) m = mi
-      }
-
-      let h = hour
-      if (hour === null || m === 60) {
-        searchAMPM()
-        if (m === 60 && minute === null) m = 0
-      }
-
-      if (m < 10) m = '0' + m
-      m = m.toString()
-
-      DOM.m.querySelectorAll('.char')[0].querySelector('.n').classList.add('eee1')
-      DOM.m.querySelectorAll('.char')[0].querySelector('.n').innerHTML = m[0]
-      DOM.m.querySelectorAll('.char')[1].querySelector('.n').innerHTML = m[1]
-
-      if (state.current.clockact === 1) {
-        main.current.events.anim.detail.state = 1
-        main.current.events.anim.detail.el = DOM.m
-        document.dispatchEvent(main.current.events.anim)
-      }
-    }
-
-    function searchAMPM(h = null) {
-      if (h === null) h = new Date().getHours()
-
-      if (h >= 12) {
-        DOM.a.querySelectorAll('.char')[1].querySelector('.n').innerHTML = 'M'
-        if (h > 12) {
-          h -= 12
-          DOM.a.querySelectorAll('.char')[0].querySelector('.n').innerHTML = 'P'
-        }
-      } else {
-        DOM.a.querySelectorAll('.char')[0].querySelector('.n').innerHTML = 'A'
-      }
-
-      if (h < 10) h = '0' + h
-      const actualh = parseInt(
-        DOM.h.querySelectorAll('.char')[0].querySelector('.n').innerHTML +
-          DOM.h.querySelectorAll('.char')[1].querySelector('.n').innerHTML
-      )
-
-      DOM.h.querySelectorAll('.char')[0].querySelector('.n').innerHTML = h.toString()[0]
-      DOM.h.querySelectorAll('.char')[1].querySelector('.n').innerHTML = h.toString()[1]
-
-      if (h === actualh) return h
-
-      if (state.current.clockact === 1) {
-        main.current.events.anim.detail.state = 1
-        main.current.events.anim.detail.el = DOM.h
-        document.dispatchEvent(main.current.events.anim)
-      }
-
-      return h
-    }
-
-    async function openMenu() {
-      document.documentElement.classList.add('act-menu')
-      document.dispatchEvent(main.current.events.openmenu)
-    }
-
-    async function closeMenu() {
-      document.documentElement.classList.remove('act-menu')
-      document.dispatchEvent(main.current.events.closemenu)
-    }
-
-    async function show() {
-      DOM.el.style.opacity = 1
-      main.current.events.anim.detail.state = 1
-      main.current.events.anim.detail.el = DOM.c
-      document.dispatchEvent(main.current.events.anim)
-
-      DOM.c.onmouseenter = () => {
-        main.current.events.anim.detail.state = 1
-        main.current.events.anim.detail.el = DOM.c
-        document.dispatchEvent(main.current.events.anim)
-      }
-
-      DOM.el.querySelector('.nav_clock_s').style.opacity = 1
-      ;['city', 'h', 'm', 'a'].forEach((k) => {
-        main.current.events.anim.detail.state = 1
-        main.current.events.anim.detail.el = DOM[k]
-        document.dispatchEvent(main.current.events.anim)
+    if (typeof window === 'undefined') return
+    if (!burgerRef.current || !menuContainerRef.current) return
+    
+    const burgerLines = burgerRef.current.querySelectorAll('.line')
+    
+    if (menuOpen) {
+      // Menu opening animation
+      gsap.to(burgerLines[0], { 
+        rotation: 45, 
+        y: 7, 
+        duration: 0.3, 
+        ease: 'power2.out' 
       })
-
-      for (let [i, a] of DOM.els.entries()) {
-        main.current.events.anim.detail.el = a
-        main.current.events.anim.detail.state = 0
-        document.dispatchEvent(main.current.events.anim)
-        main.current.events.anim.detail.state = 1
-        document.dispatchEvent(main.current.events.anim)
-
-        a.onmouseenter = () => {
-          main.current.events.anim.detail.el = a
-          main.current.events.anim.detail.state = 1
-          document.dispatchEvent(main.current.events.anim)
+      
+      gsap.to(burgerLines[1], { 
+        opacity: 0, 
+        duration: 0.2 
+      })
+      
+      gsap.to(burgerLines[2], { 
+        rotation: -45, 
+        y: -7, 
+        duration: 0.3, 
+        ease: 'power2.out' 
+      })
+      
+      // Show menu container
+      gsap.to(menuContainerRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power2.out'
+      })
+      
+      // Animate menu links
+      const menuLinks = menuContainerRef.current.querySelectorAll('a')
+      gsap.fromTo(
+        menuLinks,
+        { y: 20, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          stagger: 0.05, 
+          duration: 0.4, 
+          ease: 'power2.out',
+          delay: 0.1
         }
-      }
-
-      state.current.clockact = 1
+      )
+      
+      // Add class to body for full-screen menu styling
+      document.body.classList.add('menu-open')
+      
+    } else {
+      // Menu closing animation
+      gsap.to(burgerLines[0], { 
+        rotation: 0, 
+        y: 0, 
+        duration: 0.3, 
+        ease: 'power2.in' 
+      })
+      
+      gsap.to(burgerLines[1], { 
+        opacity: 1, 
+        duration: 0.3 
+      })
+      
+      gsap.to(burgerLines[2], { 
+        rotation: 0, 
+        y: 0, 
+        duration: 0.3, 
+        ease: 'power2.in' 
+      })
+      
+      // Hide menu container
+      gsap.to(menuContainerRef.current, {
+        y: -20,
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power2.in'
+      })
+      
+      // Remove class from body
+      document.body.classList.remove('menu-open')
     }
-
-    function initEvents() {
-      if (DOM.burger) {
-        DOM.burger.onclick = () => {
-          if (state.current.isOpen === 1) {
-            closeMenu()
-            state.current.isOpen = 0
-          } else {
-            openMenu()
-            state.current.isOpen = 1
+  }, [menuOpen])
+  
+  // Handle time updates
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    // Update the time every minute
+    const updateTime = () => {
+      const now = new Date()
+      const hours = now.getHours()
+      const minutes = now.getMinutes()
+      
+      setTime({
+        hours: hours > 12 ? hours - 12 : hours === 0 ? 12 : hours,
+        minutes: minutes < 10 ? `0${minutes}` : minutes,
+        ampm: hours >= 12 ? 'PM' : 'AM'
+      })
+    }
+    
+    // Initial update
+    updateTime()
+    
+    // Set interval to update every minute
+    const intervalId = setInterval(() => {
+      updateTime()
+    }, 60000) // Check every minute
+    
+    timeIntervalRef.current = intervalId
+    
+    return () => {
+      if (timeIntervalRef.current) {
+        clearInterval(timeIntervalRef.current)
+      }
+    }
+  }, [])
+  
+  // Handle text splitting for animations
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    // Wait for DOM to be ready
+    const initializeSplitText = () => {
+      const elementsToSplit = [
+        { ref: cityRef, className: 'city' },
+        { ref: hourRef, className: 'hour' },
+        { ref: minuteRef, className: 'minute' },
+        { ref: ampmRef, className: 'ampm' },
+        { ref: logoRef, className: 'logo' }
+      ]
+      
+      // Process each element
+      elementsToSplit.forEach(({ ref, className }) => {
+        if (ref.current) {
+          try {
+            const split = new SplitType(ref.current, { 
+              types: 'chars',
+              tagName: 'span'
+            })
+            
+            // Store for cleanup
+            textSplitsRef.current[className] = split
+            
+            // Add necessary wrapper for animation
+            if (split.chars) {
+              split.chars.forEach(char => {
+                // Create wrapper span
+                const wrapper = document.createElement('span')
+                wrapper.classList.add('char-wrapper')
+                
+                // Create inner span for animation
+                const inner = document.createElement('span')
+                inner.classList.add('n')
+                inner.textContent = char.textContent
+                
+                // Update DOM
+                char.textContent = ''
+                wrapper.appendChild(inner)
+                char.appendChild(wrapper)
+              })
+            }
+          } catch (error) {
+            console.warn(`Failed to split text for ${className}:`, error)
           }
         }
-      }
+      })
+    }
+    
+    // Run after a small delay to ensure DOM is ready
+    const timeout = setTimeout(() => {
+      initializeSplitText()
+    }, 100)
+    
+    return () => {
+      clearTimeout(timeout)
+      
+      // Clean up split instances
+      Object.values(textSplitsRef.current).forEach(split => {
+        if (split && typeof split.revert === 'function') {
+          split.revert()
+        }
+      })
+    }
+  }, [])
+  // Initialize animations
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    // Show elements with initial animations
+    const showElements = () => {
+      // Create animation for the nav
+      gsap.fromTo(
+        navRef.current,
+        { opacity: 0 },
+        { 
+          opacity: 1, 
+          duration: 0.6, 
+          ease: 'power2.out',
+          onComplete: () => {
+            // Animate clock elements
+            const hourChars = hourRef.current?.querySelectorAll('.char .n') || []
+            const minuteChars = minuteRef.current?.querySelectorAll('.char .n') || []
+            const ampmChars = ampmRef.current?.querySelectorAll('.char .n') || []
+            
+            gsap.fromTo(
+              [...hourChars, ...minuteChars, ...ampmChars],
+              { y: 10, opacity: 0 },
+              { 
+                y: 0, 
+                opacity: 1, 
+                stagger: 0.02, 
+                duration: 0.4, 
+                ease: 'power2.out' 
+              }
+            )
+          }
+        }
+      )
     }
 
-    const clockTimer = setInterval(() => {
-      const now = performance.now()
-      if (state.current.time + 60010 <= now) {
-        state.current.time = now
-        setTime()
-      }
-    }, 10000)
+    // Run animations after a small delay
+    const timeout = setTimeout(showElements, 200)
+    
+    return () => clearTimeout(timeout)
+  }, [])
 
-    return () => clearInterval(clockTimer)
-  }, [main])
+  // Handle link hover animations
+  const handleLinkHover = (event) => {
+    const target = event.currentTarget
+    const chars = target.querySelectorAll('.char .n')
+    
+    if (chars && chars.length) {
+      gsap.to(chars, {
+        y: -3,
+        stagger: 0.02,
+        duration: 0.2,
+        ease: 'power2.out'
+      })
+    }
+  }
+  
+  const handleLinkHoverExit = (event) => {
+    const target = event.currentTarget
+    const chars = target.querySelectorAll('.char .n')
+    
+    if (chars && chars.length) {
+      gsap.to(chars, {
+        y: 0,
+        stagger: 0.01,
+        duration: 0.2,
+        ease: 'power2.in'
+      })
+    }
+  }
 
-  return <nav ref={navRef} className="nav" />
+  return (
+    <nav ref={navRef} className="nav" aria-label="Main navigation">
+      {/* Logo */}
+      <div className="nav_logo">
+        <Link href="/" ref={logoRef} className="logo" onMouseEnter={handleLinkHover} onMouseLeave={handleLinkHoverExit}>
+          NextGL
+        </Link>
+      </div>
+      
+      {/* Clock Display */}
+      <div className="nav_clock" ref={clockRef}>
+        <div className="nav_clock_city">
+          <p ref={cityRef} className="nav_clock_p">New York</p>
+        </div>
+        <div className="nav_clock_time">
+          <span ref={hourRef} className="nav_clock_h">{time.hours}</span>
+          <span className="nav_clock_divider">:</span>
+          <span ref={minuteRef} className="nav_clock_m">{time.minutes}</span>
+          <span ref={ampmRef} className="nav_clock_a">{time.ampm}</span>
+        </div>
+      </div>
+      
+      {/* Top Navigation Links */}
+      <div className="nav_right" ref={navLinksRef}>
+        <Link 
+          href="/about" 
+          className={currentPage === 'about' ? 'active' : ''}
+          onMouseEnter={handleLinkHover}
+          onMouseLeave={handleLinkHoverExit}
+        >
+          About
+        </Link>
+        <Link 
+          href="/projects" 
+          className={currentPage === 'projects' ? 'active' : ''}
+          onMouseEnter={handleLinkHover}
+          onMouseLeave={handleLinkHoverExit}
+        >
+          Projects
+        </Link>
+        <Link 
+          href="/playground" 
+          className={currentPage === 'playground' ? 'active' : ''}
+          onMouseEnter={handleLinkHover}
+          onMouseLeave={handleLinkHoverExit}
+        >
+          Playground
+        </Link>
+      </div>
+      
+      {/* Burger Menu Button */}
+      <button 
+        ref={burgerRef} 
+        className={`nav_burger ${menuOpen ? 'active' : ''}`}
+        onClick={toggleMenu}
+        aria-expanded={menuOpen}
+        aria-controls="menu-container"
+        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+      >
+        <span className="line"></span>
+        <span className="line"></span>
+        <span className="line"></span>
+      </button>
+      
+      {/* Full-screen Menu Container */}
+      <div 
+        id="menu-container"
+        ref={menuContainerRef} 
+        className={`menu-container ${menuOpen ? 'active' : ''}`}
+        aria-hidden={!menuOpen}
+      >
+        <div className="menu-content">
+          <ul className="menu-links">
+            <li>
+              <Link 
+                href="/"
+                onClick={() => setMenuOpen(false)}
+                className={currentPage === 'home' ? 'active' : ''}
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/about"
+                onClick={() => setMenuOpen(false)}
+                className={currentPage === 'about' ? 'active' : ''}
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/projects"
+                onClick={() => setMenuOpen(false)}
+                className={currentPage === 'projects' ? 'active' : ''}
+              >
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/playground"
+                onClick={() => setMenuOpen(false)}
+                className={currentPage === 'playground' ? 'active' : ''}
+              >
+                Playground
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/contact"
+                onClick={() => setMenuOpen(false)}
+                className={currentPage === 'contact' ? 'active' : ''}
+              >
+                Contact
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  )
 }

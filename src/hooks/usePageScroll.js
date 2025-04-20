@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export function usePageScroll() {
   const ticking = useRef(false)

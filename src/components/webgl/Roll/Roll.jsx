@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 import createRollGeometry from '@/lib/webgl/createRollGeometry'
 import useRollState from '@/hooks/useRollState'
 import useRollTimeline from '@/hooks/useRollTimeline'

@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export function useNavigation() {
   const {

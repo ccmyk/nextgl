@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 import createLoaderGeometry from '@/lib/webgl/createLoaderGeometry'
 import useLoaderState from '@/hooks/useLoaderState'
 import useLoaderTimeline from '@/hooks/useLoaderTimeline'

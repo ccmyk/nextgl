@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export function usePageTransition() {
   const { pHide } = useAppContext()

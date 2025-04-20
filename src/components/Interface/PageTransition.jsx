@@ -3,7 +3,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export default function PageTransition() {
   const { pHide } = useAppContext()

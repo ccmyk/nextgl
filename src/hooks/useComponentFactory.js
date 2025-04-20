@@ -3,7 +3,7 @@
 'use client'
 
 import { useCallback } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 export function useComponentFactory() {
   const { page } = useAppContext()

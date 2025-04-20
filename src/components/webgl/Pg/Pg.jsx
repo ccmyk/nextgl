@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 import createPgGeometry from '@/lib/webgl/createPgGeometry'
 import usePgState from '@/hooks/usePgState'
 import usePgTimeline from '@/hooks/usePgTimeline'

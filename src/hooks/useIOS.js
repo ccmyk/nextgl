@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 import { createIos } from '@/lib/ios/createIos'
 import { callIos } from '@/lib/ios/callIos'
 import { showIos } from '@/lib/ios/showIos'

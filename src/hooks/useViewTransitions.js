@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 
 /**
  * Handles fade-in/out and view-specific transition coordination.

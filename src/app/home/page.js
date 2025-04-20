@@ -2,73 +2,160 @@
 
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useState, useEffect, Suspense } from 'react'
+import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import Footer from '@/components/webgl/Footer/Footer'
-import Background from '@/components/webgl/Background/Background'
-import Title from '@/components/webgl/Title/Title'
-import LoaderDOM from '@/components/Interface/LoaderDOM'
-import useTextAnimation from '@/hooks/useTextAnimation'
+import { useTextAnimation } from '@/hooks/useTextAnimation'
+import { useAppState } from '@/context/AppProvider'
+import gsap from 'gsap'
 
+// Dynamically import WebGL components to prevent SSR execution
+const LoaderDOM = dynamic(() => import('@/components/Interface/LoaderDOM'), {
+  ssr: false
+})
+
+const Footer = dynamic(() => import('@/components/webgl/Footer/Footer'), {
+  ssr: false
+})
+
+const Background = dynamic(() => import('@/components/webgl/Background/Background'), {
+  ssr: false
+})
+
+const Title = dynamic(() => import('@/components/webgl/Title/Title'), {
+  ssr: false
+})
+
+/**
+ * Loading component for WebGL elements
+ * @returns {JSX.Element} Loading UI
+ */
+const WebGLFallback = () => (
+  <div className="webgl-loading">
+    <span className="loading-indicator">Loading experience...</span>
+  </div>
+)
+
+/**
+ * HomePage component - Main landing page with WebGL experiences
+ * @returns {JSX.Element} HomePage UI
+ */
 export default function HomePage() {
   const heroRef = useRef(null)
-  const ttRef = useRef(null)
-  const textRef = useRef(null)
+  const firstNameRef = useRef(null)
+  const lastNameRef = useRef(null)
+  const taglineRef = useRef(null)
+  const contactLinkRef = useRef(null)
+  const workLinkRef = useRef(null)
+  const aboutTitleRef = useRef(null)
+  
+  const { isLoaded, setLoaded, setCurrentPage } = useAppState()
+  const [isClient, setIsClient] = useState(false)
+  const [animationsReady, setAnimationsReady] = useState(false)
+  
+  // Initialize animation timelines
+  const mainTimelineRef = useRef(null)
 
-  useTextAnimation({ target: ttRef })
-  useTextAnimation({ target: textRef })
+  // Track if component is mounted on client
+  useEffect(() => {
+    setIsClient(true)
+    setCurrentPage('home')
+    
+    // Create main animation timeline
+    const timeline = gsap.timeline({ paused: true });
+    mainTimelineRef.current = timeline;
+    
+    // Mark animations as ready for sequencing
+    setAnimationsReady(true)
+    
+    return () => {
+      // Cleanup timelines
+      if (mainTimelineRef.current) {
+        mainTimelineRef.current.kill();
+      }
+    }
+  }, [setCurrentPage])
+
+  // Initialize text animations with proper refs
+  useEffect(() => {
+    if (!animationsReady || !isClient) return;
+    
+    // Allow some time for DOM to be ready
+    const delay = setTimeout(() => {
+      // Start the main animation sequence
+      if (mainTimelineRef.current) {
+        mainTimelineRef.current.play();
+        
+        // Set page as loaded after animations complete
+        mainTimelineRef.current.eventCallback('onComplete', () => {
+          setLoaded(true);
+        });
+      }
+    }, 100);
+    
+    return () => clearTimeout(delay);
+  }, [animationsReady, isClient, setLoaded]);
+
+  // Initialize text animations
+  useTextAnimation(firstNameRef)
+  useTextAnimation(lastNameRef)
+  useTextAnimation(taglineRef)
+  useTextAnimation(contactLinkRef, 1) // Use compressed style for links
+  useTextAnimation(workLinkRef, 1) // Use compressed style for links
+  useTextAnimation(aboutTitleRef)
 
   return (
     <main className="home">
-      <section className="home_hero" ref={heroRef}>
-        <canvas id="glBg" />
-        <div className="Mbg">
-          <div className="Mbg_col">
-            <div className="Mbg_col_el Mbg_col_el-1" />
-            <div className="Mbg_col_el Mbg_col_el-2" />
+      <section className="home-hero" ref={heroRef}>
+        {isClient && <canvas id="glBg" className="webgl-background" />}
+        
+        <div className="background-grid">
+          <div className="background-column">
+            <div className="grid-element grid-element-1" />
+            <div className="grid-element grid-element-2" />
           </div>
         </div>
 
-        <div id="content" data-template="home">
-          <div className="cnt">
-            <div className="cnt_hold">
-              <h2 className="cnt_tt">
-                <div className="Atitle">
-                  <div className="cCover">
-                    <canvas className="glF" />
+        <div id="content" className="content-container" data-template="home">
+          <div className="container">
+            <div className="content-wrapper">
+              <h1 className="hero-title">
+                <div className="animated-title">
+                  <div className="canvas-wrapper">
+                    {isClient && <canvas className="title-canvas" />}
                   </div>
-                  <div className="Oi Oi-tt" data-text="Chris" />
-                  <div className="ttj Oiel act" ref={ttRef} />
+                  <div className="title-text" data-text="Chris" />
+                  <span ref={firstNameRef}>Chris</span>
                 </div>
-                <div className="Atitle">
-                  <div className="cCover">
-                    <canvas className="glF" />
+                <div className="animated-title">
+                  <div className="canvas-wrapper">
+                    {isClient && <canvas className="title-canvas" />}
                   </div>
-                  <div className="Oi Oi-tt" data-text="Hall" />
-                  <div className="ttj Oiel act" ref={ttRef} />
+                  <div className="title-text" data-text="Hall" />
+                  <span ref={lastNameRef}>Hall</span>
                 </div>
-              </h2>
+              </h1>
 
-              <div className="cnt_bt inview stview">
-                <h3 className="tt3">Designer + Art Director<br />Living in Los Angeles</h3>
-                <h4 className="Awrite inview stview" ref={textRef}>
-                  <div className="word">
-                    <div className="char">Portfolio</div>
-                  </div>
-                </h4>
-                <div className="cnt_lk">
-                  <a className="Awrite inview stview" href="#">
-                    <div className="iO iO-std" />
-                    <div className="word">
-                      <div className="char">Contact</div>
-                    </div>
-                  </a>
-                  <a className="Awrite inview stview" href="#">
-                    <div className="iO iO-std" />
-                    <div className="word">
-                      <div className="char">Work</div>
-                    </div>
-                  </a>
+              <div className="hero-content">
+                <h2 className="subtitle">Designer + Art Director<br />Living in Los Angeles</h2>
+                <h3 className="tagline" ref={taglineRef}>Portfolio</h3>
+                <div className="hero-links">
+                  <Link 
+                    href="/contact" 
+                    className="animated-link"
+                    aria-label="Contact page"
+                  >
+                    <div className="link-icon" />
+                    <span ref={contactLinkRef}>Contact</span>
+                  </Link>
+                  <Link 
+                    href="/projects" 
+                    className="animated-link"
+                    aria-label="Projects page"
+                  >
+                    <div className="link-icon" />
+                    <span ref={workLinkRef}>Work</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -76,23 +163,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="home_about">
-        <div className="Oi Oi-bg" />
-        <div className="c-vw cnt">
-          <div className="cnt_tp">
-            <h2 className="tt1 Oiel">
-              <div className="word">
-                <div className="char">About</div>
-              </div>
-            </h2>
+      <section className="home-about">
+        <div className="background-overlay" />
+        <div className="container">
+          <div className="about-content">
+            <h2 className="section-title" ref={aboutTitleRef}>About</h2>
+            {/* Content to be added here */}
           </div>
         </div>
       </section>
 
-      <Footer />
-      <Background />
-      <Title />
-      <LoaderDOM />
+      {/* WebGL Components with Suspense for loading state */}
+      <Suspense fallback={<WebGLFallback />}>
+        <Footer />
+        <Background />
+        <Title />
+        <LoaderDOM />
+      </Suspense>
     </main>
   )
 }

@@ -3,7 +3,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useAppContext } from '@/context/useAppContext'
+import { useAppContext } from '@/context/AppProvider'
 import useFooterState from '@/hooks/useFooterState'
 import useFooterTimeline from '@/hooks/useFooterTimeline'
 import useFooterEvents from '@/hooks/useFooterEvents'
