@@ -1,39 +1,9 @@
-// src/context/AppProvider.jsx
-
 'use client'
 
 import { createContext, useContext, useRef, useEffect } from 'react';
 import { create } from 'zustand';
+import { browserCheck } from '@/lib/startup/browser';
 
-/**
- * @typedef {Object} AppState
- * @property {boolean} isLoaded - Whether the app has finished initial loading
- * @property {string|null} currentPage - Current page route key
- * @property {boolean} isNavigating - Whether navigation is in progress
- * @property {boolean} menuOpen - Whether the menu is open
- * @property {string} theme - Current theme ('light' or 'dark')
- * @property {Object} dimensions - Viewport dimensions
- * @property {number} dimensions.width - Viewport width
- * @property {number} dimensions.height - Viewport height
- * @property {boolean} isMobile - Whether the viewport is mobile-sized
- * @property {boolean} isTablet - Whether the viewport is tablet-sized
- * @property {boolean} isDesktop - Whether the viewport is desktop-sized
- */
-
-/**
- * @typedef {Object} AppActions
- * @property {function} setLoaded - Set app as loaded
- * @property {function(string)} setCurrentPage - Set current page
- * @property {function(boolean)} setNavigating - Set navigation state
- * @property {function(boolean)} setMenuOpen - Set menu open state
- * @property {function(string)} setTheme - Set theme
- * @property {function} updateDimensions - Update viewport dimensions
- */
-
-/**
- * Create Zustand store for app state
- * @type {import('zustand').UseBoundStore<import('zustand').StoreApi<AppState & AppActions>>}
- */
 const useAppStore = create((set, get) => ({
   // Initial state
   isLoaded: false,
@@ -45,9 +15,12 @@ const useAppStore = create((set, get) => ({
     width: typeof window !== 'undefined' ? window.innerWidth : 1200,
     height: typeof window !== 'undefined' ? window.innerHeight : 800,
   },
-  isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
-  isTablet: typeof window !== 'undefined' ? window.innerWidth >= 768 && window.innerWidth < 1024 : false,
-  isDesktop: typeof window !== 'undefined' ? window.innerWidth >= 1024 : true,
+  deviceClass: '',
+  deviceNum: 0,
+  isTouch: false,
+  webp: false,
+  webm: false,
+  vidauto: false,
   
   // Actions
   setLoaded: () => set({ isLoaded: true }),
@@ -55,17 +28,31 @@ const useAppStore = create((set, get) => ({
   setNavigating: (isNavigating) => set({ isNavigating }),
   setMenuOpen: (menuOpen) => set({ menuOpen }),
   setTheme: (theme) => set({ theme }),
+  initializeDevice: () => {
+    const { deviceclass, device, isTouch, webp, webm, vidauto } = browserCheck();
+    if (typeof document !== 'undefined') {
+      const doc = document.documentElement;
+      if (!isTouch) {
+        doc.classList.add('D');
+      } else {
+        doc.classList.add('T', deviceclass);
+      }
+    }
+    set({
+      deviceClass: deviceclass,
+      deviceNum: device,
+      isTouch,
+      webp,
+      webm,
+      vidauto
+    });
+  },
   updateDimensions: () => {
     if (typeof window === 'undefined') return;
-    
     const width = window.innerWidth;
     const height = window.innerHeight;
-    
     set({
-      dimensions: { width, height },
-      isMobile: width < 768,
-      isTablet: width >= 768 && width < 1024,
-      isDesktop: width >= 1024,
+      dimensions: { width, height }
     });
   },
 }));
@@ -74,7 +61,7 @@ const useAppStore = create((set, get) => ({
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  // DOM refs that need to be accessible app-wide but don't belong in Zustand state
+  // DOM refs that need to be accessible app-wide
   const mainRef = useRef();
   const pageRef = useRef();
   const contentRef = useRef();
@@ -82,6 +69,11 @@ export function AppProvider({ children }) {
   const loaderRef = useRef();
   const mouseRef = useRef();
   
+  // Initialize device detection
+  useEffect(() => {
+    useAppStore.getState().initializeDevice();
+  }, []);
+
   // Handle window resize
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -98,16 +90,10 @@ export function AppProvider({ children }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Utility functions to set refs
-  const setMain = (main) => (mainRef.current = main);
-  const setPage = (page) => (pageRef.current = page);
-
   return (
     <AppContext.Provider
       value={{
         store: useAppStore,
-        setMain,
-        setPage,
         mainRef,
         pageRef,
         contentRef,
@@ -121,24 +107,14 @@ export function AppProvider({ children }) {
   );
 }
 
-/**
- * Hook to access the App context
- * @returns {Object} The AppContext
- */
 export function useAppContext() {
   const context = useContext(AppContext);
-  
   if (context === null) {
     throw new Error('useAppContext must be used within an AppProvider');
   }
-  
   return context;
 }
 
-/**
- * Hook to access app state from Zustand store
- * @returns {AppState & AppActions} The app state and actions
- */
 export function useAppState() {
   return useAppStore();
 }

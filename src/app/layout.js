@@ -1,124 +1,49 @@
-// src/app/layout.js
+'use client'
 
-import '@/styles/index.css'
-import { AppProvider } from '@/context/AppProvider'
-import { LenisProvider } from '@/context/LenisProvider'
-import { WebGLProvider } from '@/context/WebGLContext'
+import { WebGLProvider } from '@/webgl/core/WebGLContext'
+import { useEffect } from 'react'
+import { webgl } from '@/webgl/core/WebGLManager'
 import Nav from '@/components/Interface/Nav'
-import { Inter } from 'next/font/google'
-import ErrorBoundary from '@/components/ErrorBoundary'
-
-// Font optimization
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter'
-})
-
-// Metadata configuration
-export const metadata = {
-  title: {
-    template: '%s | NextGL',
-    default: 'NextGL - Creative WebGL Experiences',
-  },
-  description: 'Explore creative WebGL experiences built with Next.js, Three.js, and GSAP.',
-  keywords: ['WebGL', 'Next.js', 'Creative', '3D', 'Interactive', 'GSAP', 'Animation'],
-  authors: [{ name: 'NextGL Team' }],
-  creator: 'NextGL',
-  publisher: 'NextGL',
-  robots: {
-    index: true,
-    follow: true,
-  },
-  metadataBase: new URL('https://nextgl.example.com'),
-  alternates: {
-    canonical: '/',
-  },
-  openGraph: {
-    title: 'NextGL - Creative WebGL Experiences',
-    description: 'Explore creative WebGL experiences built with Next.js, Three.js, and GSAP.',
-    url: 'https://nextgl.example.com',
-    siteName: 'NextGL',
-    locale: 'en_US',
-    type: 'website',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'NextGL - Creative WebGL Experiences',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'NextGL - Creative WebGL Experiences',
-    description: 'Explore creative WebGL experiences built with Next.js, Three.js, and GSAP.',
-    creator: '@nextgl',
-    images: ['/twitter-image.jpg'],
-  },
-  icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
-    other: [
-      { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#000000' },
-    ],
-  },
-  manifest: '/site.webmanifest',
-  appleWebApp: {
-    title: 'NextGL',
-    statusBarStyle: 'black-translucent',
-    capable: true,
-  },
-  category: 'technology',
-}
-
-// Viewport configuration (moved from metadata)
-export const viewport = {
-  themeColor: '#000000',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
+import '@/styles/index.css'
 
 export default function RootLayout({ children }) {
+  // Initialize font loading same as legacy
+  useEffect(() => {
+    // Add fonts to document for MSDF text
+    const style = document.createElement('style')
+    style.textContent = `
+      @font-face {
+        font-family: 'montreal';
+        src: url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: block;
+      }
+    `
+    document.head.appendChild(style)
+
+    // Handle device detection same as legacy
+    const isTouch = /Mobi|Android|Tablet|iPad|iPhone/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
+    document.documentElement.classList.add(isTouch ? 'T' : 'D')
+    if (isTouch) {
+      document.documentElement.classList.add('touch')
+    }
+
+    // Clean up
+    return () => {
+      document.head.removeChild(style)
+    }
+  }, [])
+
   return (
-    <html lang="en" className={inter.variable}>
-      <head>
-        {/* PWA specific meta tags */}
-        <meta name="application-name" content="NextGL" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#000000" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="theme-color" content="#000000" />
-      </head>
+    <html lang="en">
       <body>
-        <ErrorBoundary fallback={<div>Something went wrong. Please refresh the page.</div>}>
-          <AppProvider>
-            <ErrorBoundary fallback={<div>Smooth scrolling unavailable.</div>}>
-              <LenisProvider>
-                <ErrorBoundary fallback={<div>WebGL content unavailable on your device.</div>}>
-                  <WebGLProvider>
-                    <Nav />
-                    <main id="main-content">
-                      {children}
-                    </main>
-                  </WebGLProvider>
-                </ErrorBoundary>
-              </LenisProvider>
-            </ErrorBoundary>
-          </AppProvider>
-        </ErrorBoundary>
+        <WebGLProvider>
+          <Nav />
+          {children}
+        </WebGLProvider>
       </body>
     </html>
   )
