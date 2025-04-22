@@ -1,118 +1,69 @@
-// src/components/Interface/Mouse.jsx
-
 'use client'
 
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
+import { useEffect } from 'react'
+import { useMouse } from '@/hooks/useMouse'
 
 export default function Mouse({ main }) {
-  const elRef = useRef(null)
-  const chdRef = useRef(null)
-  const animev = main?.events?.anim
-  const posRef = useRef([window.innerWidth / 2, window.innerHeight / 2])
+  const {
+    elementRef,
+    followIn,
+    followOut,
+    position,
+    setPosition,
+    active
+  } = useMouse()
 
+  // Handle mouse movement exactly as legacy
   useEffect(() => {
-    const el = document.createElement('div')
-    el.className = 'mouse'
-    elRef.current = el
-    document.body.appendChild(el)
-
-    const pH = document.querySelector('.pHide')
-    if (pH) {
-      pH.onmouseenter = () => {
-        if (chdRef.current) {
-          gsap.to(chdRef.current, {
-            width: 0,
-            duration: 0.2,
-            onComplete: () => {
-              chdRef.current?.remove()
-              chdRef.current = null
-            },
-          })
-        }
-      }
+    const handleMouseMove = (e) => {
+      if (active === 0) return false
+      setPosition([e.clientX, e.clientY])
     }
 
-    window.addEventListener('mousedown', () => {
-      document.documentElement.classList.add('mouse-down')
-    })
-    window.addEventListener('mouseup', () => {
-      document.documentElement.classList.remove('mouse-down')
-    })
+    document.body.onmousemove = handleMouseMove
 
-    const lightX = gsap.quickTo(el, 'x', { duration: 0.05, ease: 'none' })
-    const lightY = gsap.quickTo(el, 'y', { duration: 0.05, ease: 'none' })
-
-    document.body.onmousemove = (e) => {
-      posRef.current = [e.clientX, e.clientY]
-      lightX(posRef.current[0])
-      lightY(posRef.current[1])
-    }
-
-    const followIn = async (el) => {
-      // if(this.chd){ await window.waiter(300) } else { await window.waiter(6) }
-      if (chdRef.current) {
-        await window.waiter(300)
-      } else {
-        await window.waiter(6)
-      }
-
-      // if(this.chd){ this.chd.remove(); delete this.chd }
-      chdRef.current?.remove()
-      chdRef.current = null
-
-      const chd = document.createElement('div')
-      const aW = document.createElement('div')
-      chd.classList.add('mouse_el')
-      aW.classList.add('Awrite', 'Awrite-inv', 'Ms')
-      if (el.dataset.w) aW.classList.add('Awrite-w')
-      aW.innerHTML = el.dataset.tt
-
-      // this.animev.detail.state = 0; dispatchEvent()
-      if (animev) {
-        animev.detail.state = 0
-        animev.detail.el = aW
-        document.dispatchEvent(animev)
-      }
-
-      chd.appendChild(aW)
-      elRef.current.appendChild(chd)
-      chdRef.current = chd
-
-      // this.animev.detail.state = 1; dispatchEvent()
-      if (animev) {
-        animev.detail.state = 1
-        document.dispatchEvent(animev)
-      }
-    }
-
-    const followOut = () => {
-      if (!chdRef.current) return
-      gsap.to(chdRef.current, {
-        width: 0,
-        duration: 0.2,
-        onComplete: () => {
-          chdRef.current?.remove()
-          chdRef.current = null
-        },
-      })
-    }
-
-    // Refactored from: this.reset()
-    const mWrite = document.querySelectorAll('.MW')
-    for (let el of mWrite) {
+    // Set up .MW elements exactly as legacy
+    const mWriteElements = document.querySelectorAll('.MW')
+    mWriteElements.forEach(el => {
       if (!el.classList.contains('evt')) {
         el.addEventListener('mouseenter', (e) => followIn(el, e))
         el.addEventListener('mouseleave', (e) => followOut(el, e))
         el.classList.add('evt')
       }
+    })
+
+    // Handle page transitions
+    const pHide = document.querySelector('.pHide')
+    if (pHide) {
+      pHide.onmouseenter = () => {
+        const child = elementRef.current?.querySelector('.mouse_el')
+        if (child) {
+          gsap.to(child, {
+            width: 0,
+            duration: 0.2,
+            onComplete: () => {
+              if (child.parentNode === elementRef.current) {
+                child.remove()
+              }
+            }
+          })
+        }
+      }
     }
 
     return () => {
-      el.remove()
       document.body.onmousemove = null
+      mWriteElements.forEach(el => {
+        el.removeEventListener('mouseenter', followIn)
+        el.removeEventListener('mouseleave', followOut)
+      })
     }
-  }, [main])
+  }, [active, followIn, followOut, setPosition])
 
-  return null
+  return (
+    <div 
+      ref={elementRef}
+      className="mouse"
+    />
+  )
 }

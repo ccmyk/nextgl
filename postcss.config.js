@@ -1,16 +1,19 @@
 // postcss.config.js
 
 module.exports = {
-  plugins: {
-    'postcss-import': {},
-    'postcss-nesting': {},
-    'postcss-preset-env': {
-      stage: 3,
+  plugins: [
+    require('postcss-import'),
+    require('postcss-nesting'),
+    require('postcss-preset-env')({
+      browsers: 'last 2 versions', // Or your specific browser targets
+      stage: 2, // Adjust based on your needs (0-4)
       features: {
-        'nesting-rules': true,
+        'nesting-rules': true, // Redundant, but good to be explicit
       },
-    },
-    autoprefixer: {},
-  },
+    }),
+    require('postcss-calc'),
+    require('autoprefixer'),
+    require('cssnano'),
+    require('postcss-focus-visible'), // Polyfill for better focus outlines
+  ],
 };
-

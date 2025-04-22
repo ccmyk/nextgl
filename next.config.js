@@ -1,35 +1,31 @@
 // next.config.js
-
 const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
-  // Setup module resolution for @ imports
-  webpack: (config, { isServer }) => {
-    // Configure loaders for shader files (.glsl, .frag, .vert)
+
+  // 1) Webpack rules for normal builds (and for next dev without --turbo)
+  webpack(config, { isServer }) {
+    // GLSL shaders via raw + glslify
     config.module.rules.push({
       test: /\.(glsl|frag|vert)$/,
-      use: [
-        'raw-loader',
-        'glslify-loader'
-      ],
+      use: ['raw-loader', 'glslify-loader'],
     });
 
-    // Handle SVG imports
+    // SVG → React component
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     });
 
-    // Configure path aliases
+    // “@” → src/
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, 'src'),
     };
 
-    // Optimize bundle size
+    // Client‑side code splitting
     if (!isServer) {
       config.optimization.splitChunks = {
         chunks: 'all',
@@ -51,7 +47,7 @@ const nextConfig = {
     return config;
   },
 
-  // Configure images domain for external images (if needed)
+  // 2) Remote image domains
   images: {
     remotePatterns: [
       {
@@ -61,33 +57,39 @@ const nextConfig = {
     ],
   },
 
-  // Enable necessary experimental features
+  // 3) Experimental features, including Turbopack loader rules
   experimental: {
-    // For WebGL support
+    // Turbopack loader for all .glsl/.frag/.vert files
+    turbo: {
+      rules: {
+        '\\.(glsl|frag|vert)$': {
+          loaders: ['raw-loader', 'glslify-loader'],
+          as: '*.js',
+        },
+      },
+    },
+
+    // keep OGL on the server components allowed list
     serverComponentsExternalPackages: ['ogl'],
+
+    // other experiments
     optimizeCss: true,
     scrollRestoration: true,
   },
-  
-  // Disable certain ESLint rules during development
+
+  // 4) ESLint config
   eslint: {
     ignoreDuringBuilds: process.env.NODE_ENV === 'development',
   },
 
-  // Enable CORS headers for WebGL assets
+  // 5) CORS headers for WebGL
   async headers() {
     return [
       {
         source: '/(.*)',
         headers: [
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
-          },
+          { key: 'Cross-Origin-Opener-Policy',    value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy',  value: 'require-corp' },
         ],
       },
     ];

@@ -1,25 +1,84 @@
-/* Mouse styles */
+/* Mouse cursor styles */
+
+:root {
+  --mouse-size: 12px;
+  --mouse-text-size: 10px;
+}
 
 .mouse {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 49;
-  pointer-events: none
+  z-index: 9999;
+  pointer-events: none;
+  will-change: transform;
+  transform: translate(var(--mouse-x, 0), var(--mouse-y, 0));
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--mouse-size) * -0.5);
+    left: calc(var(--mouse-size) * -0.5);
+    width: var(--mouse-size);
+    height: var(--mouse-size);
+    background: #fff;
+    border-radius: 50%;
+    transform-origin: center;
+    transition: transform 0.2s ease;
+  }
 }
 
 .mouse_el {
   position: absolute;
-  left: 2rem;
-  top: -.8rem;
-  overflow: hidden
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  height: 26px;
+  background: #fff;
+  color: #000;
+  border-radius: 13px;
+  transition: width 0.2s ease;
+
+  & .Awrite {
+    font-family: var(--font-montreal);
+    font-size: var(--mouse-text-size);
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    &.Awrite-inv {
+      color: var(--color-text-inverse);
+    }
+
+    &.Awrite-w {
+      color: var(--color-white);
+    }
+  }
 }
 
-.mouse_el .Awrite {
-  white-space: nowrap
+/* Mouse states */
+.mouse-down {
+  & .mouse::before {
+    transform: scale(0.8);
+  }
 }
 
-.mouse_el .Awrite-w {
-  --dark: #F8F6F2;
-  --light: #000
+/* MW element styles */
+.MW {
+  cursor: none;
+
+  &:hover + .mouse::before {
+    transform: scale(1.5);
+  }
+}
+
+/* Hide mouse on touch devices */
+@media (hover: none) {
+  .mouse {
+    display: none;
+  }
 }

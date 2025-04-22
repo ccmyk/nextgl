@@ -1,112 +1,111 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
-import { Loader as LoaderEffect } from '@/webgl/components/Loader'
-import { webgl } from '@/webgl/core/WebGLManager'
+import { useEffect, useRef } from 'react'
+import { useLoader } from '@/hooks/webgl/useLoader'
 import gsap from 'gsap'
 
 export default function Loader() {
+  const { isReady, progress, effectRef } = useLoader()
   const containerRef = useRef(null)
-  const effectRef = useRef(null)
-  const timelineRef = useRef(null)
+  const numberRef = useRef(null)
+  const textRef = useRef(null)
 
-  // Initialize WebGL effect with same timing as legacy
+  // Handle number animation exactly like legacy
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!numberRef.current || !textRef.current) return
 
-    const bounds = containerRef.current.getBoundingClientRect()
+    const obj = { num: 0 }
     
-    effectRef.current = new LoaderEffect({
-      element: containerRef.current,
-      bounds
-    })
-
-    // Register with WebGL manager
-    webgl.registerComponent('loader', effectRef.current)
-
-    // Set up the text animation timeline
-    timelineRef.current = gsap.timeline({
-      paused: true,
-      onComplete: () => {
-        if (effectRef.current) {
-          effectRef.current.active = 0
-        }
-      }
-    })
-
-    // Add same text animation as legacy
-    const text = containerRef.current.querySelector('.loader-text')
-    if (text) {
-      timelineRef.current.fromTo(text,
-        { opacity: 0, y: 20 },
+    // Same animation timeline as legacy
+    const timeline = gsap.timeline({ paused: true })
+      .fromTo(obj, 
+        { num: 0 },
         {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power4.out'
-        }
-      )
-    }
-
-    // Handle resize
-    const handleResize = () => {
-      const newBounds = containerRef.current.getBoundingClientRect()
-      if (effectRef.current?.resize) {
-        effectRef.current.resize(
-          window.innerWidth,
-          window.innerHeight
-        )
-      }
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    // Start animation
-    effectRef.current.start()
-    timelineRef.current.play()
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      if (effectRef.current) {
-        webgl.unregisterComponent('loader')
-        effectRef.current.destroy()
-      }
-      if (timelineRef.current) {
-        timelineRef.current.kill()
-      }
-    }
-  }, [])
-
-  // Handle intersection
-  useEffect(() => {
-    if (!containerRef.current) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (effectRef.current) {
-          if (entry.isIntersecting) {
-            effectRef.current.start()
-          } else {
-            effectRef.current.stop()
+          num: 42,
+          ease: 'none',
+          duration: 2,
+          onUpdate: () => {
+            const num = obj.num.toFixed(0)
+            numberRef.current.textContent = num.padStart(3, '0')
           }
+        }, 0)
+      .to(obj, {
+        num: 90,
+        ease: 'power2.inOut',
+        duration: 8,
+        onUpdate: () => {
+          const num = obj.num.toFixed(0)
+          numberRef.current.textContent = num.padStart(3, '0')
         }
-      },
-      { threshold: 0.1 }
-    )
+      }, 2.2)
 
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
+    // Text animation with same timing as legacy
+    const aw = textRef.current.querySelectorAll('.Awrite')
+    aw.forEach(el => {
+      const event = new CustomEvent('anim', {
+        detail: { state: 0, el }
+      })
+      document.dispatchEvent(event)
+
+      event.detail.state = 1
+      document.dispatchEvent(event)
+    })
+
+    timeline.play()
+
+    return () => timeline.kill()
   }, [])
+
+  // Handle hide animation exactly like legacy
+  const hideLoader = async () => {
+    if (!effectRef.current) return
+
+    // Same animation sequence as legacy
+    gsap.to({ num: progress }, {
+      num: 100,
+      ease: 'power2.inOut',
+      duration: 0.49,
+      onUpdate: function() {
+        if (numberRef.current) {
+          const num = this.targets()[0].num.toFixed(0)
+          numberRef.current.textContent = num.padStart(3, '0')
+        }
+      }
+    })
+
+    gsap.to(containerRef.current, {
+      opacity: 0,
+      duration: 0.5,
+      delay: 0.2,
+      ease: 'power2.inOut',
+      onComplete: () => {
+        if (containerRef.current) {
+          containerRef.current.remove()
+        }
+      }
+    })
+  }
+
+  // Start hide animation when ready
+  useEffect(() => {
+    if (isReady) {
+      hideLoader()
+    }
+  }, [isReady])
 
   return (
     <div 
       ref={containerRef}
-      className="loader-container fixed inset-0 z-50 flex items-center justify-center"
+      className="loader fixed inset-0 z-50 flex items-center justify-center"
     >
-      <div className="loader-text text-5xl font-montreal opacity-0 transform">
-        Loading
+      <div className="loader_cnt">
+        <div ref={numberRef} className="loader_tp">000</div>
+        <div ref={textRef} className="loader_text">
+          <div className="Awrite">Loading</div>
+          <div className="Awrite">Please Wait</div>
+        </div>
       </div>
+      <div className="loader_bg" />
     </div>
   )
 }

@@ -1,55 +1,40 @@
-// src/app/about/page.js
-
 'use client'
 
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import Intro from './Intro'
-import DualIO from './DualIO'
+import { useRef, useEffect } from 'react'
+import About from '@/components/webgl/About'
+import { useWebGL } from '@/webgl/core/WebGLContext'
 
 export default function AboutPage() {
-  const mainRef = useRef(null)
+  const containerRef = useRef(null)
+  const { webgl } = useWebGL()
 
+  // Register page load handling
   useEffect(() => {
-    const el = mainRef.current
-    const device = window.innerWidth < 768 ? 1 : 2
+    let isActive = true
 
-    if (device > 1) {
-      for (let node of el.querySelectorAll('.about_list .Awrite .iO')) {
-        const parent = node.parentNode
-        parent.classList.add('ivi', 'nono')
-        node.remove()
-      }
+    const initializePage = async () => {
+      if (!isActive) return
+
+      // Transition loader to about, same as legacy
+      await webgl.transition('loader', 'about')
     }
 
-    const eye = el.querySelector('.about_list .Awrite i')
-    for (let link of el.querySelectorAll('.about_dual .cnt_t a')) {
-      link.insertAdjacentElement('beforeend', eye.cloneNode(true))
-    }
+    initializePage()
 
-    const activeEl = el.querySelector('.iO.goout')
-    if (activeEl) {
-      gsap.to(
-        document.querySelector(`[data-io="${activeEl.dataset.io}"] .anim`),
-        { progress: 0, duration: 0.8, ease: 'power2.inOut' }
-      )
-    } else {
-      gsap.to('.about_dual .cnt_t', {
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      })
+    return () => {
+      isActive = false
     }
-  }, [])
+  }, [webgl])
+
+  // Text matches legacy
+  const aboutText = "Enthusiastic about graphic design, typography, and the dynamic areas of motion and web-based animations. Specialized in translating brands into unique and immersive digital user experiences."
 
   return (
-    <main ref={mainRef} className="about_main">
-      <section className="about_intro">
-        <Intro />
-      </section>
-      <section className="about_dual">
-        <DualIO />
-      </section>
+    <main ref={containerRef} className="min-h-screen">
+      <About 
+        text={aboutText}
+        className="h-screen flex items-center justify-center"
+      />
     </main>
   )
 }

@@ -1,49 +1,50 @@
 'use client'
 
-import { WebGLProvider } from '@/webgl/core/WebGLContext'
 import { useEffect } from 'react'
-import { webgl } from '@/webgl/core/WebGLManager'
-import Nav from '@/components/Interface/Nav'
+import Mouse from '@/components/interface/Mouse'
+import { initTextAnimations } from '@/lib/animations/text'
+
 import '@/styles/index.css'
 
 export default function RootLayout({ children }) {
-  // Initialize font loading same as legacy
+  // Initialize core systems
   useEffect(() => {
-    // Add fonts to document for MSDF text
-    const style = document.createElement('style')
-    style.textContent = `
-      @font-face {
-        font-family: 'montreal';
-        src: url('/fonts/PPNeueMontreal-Medium.woff2') format('woff2');
-        font-weight: 500;
-        font-style: normal;
-        font-display: block;
-      }
-    `
-    document.head.appendChild(style)
+    // Start text animation system
+    const cleanupTextAnimations = initTextAnimations()
 
-    // Handle device detection same as legacy
+    // Handle initial mouse position
+    const handleInitialMousePosition = (e) => {
+      const mouseEvent = new MouseEvent('mousemove', {
+        clientX: window.innerWidth / 2,
+        clientY: window.innerHeight / 2
+      })
+      document.dispatchEvent(mouseEvent)
+    }
+
+    // Detect touch device
     const isTouch = /Mobi|Android|Tablet|iPad|iPhone/.test(navigator.userAgent) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
+    // Add device classes same as legacy
     document.documentElement.classList.add(isTouch ? 'T' : 'D')
     if (isTouch) {
       document.documentElement.classList.add('touch')
+    } else {
+      // Only initialize mouse on non-touch
+      window.addEventListener('mouseover', handleInitialMousePosition, { once: true })
     }
 
-    // Clean up
     return () => {
-      document.head.removeChild(style)
+      cleanupTextAnimations()
+      window.removeEventListener('mouseover', handleInitialMousePosition)
     }
   }, [])
 
   return (
     <html lang="en">
       <body>
-        <WebGLProvider>
-          <Nav />
-          {children}
-        </WebGLProvider>
+        {!('ontouchstart' in window) && <Mouse />}
+        {children}
       </body>
     </html>
   )

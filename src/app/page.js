@@ -1,61 +1,83 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
-import { useWebGL } from '@/webgl/core/WebGLContext'
+import { useEffect, useState } from 'react'
+import Loader from '@/components/webgl/Loader'
+import Background from '@/components/webgl/Background'
 import Title from '@/components/webgl/Title'
+import { useWebGL } from '@/webgl/core/WebGLContext'
 
-// This component shows how the Title integrates with other WebGL components
 export default function Home() {
-  const { webgl, startTransition } = useWebGL()
-  const titleRef = useRef(null)
-  const containerRef = useRef(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showBackground, setShowBackground] = useState(false)
+  const { gl } = useWebGL()
 
-  // Handle initial page load animation sequence
+  // Handle initial load sequence exactly like legacy
   useEffect(() => {
-    let isActive = true
+    if (!gl) return
 
-    const initializeAnimations = async () => {
-      if (!isActive) return
+    const initialize = async () => {
+      await document.fonts.ready
 
-      // Same sequence timing as legacy
-      await startTransition('loader', 'title')
-      
-      if (titleRef.current) {
-        titleRef.current.start()
-      }
+      setTimeout(() => {
+        setShowBackground(true)
+        document.documentElement.classList.add('has-background')
+
+        setTimeout(() => {
+          setIsLoading(false)
+          document.documentElement.classList.add('is-loaded')
+        }, 800)
+      }, 400)
     }
 
-    initializeAnimations()
-
-    return () => {
-      isActive = false
-    }
-  }, [startTransition])
+    initialize()
+  }, [gl])
 
   return (
-    <main ref={containerRef} className="relative">
-      <section className="h-screen flex items-center justify-center">
-        <Title
-          ref={titleRef}
-          text="NextGL"
-          className="title-main"
-        >
-          <h1 className="text-5xl">NextGL</h1>
-        </Title>
-      </section>
+    <main className="relative min-h-screen">
+      {isLoading && <Loader />}
+      {showBackground && <Background />}
 
-      {/* Additional sections use the same pattern for other WebGL components */}
-      <section className="h-screen bg-black">
-        {/* Background component would go here */}
-      </section>
+      {/* First Name Title - exact same as legacy */}
+      <Title 
+        text="Chris"
+        letterSpacing={-0.022}
+        size={5}
+      />
 
-      <section className="h-screen">
-        {/* Slides component would go here */}
-      </section>
+      {/* Second Name Title */}
+      <Title 
+        text="Hall"
+        letterSpacing={-0.016}
+        size={5}
+      />
 
-      <section className="h-screen">
-        {/* About component would go here */}
-      </section>
+      {/* Featured Works Title */}
+      <Title 
+        text="Featured works"
+        letterSpacing={-0.024}
+        size={3.8}
+        width={33}
+        scale={0.29}
+        noAnimation
+      />
+
+      {/* Interactive Designer Title */}
+      <Title 
+        text="Interactive Designer,"
+        letterSpacing={-0.024}
+        size={3.8}
+        white
+        noAnimation
+      />
+
+      {/* Also Speaker & Teacher Title */}
+      <Title 
+        text="also Speaker & Teacher"
+        letterSpacing={-0.032}
+        size={3.8}
+        white
+        noAnimation
+      />
     </main>
   )
 }
