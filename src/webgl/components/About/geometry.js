@@ -1,49 +1,53 @@
-import { Geometry } from 'ogl'
+import gsap from 'gsap'
 
-export function createGeometry(gl, text) {
-  // Create geometry with same attributes as legacy
-  const geometry = new Geometry(gl, {
-    position: { size: 3, data: text.buffers.position },
-    uv: { size: 2, data: text.buffers.uv },
-    id: { size: 1, data: text.buffers.id },
-    index: { data: text.buffers.index }
-  })
+// Optional: if you need clamp and lerp here,
+// either import from a small utils file or inline them:
+const clamp = (v, min, max) => Math.min(Math.max(v, min), max)
+const lerp  = (a, b, t)    => a * (1 - t) + b * t
 
-  // Compute bounding box the same way as legacy
-  geometry.computeBoundingBox()
-
-  return geometry
+export function check(entry) {
+  const vis = entry.isIntersecting
+  if (vis) this.start()
+  else     this.stop()
+  return vis
 }
 
-// Helper to set up text with same line breaks as legacy
-export function createText(Text, font, text, device) {
-  let br = ' '
-  let br2 = ' '
-  let width = 6.2
-  let letterSpacing = -0.01
-  let lineHeight = 0.995
-
-  // Match legacy responsive adjustments
-  if (device < 2) {
-    br = '\n'
-    br2 = '\n'
-    width = 13.1
-    lineHeight = 1.035
-  } else if (device === 2) {
-    width = 7.5
-    lineHeight = 1.01
-    letterSpacing = -0.015
+export function start() {
+  if (this.active === 1) return false
+  if (this.active === -1) {
+    this.animstart = gsap.timeline({ paused: true })
+      .set(this.canvas, { opacity: 1 }, 0)
+      .fromTo(
+        this.post.passes[0].program.uniforms.uStart,
+        { value: -0.92 },
+        { value: 1, duration: 4, ease: 'power2.inOut' },
+        0
+      )
+    this.animstart.play()
   }
-
-  return new Text({
-    font,
-    text,
-    width,
-    align: 'center',
-    letterSpacing,
-    size: device === 2 ? 0.77 : 1,
-    lineHeight
-  })
+  this.active = 1
 }
 
-export default { createGeometry, createText }
+export function stop() {
+  this.end = 0
+  Object.assign(this.ctr, { prog: 0, progt: 0 })
+  this.animctr.progress(0)
+  if (this.active < 1) return false
+  this.active = 0
+}
+
+export function updateX(x = 0) {}
+
+export function updateY(y = 0) {
+  if (this.ctr.stop !== 1) {
+    this.ctr.current = clamp(y - this.ctr.start, 0, this.ctr.limit)
+  }
+}
+
+export function updateAnim() {
+  this.ctr.progt = Number((this.ctr.current / this.ctr.limit).toFixed(3))
+  this.ctr.prog  = lerp(this.ctr.prog, this.ctr.progt, 0.015)
+  this.animctr.progress(this.ctr.prog)
+}
+
+export function updateScale() {}

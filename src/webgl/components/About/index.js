@@ -1,170 +1,153 @@
-'use client'
-
-import { Program, Mesh, Post } from 'ogl'
+import { Program, Mesh, Post, Vec2, Camera, Transform } from 'ogl'
 import gsap from 'gsap'
+import {
+  check,
+  start,
+  stop,
+  updateX,
+  updateY,
+  updateAnim
+} from './geometry'
+import vertexShader   from './shaders/msdf.vert.glsl'
+import fragmentShader from './shaders/msdf.frag.glsl'
+import parentShader   from './shaders/parent.frag.glsl'
 
-export class About {
-  constructor({ gl, scene, camera, element, bounds }) {
-    this.name = 'About'
-    this.gl = gl
-    this.scene = scene
-    this.camera = camera
-    this.element = element
-    this.bounds = bounds
+class About {
+  constructor({ el, pos = 0, renderer, mesh, post, scene, cam, touch = 0, canvas }) {
+    this.name     = 'About'
+    this.el       = el
+    this.pos      = pos
+    this.renderer = renderer
+    this.mesh     = mesh
+    this.post     = post
+    this.scene    = scene
+    this.camera   = cam
+    this.canvas   = canvas
+    this.touch    = touch
+    this.cnt      = el.parentNode.querySelector('.cCover')
 
-    // Same state management as legacy
-    this.active = -1
-    this.isready = 0
-    this.stopt = 0
+    this.active   = -1
+    this.isready  = 0
+    this.stopt    = 0
+    this.ctr      = { actual: 0, current: 0, limit: 0, start: 0, prog: 0, progt: 0, stop: 0 }
 
-    // Same scroll tracking as legacy
-    this.ctr = {
-      actual: 0,
-      current: 0,
-      limit: 0,
-      start: 0,
-      prog: 0,
-      progt: 0,
-      stop: 0
-    }
-
-    // Same mouse tracking as legacy
-    this.norm = 0
-    this.end = 0
-    this.lerp = 0.6
-
-    // MSDF Uniforms
-    this.uniforms = {
-      tMap: { value: null },
-      uColor: { value: 0 }
-    }
-
-    // Post-processing uniforms for ripple effect
-    this.postUniforms = {
-      uTime: { value: 0.4 },
-      uStart: { value: -1 },
-      uMouseT: { value: 0.4 },
-      uMouse: { value: -1 }
-    }
-
-    this.createMesh()
-    this.createPost()
-    this.initTimelines()
-  }
-
-  createMesh() {
-    // MSDF program with same settings as legacy
-    const program = new Program(this.gl, {
-      vertex: /* glsl */`
-        attribute vec3 position;
-        attribute vec2 uv;
-        
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        
-        varying vec2 vUv;
-        varying vec2 vUvR;
-        
-        void main() {
-          vUv = uv;
-          vUvR = position.xy;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragment: /* glsl */`
-        precision highp float;
-        
-        uniform sampler2D tMap;
-        uniform float uColor;
-        
-        varying vec2 vUv;
-        varying vec2 vUvR;
-        
-        void main() {
-          vec3 tex = texture2D(tMap, vUv).rgb;
-          float signedDist = max(min(tex.r, tex.g), min(max(tex.r, tex.g), tex.b)) - 0.5;
-          float d = fwidth(signedDist);
-          float alpha = smoothstep(-d, d, signedDist);
-          
-          gl_FragColor.rgb = vec3(uColor);
-          gl_FragColor.a = alpha;
-        }
-      `,
-      uniforms: this.uniforms,
-      transparent: true,
-      cullFace: null,
-      depthWrite: false
-    })
-
-    const mesh = new Mesh(this.gl, {
-      geometry: this.createGeometry(),
-      program
-    })
-
-    this.program = program
-    this.mesh = mesh
-
-    if (this.scene) {
-      this.scene.addChild(mesh)
-    }
-  }
-
-  createPost() {
-    // Create post-processing pass with exact same effect as legacy
-    this.post = new Post(this.gl)
-    this.post.addPass({
-      fragment: /* glsl */`
-        precision highp float;
-        
-        uniform sampler2D tMap;
-        uniform float uTime;
-        uniform float uStart;
-        uniform float uMouseT;
-        uniform float uMouse;
-        
-        varying vec2 vUv;
-        
-        float ripple(float uv, float time, float prog, float multi) {
-          float distance = length((uv * 3.0) + (time * 1.4));
-          return tan(distance * (1.0)) * (multi * prog);
-        }
-        
-        void main() {
-          float timer = uStart;
-          float centeredx = (vUv.x - 0.5) * 2.0;
-          float centeredy = (vUv.y - 0.5) * 2.0;
-          
-          float rippleUV = (ripple(vUv.y, timer, 1.0 - abs(timer), -0.36) * (0.1 * (1.0 - abs(timer))));
-          
-          vec2 U = vec2(vUv.x, rippleUV + vUv.y);
-          vec4 im = texture2D(tMap, U);
-          
-          if (rippleUV * -100.0 > centeredy + timer) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-          } else {
-            gl_FragColor = vec4(im);
-          }
-        }
-      `,
-      uniforms: this.postUniforms
-    })
-  }
-
-  initTimelines() {
-    // Mouse animation with exact same timing as legacy
+    // GSAP timelines
+    this.animctr   = gsap.timeline({ paused: true })
     this.animmouse = gsap.timeline({ paused: true })
-      .fromTo(this.post.passes[0].program.uniforms.uMouse,
+      .fromTo(
+        this.post.passes[0].program.uniforms.uMouse,
         { value: -1 },
-        {
-          value: 1.2,
-          duration: 1,
-          immediateRender: false,
-          ease: 'none'
-        }, 0)
+        { value: 1.2, duration: 1, ease: 'none' },
+        0
+      )
     this.animmouse.progress(0)
 
-    // Animation timeline with same timing as legacy
-    this.animctr = gsap.timeline({ paused: true })
+    this.initEvents()
   }
 
-  // Continue with methods...
+  update(time, speed, pos) {
+    if (!this.renderer) return false
+
+    // Mouse ripple lerp
+    this.end = this.lerp(this.end ?? 0, this.norm ?? 0, this.lerpVal ?? 0.6)
+    this.animmouse.progress(this.end)
+
+    // Scroll‑triggered animation
+    if (this.ctr.actual !== pos) {
+      this.ctr.actual = pos
+      this.updateY(pos)
+    }
+    if (this.ctr.stop !== 1) {
+      this.updateAnim()
+    }
+
+    // Render post‑pass
+    if (this.stopt === 0) {
+      this.post.render({ scene: this.mesh })
+    }
+  }
+
+  initEvents() {
+    this.tt = this.el.parentNode.querySelector('.Oiel')
+    new window.SplitType(this.tt, { types: 'chars,words' })
+
+    this.inFn = () => { this.stopt = 0; this.lerpVal = 0.02 }
+    this.mvFn = e => {
+      const y = e.touches ? e.touches[0].pageY - this.bound[1] : e.layerY
+      this.norm = this.clamp(y / this.bound[3], 0, 1)
+    }
+    this.lvFn = e => {
+      this.lerpVal = 0.01
+      const y = e.touches ? e.touches[0].pageY - this.bound[1] : e.layerY
+      this.norm = this.clamp(y / this.bound[3], 0, 1)
+    }
+
+    if (this.touch === 0) {
+      this.tt.onmouseenter = this.inFn
+      this.tt.onmousemove  = this.mvFn
+      this.tt.onmouseleave = this.lvFn
+    } else {
+      this.tt.ontouchstart = this.inFn
+      this.tt.ontouchmove  = this.mvFn
+      this.tt.ontouchend   = this.lvFn
+    }
+  }
+
+  onResize(viewport, screen) {
+    const rect         = this.cnt.getBoundingClientRect()
+    this.bound         = [rect.x, rect.y, rect.width, rect.height]
+    this.screen        = [rect.width, rect.height]
+    this.ctr.start     = Math.floor(rect.y - screen.h + window.scrollY + this.screen[1] * 0.5)
+    this.ctr.limit     = Math.floor(this.el.clientHeight + this.screen[1] * 0.5)
+
+    this.renderer.setSize(rect.width, rect.height)
+    this.camera.perspective({
+      aspect: this.renderer.gl.canvas.clientWidth /
+              this.renderer.gl.canvas.clientHeight
+    })
+    this.camera.fov = 45
+    this.camera.position.set(0, 0, 7)
+
+    const fov        = (this.camera.fov * Math.PI) / 180
+    const h          = 2 * Math.tan(fov / 2) * this.camera.position.z
+    const w          = h * this.camera.aspect
+    this.viewport    = [w, h]
+
+    // initial render
+    this.renderer.render({ scene: this.scene, camera: this.camera })
+  }
+
+  removeEvents() {
+    this.active = -2
+    gsap
+      .timeline({
+        onUpdate: () => this.post.render({ scene: this.mesh }),
+        onComplete: () => {
+          this.renderer.gl
+            .getExtension('WEBGL_lose_context')
+            .loseContext()
+          this.canvas.remove()
+        }
+      })
+      .to(this.post.passes[0].program.uniforms.uStart, {
+        value: -1, duration: 1, ease: 'power2.inOut'
+      }, 0)
+      .to(this.canvas, {
+        filter: 'blur(6px)', duration: 1, ease: 'power2.inOut'
+      }, 0)
+      .to(this.canvas, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.4)
+  }
+
+  clamp(v, min, max) { return Math.min(Math.max(v, min), max) }
+  lerp(a, b, t)      { return a * (1 - t) + b * t }
+}
+
+// attach geometry helpers
+About.prototype.check     = check
+About.prototype.start     = start
+About.prototype.stop      = stop
+About.prototype.updateX   = updateX
+About.prototype.updateY   = updateY
+About.prototype.updateAnim= updateAnim
+
+export default About

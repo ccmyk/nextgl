@@ -2,7 +2,6 @@
   "name": "nextgl",
   "version": "0.1.0",
   "private": true,
-
   "pnpm": {
     "overrides": {
       "puppeteer": "23.11.1"
@@ -10,12 +9,16 @@
     "peerDependencyRules": {
       "ignoreMissing": [
         "eslint-config-next",
-        "@typescript-eslint/parser",
         "eslint-plugin-react-hooks"
       ]
-    }
+    },
+    "onlyBuiltDependencies": [
+      "core-js",
+      "puppeteer",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
-
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
@@ -41,6 +44,7 @@
     "cssnano": "^7.0.6",
     "eslint": "^9.25.1",
     "eslint-config-next": "14.1.0",
+    "eslint-plugin-glsl": "0.0.0-wip",
     "eslint-plugin-prettier": "^5.2.6",
     "glslify-loader": "^2.0.0",
     "msdf-atlas-gen": "^1.0.0",
