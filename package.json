@@ -24,7 +24,8 @@
     "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:msdf": "three-msdf --font src/assets/fonts/PPNeueMontreal-Medium.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontreal-Medium && three-msdf --font src/assets/fonts/PPNeueMontreal-Book.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontreal-Book && three-msdf --font src/assets/fonts/PPNeueMontrealMono-Book.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontrealMono-Book && three-msdf --font src/assets/fonts/PPAir-Medium.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPAir-Medium"
   },
   "dependencies": {
     "gsap": "^3.12.7",
@@ -62,7 +63,8 @@
     "postcss-preset-env": "^9.6.0",
     "prettier": "^3.5.3",
     "prettier-plugin-glsl": "^0.2.1",
-    "raw-loader": "^4.0.2"
+    "raw-loader": "^4.0.2",
+    "three-msdf": "^1.0.2"
   },
   "browserslist": [
     "defaults",

@@ -1,78 +1,66 @@
-'use client'
+'use client';
 
-import { useRef, useEffect, useState } from 'react'
-import { useWebGL } from '@/webgl/core/WebGLContext'
-import { Loader } from '@/webgl/components/Loader'
-import gsap from 'gsap'
+import { useRef, useEffect, useState } from 'react';
+import { useWebGL } from '@/webgl/core/WebGLContext';
+import Loader from '@/webgl/components/Loader';
+import gsap from 'gsap';
 
 export function useLoader() {
-  const [isReady, setIsReady] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const effectRef = useRef(null)
-  const { gl, scene } = useWebGL()
+  const [isReady, setIsReady]   = useState(false);
+  const [progress, setProgress] = useState(0);
+  const effectRef = useRef(null);
+  const { gl, scene } = useWebGL();
 
+  // instantiate and drive Loader + GSAP progress
   useEffect(() => {
-    if (!gl || !scene) return
+    if (!gl || !scene) return;
+    effectRef.current = new Loader({ gl, scene });
 
-    // Create loader with same setup as legacy
-    effectRef.current = new Loader({
-      gl,
-      scene
-    })
-
-    // Track loading progress
-    const timeline = gsap.timeline({
+    const tl = gsap.timeline({
       paused: true,
-      onUpdate: () => {
-        setProgress(timeline.progress() * 100)
-      },
-      onComplete: () => {
-        setIsReady(true)
-      }
+      onUpdate: () => setProgress(tl.progress() * 100),
+      onComplete: () => setIsReady(true),
     })
+    .to({}, { duration: 0.6, ease: 'power2.inOut' })
+    .to({}, { duration: 2,   ease: 'power2.inOut' }, 0)
+    .to({}, { duration: 1,   ease: 'power2.inOut' }, 0.6);
 
-    // Add exact loading sequence from legacy
-    timeline.to({}, {
-      duration: 0.6,
-      ease: 'power2.inOut'
-    })
-    .to({}, {
-      duration: 2,
-      ease: 'power2.inOut'
-    }, 0)
-    .to({}, {
-      duration: 1,
-      ease: 'power2.inOut'
-    }, 0.6)
-
-    // Start loader
-    effectRef.current.start()
-    timeline.play()
+    effectRef.current.start();
+    tl.play();
 
     return () => {
-      timeline.kill()
-      if (effectRef.current) {
-        effectRef.current.destroy()
-      }
-    }
-  }, [gl, scene])
+      tl.kill();
+      if (effectRef.current) effectRef.current.destroy();
+    };
+  }, [gl, scene]);
 
-  // Handle window resize
+  // resize
   useEffect(() => {
-    const handleResize = () => {
-      if (!effectRef.current) return
-      effectRef.current.resize(window.innerWidth, window.innerHeight)
-    }
+    const onResize = () => {
+      if (effectRef.current) {
+        effectRef.current.resize(window.innerWidth, window.innerHeight);
+      }
+    };
+    window.addEventListener('resize', onResize);
+    onResize();
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
-    window.addEventListener('resize', handleResize)
-    handleResize()
+  return { isReady, progress, effectRef };
+}
 
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+import { Texture, Text } from 'ogl';
 
-  return {
-    isReady,
-    progress,
-    effectRef
-  }
+export async function useMSDFText(gl) {
+  const [meta, img] = await Promise.all([
+    fetch('/PPNeueMontreal-Medium.json').then(r => r.json()),
+    new Promise(res => {
+      const i = new Image();
+      i.src = '/PPNeueMontreal-Medium.png';
+      i.onload = () => res(i);
+    }),
+  ]);
+  const fontTex = new Texture(gl, { generateMipmaps: false });
+  fontTex.image = img;
+  return { meta, fontTex };
 }

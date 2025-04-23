@@ -1,10 +1,8 @@
-// src/components/webgl/Loader/shaders/main.vert.glsl
+attribute vec3 position;
 attribute vec2 uv;
-attribute vec2 position;
-uniform vec2 uResolution;
 varying vec2 vUv;
 
 void main() {
   vUv = uv;
-  gl_Position = vec4(position, 0, 1);
+  gl_Position = vec4(position, 1.0);
 }

@@ -1,53 +1,29 @@
 #version 300 es
 precision highp float;
-#define attribute in
-#define varying out
 
-attribute vec2 uv;
-attribute vec3 position;
+in vec3 position;
+in vec2 uv;
+in float id;   // per-character index
 
-                uniform mat4 modelViewMatrix;
-                uniform mat4 projectionMatrix;
-
-
-attribute float id;
-attribute vec3 index;
-
-uniform sampler2D tMap;
-uniform float uTime;
-uniform vec2 uMouse;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform float uStart;
 uniform float uPower;
-uniform float uCols;
-uniform int uLength;
+uniform float uKey;
+uniform float uMouse; // only x component used
+uniform vec2 uPowers; // per-character deformer array
 
-varying vec2 vUv;
-varying vec2 vUvR;
-
-varying vec3 vPos;
-varying vec3 vIndex;
-varying float vId;
-
+out vec2 vUv;
+out float vId;
 
 void main() {
-    vUv = uv;
-    vUvR = vec2(gl_VertexID << 1 & 2, gl_VertexID & 2);
+  vUv = uv;
+  vId = id;
 
-    vPos = position;
-    // vPos.x *=.5;
-    vId = id;
-    vIndex = index;
-    
-    if(vId == 3.){
-      // vPos.x += sin(uTime * .002) * .005;
-      // vUvR.x += sin(uTime * .002) * .1;
-    }
+  // example of mixing in mouse & key:
+  float power = uPower * mix(1.0, uPowers[int(id)], step(uKey, id));
 
-    // gl_Position = vec4(vPos.x,vPos.y,vPos.z,  1.);
-
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-
-// gl_Position = position;
-
+  vec3 pos = position;
+  pos.x += power * uMouse * 0.1;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }
-
-
