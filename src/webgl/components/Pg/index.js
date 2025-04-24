@@ -1,7 +1,11 @@
+"use client";
+"use client"// Client-only module
+'use client';
+
 import Pg from './Pg';
-import * as position from './position';
-import vertexShader from './shaders/pg.vert.glsl';
-import fragmentShader from './shaders/pg.frag.glsl';
+import * as position from './geometry';
+import vertexShader from './shaders/main.vert.glsl';
+import fragmentShader from './shaders/main.frag.glsl';
 
 export default Pg;
 export { position, vertexShader, fragmentShader };

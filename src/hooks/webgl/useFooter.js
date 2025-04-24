@@ -1,130 +1,93 @@
-'use client'
-import { useRef, useEffect } from 'react'
-import {
-  Renderer, Camera, Transform,
-  Text, Geometry, Texture, Program,
-  Mesh, Post
-} from 'ogl'
-import Footer from '@/webgl/components/Footer'
-import vertexShader   from '@/webgl/components/Footer/shaders/msdf.vert.glsl'
-import fragmentShader from '@/webgl/components/Footer/shaders/msdf.frag.glsl'
-import parentShader   from '@/webgl/components/Footer/shaders/parent.frag.glsl'
-import { useWebGL }   from '@/webgl/core/WebGLContext'
+'use client';
+import { useRef, useEffect } from 'react';
+import { Renderer, Transform, Camera, Text, Geometry, Texture } from 'ogl';
+import { useWebGL } from '@/webgl/core/WebGLContext';
+import Footer from '@/webgl/components/Footer';
+import vert from '@/webgl/components/Footer/shaders/msdf.vert.glsl';
+import frag from '@/webgl/components/Footer/shaders/msdf.frag.glsl';
+import parent from '@/webgl/components/Footer/shaders/parent.frag.glsl';
 
-export function useFooter({ pos = 0, touch = 0 } = {}) {
-  const containerRef = useRef(null)
-  const footerRef    = useRef(null)
-  const { gl, scene, camera } = useWebGL()
+export function useFooter({ text, letterSpacing=0, size=1 }) {
+  const containerRef = useRef(null);
+  const elementRef   = useRef(null);
+  const footerRef    = useRef(null);
+  const { gl, scene, camera } = useWebGL();
 
   useEffect(() => {
-    if (!containerRef.current || !gl || !scene) return
-    const el = containerRef.current
+    const wrapper = containerRef.current;
+    const el      = elementRef.current;
+    if (!wrapper || !el || !gl || !scene) return;
 
-    // 1) Create ogl renderer
+    // 1) OGL renderer on shared canvas
     const renderer = new Renderer({
-      canvas: null,
-      alpha: true,
-      dpr: Math.min(window.devicePixelRatio, 2)
-    })
-    const ogl = renderer.gl
-    ogl.canvas.classList.add('glFooter')
-    el.parentNode.querySelector('.cCover').appendChild(ogl.canvas)
+      canvas: gl.canvas,
+      alpha:  true,
+      dpr:    Math.min(window.devicePixelRatio, 2),
+      antialias: true
+    });
+    const ogl = renderer.gl;
+    ogl.canvas.classList.add('glFooter');
+    wrapper.querySelector('.cCover').appendChild(ogl.canvas);
 
-    // 2) Camera & scene branch
-    const cam = new Camera(ogl)
-    cam.position.z = 7
-    const sceneNode = new Transform()
-
-    // 3) MSDF text setup
-    const fontJSON = await fetch('/fonts/PPNeueMontreal-Medium.json').then(r => r.json())
-    const fontImg  = new Image()
-    fontImg.src    = '/fonts/PPNeueMontreal-Medium.png'
-    await fontImg.decode()
-
-    const text = new Text(ogl, {
+    // 2) Prepare MSDF text buffers
+    const fontJSON = await fetch('@/assets/fonts/PPNeueMontreal-Medium.json').then(r => r.json());
+    const textObj  = new Text({
       font: fontJSON,
-      text: el.dataset.text,
+      text,
       align: 'center',
-      letterSpacing: +el.dataset.l,
-      size: +el.dataset.m,
+      letterSpacing,
+      size,
       lineHeight: 1
-    })
+    });
+    const geo = new Geometry(ogl, {
+      position: { size: 3, data: textObj.buffers.position },
+      uv:       { size: 2, data: textObj.buffers.uv },
+      id:       { size: 1, data: textObj.buffers.id },
+      index:    { data: textObj.buffers.index }
+    });
+    geo.computeBoundingBox();
+    const img = new Image();
+    img.src = '@/assets/fonts/PPNeueMontreal-Medium.png';
+    await img.decode();
+    const tex = new Texture(ogl, { generateMipmaps: false });
+    tex.image = img;
 
-    const geometry = new Geometry(ogl, {
-      position: { size: 3, data: text.buffers.position },
-      uv:       { size: 2, data: text.buffers.uv },
-      id:       { size: 1, data: text.buffers.id },
-      index:    { data: text.buffers.index }
-    })
-    geometry.computeBoundingBox()
-
-    const atlasTex = new Texture(ogl, { generateMipmaps: false })
-    atlasTex.image = fontImg
-
-    // 4) Shader Program
-    const program = new Program(ogl, {
-      vertex:   vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        tMap:   { value: atlasTex },
-        uColor: { value: 0 },
-        uTime:  { value: 0 },
-        uStart: { value: 0.8 }
-      },
-      transparent: true,
-      cullFace:    null,
-      depthWrite:  false
-    })
-
-    // 5) Mesh + Post
-    const mesh = new Mesh(ogl, { geometry, program })
-    mesh.setParent(sceneNode)
-
-    const post = new Post(ogl)
-    post.addPass({
-      fragment: parentShader,
-      uniforms: {
-        uTime:   { value: 0 },
-        uStart:  { value: 0.8 },
-        uMouseT: { value: 0.2 },
-        uMouse:  { value: 0.39 },
-        uOut:    { value: 0 }
-      }
-    })
-
-    // 6) Instantiate your class
+    // 3) Instantiate Footer effect
     footerRef.current = new Footer({
       gl:       ogl,
-      scene:    sceneNode,
-      camera:   cam,
+      scene:    new Transform(), // local scene
+      camera,
       element:  el,
       renderer,
-      touch
-    })
+      touch:    0
+    });
+    footerRef.current.mesh.program.uniforms.tMap.value = tex;
 
-    // 7) Resize & observer & loop
-    footerRef.current.onResize({ w: window.innerWidth, h: window.innerHeight }, { w: window.innerWidth, h: window.innerHeight })
-    const onResize = () => footerRef.current.onResize({ w: window.innerWidth, h: window.innerHeight }, { w: window.innerWidth, h: window.innerHeight })
-    window.addEventListener('resize', onResize)
+    // 4) Resize & observe
+    const doResize = () => {
+      footerRef.current.onResize({ w:window.innerWidth,h:window.innerHeight }, { w:window.innerWidth,h:window.innerHeight });
+    };
+    window.addEventListener('resize', doResize);
+    doResize();
 
-    const obs = new IntersectionObserver(
-      entries => entries.forEach(e => footerRef.current.check(e)),
-      { threshold: 0.1 }
-    )
-    obs.observe(el)
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => footerRef.current.check(e));
+    }, { threshold: 0.1 });
+    obs.observe(el);
 
-    let id = requestAnimationFrame(function renderLoop(t) {
-      footerRef.current.update(t, null, pos)
-      id = requestAnimationFrame(renderLoop)
-    })
+    // 5) RAF loop
+    let id = requestAnimationFrame(function frame(t) {
+      footerRef.current.update(t, null, 0);
+      id = requestAnimationFrame(frame);
+    });
 
     return () => {
-      obs.disconnect()
-      window.removeEventListener('resize', onResize)
-      cancelAnimationFrame(id)
-      footerRef.current.removeEvents()
-    }
-  }, [gl, scene])
+      obs.disconnect();
+      window.removeEventListener('resize', doResize);
+      cancelAnimationFrame(id);
+      footerRef.current.removeEvents();
+    };
+  }, [gl, scene, camera, text, letterSpacing, size]);
 
-  return { containerRef }
+  return { containerRef, elementRef };
 }

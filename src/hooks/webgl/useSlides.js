@@ -1,101 +1,99 @@
-'use client'
-import { useRef, useEffect } from 'react'
-import { Renderer, Mesh, Transform, Post, Camera, Texture, Geometry, Program } from 'ogl'
-import Slides from '@/webgl/components/Slides'
-import vertexShader   from '@/webgl/components/Slides/shaders/main.vert.glsl'
-import fragmentShader from '@/webgl/components/Slides/shaders/main.frag.glsl'
-import parentShader   from '@/webgl/components/Slides/shaders/parent.frag.glsl'
-import { useWebGL }   from '@/webgl/core/WebGLContext'
+'use client';
 
-export function useSlides({ ids = 0, touch = 0 } = {}) {
-  const ref      = useRef(null)
-  const slideRef = useRef(null)
-  const { gl, scene, camera } = useWebGL()
+import { useRef, useEffect } from 'react';
+import { Renderer, Program, Mesh, Transform, Camera, Plane } from 'ogl';
+import { useWebGL } from '@/webgl/core/WebGLContext';
+import Slides from '@/webgl/components/Slides';
+import { vertexShader, fragmentShader } from '@/webgl/components/Slides';
+
+export function useSlides({ pos = 0, touch = 0 } = {}) {
+  const ref = useRef(null);
+  const slidesRef = useRef(null);
+  const { gl, scene, camera } = useWebGL();
 
   useEffect(() => {
-    if (!ref.current || !gl) return
-    const el = ref.current
+    if (!ref.current || !gl || !scene) return;
+    const el = ref.current;
 
-    // 1) Renderer & canvas
-    const renderer = new Renderer({
-      canvas: gl.canvas,
-      alpha: true,
-      dpr: Math.min(window.devicePixelRatio, 2),
-      antialias: true
-    })
+    // 1) Create a dedicated OGL Renderer & canvas
+    const renderer = new Renderer({ canvas: document.createElement('canvas'), dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
+    const { gl: ogl } = renderer;
+    ogl.canvas.classList.add('glSlides');
+    el.parentNode.appendChild(ogl.canvas);
 
-    // 2) Build meshes & textures
-    const medias   = Array.from(el.parentNode.querySelectorAll('video,img'))
-    const textures = medias.map(media => {
-      const tex = new Texture(gl, { generateMipmaps: false })
-      tex.image = media
-      return tex
-    })
-    const meshes = textures.map(tex => {
-      const geo = new Geometry(gl, {
-        position: { size: 3, data: /* your plane positions */ [] },
-        uv:       { size: 2, data: /* your plane uvs */ [] },
-        index:    { data: /* your plane indices */ [] }
-      })
-      const prog = new Program(gl, {
-        vertex:   vertexShader,
-        fragment: fragmentShader,
-        uniforms:{
-          tMap:      { value: tex },
-          uTextureSize: { value: tex.image.tagName==='VIDEO'
-            ? [media.width,media.height]
-            : [tex.image.naturalWidth,tex.image.naturalHeight]
-          },
-          uCover:    { value: [0,0] },
-          uHover:    { value: 0 },
-          uStart:    { value: 1.5 },
-        },
-        transparent:true,
-        depthWrite: false
-      })
-      const m = new Mesh(gl, { geometry: geo, program: prog })
-      return m
-    })
+    // 2) Build a camera & a scene Transform
+    const cam = new Camera(ogl);
+    cam.position.set(0, 0, 5);
+    const sceneNode = new Transform();
 
-    // 3) Scene & camera
-    const sceneNode = new Transform()
-    meshes.forEach(m => m.setParent(sceneNode))
+    // 3) Full-screen plane
+    const geometry = new Plane(ogl);
 
-    // 4) Postprocess pass
-    const post = new Post(gl)
-    post.addPass({
-      fragment: parentShader,
-      uniforms:{
-        uTime:  { value: 0 },
-        uStart:{ value: 1.5 },
-        uHover:{ value: 0 }
-      }
-    })
+    // 4) Program
+    const program = new Program(ogl, {
+      vertex:   vertexShader,
+      fragment: fragmentShader,
+      uniforms: {
+        uTime:   { value: 0 },
+        uStart:  { value: 0 },
+        uEnd:    { value: 0 },
+        tMap:    { value: null },
+        uCover:  { value: [0, 0] },
+        uTextureSize: { value: [0, 0] }
+      },
+      transparent: true
+    });
 
-    // 5) Instantiate
-    slideRef.current = new Slides({
-      gl,
+    // 5) Mesh
+    const mesh = new Mesh(ogl, { geometry, program });
+    mesh.setParent(sceneNode);
+
+    // 6) Instantiate Slides effect
+    slidesRef.current = new Slides({
+      el,
+      pos,
+      renderer,
+      mesh,
       scene: sceneNode,
-      camera,
-      element: el,
-      meshes,
-      medias,
-      textures,
-      post,
-      canvas: gl.canvas,
-      device: window.innerWidth < 768 ? 1 : 3
-    })
+      cam,
+      touch,
+      canvas: ogl.canvas
+    });
+    slidesRef.current.onResize(
+      { w: window.innerWidth, h: window.innerHeight },
+      { w: window.innerWidth, h: window.innerHeight }
+    );
 
-    // register with manager
-    webgl.registerComponent(`Slides-${ids}`, slideRef.current)
+    // 7) Resize handling
+    const onResize = () =>
+      slidesRef.current.onResize(
+        { w: window.innerWidth, h: window.innerHeight },
+        { w: window.innerWidth, h: window.innerHeight }
+      );
+    window.addEventListener('resize', onResize);
 
-    // Intersection, resize, render loop all come from the core
+    // 8) IntersectionObserver
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => slidesRef.current.check(e)),
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+
+    // 9) Render loop
+    let frame;
+    const animate = t => {
+      slidesRef.current.update(t, null, pos);
+      frame = requestAnimationFrame(animate);
+    };
+    frame = requestAnimationFrame(animate);
 
     return () => {
-      webgl.unregisterComponent(`Slides-${ids}`)
-      slideRef.current.removeEvents()
-    }
-  }, [gl, scene, camera])
+      obs.disconnect();
+      window.removeEventListener('resize', onResize);
+      cancelAnimationFrame(frame);
+      slidesRef.current.removeEvents();
+    };
+  }, [gl, scene]);
 
-  return { containerRef: ref }
+  return { containerRef: ref };
 }

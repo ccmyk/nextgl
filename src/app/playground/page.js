@@ -1,4 +1,5 @@
-// src/app/playground/page.js
+"use client";
+"use client"// src/app/playground/page.js
 
 'use client'
 

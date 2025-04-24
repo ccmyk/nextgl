@@ -1,22 +1,18 @@
 #version 300 es
 precision highp float;
-#define attribute in
-#define varying out
 
-attribute vec2 uv;
-attribute vec3 position;
-attribute float id;
+in vec3 position;
+in vec2 uv;
+in float id;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
-varying vec2 vUv;
-varying vec2 vUvR;
-varying float vId;
+out vec2 vUv;
+out float vId;
 
 void main() {
-  vUv  = uv;
-  vUvR = position.xy;
-  vId  = id;
+  vUv = uv;
+  vId = id;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }

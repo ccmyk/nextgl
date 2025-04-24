@@ -11,7 +11,7 @@ export function useLoader() {
   const effectRef = useRef(null);
   const { gl, scene } = useWebGL();
 
-  // instantiate and drive Loader + GSAP progress
+  // Instantiate Loader + GSAP progress timeline
   useEffect(() => {
     if (!gl || !scene) return;
     effectRef.current = new Loader({ gl, scene });
@@ -30,11 +30,11 @@ export function useLoader() {
 
     return () => {
       tl.kill();
-      if (effectRef.current) effectRef.current.destroy();
+      effectRef.current?.destroy();
     };
   }, [gl, scene]);
 
-  // resize
+  // Handle window resize
   useEffect(() => {
     const onResize = () => {
       if (effectRef.current) {
@@ -47,20 +47,4 @@ export function useLoader() {
   }, []);
 
   return { isReady, progress, effectRef };
-}
-
-import { Texture, Text } from 'ogl';
-
-export async function useMSDFText(gl) {
-  const [meta, img] = await Promise.all([
-    fetch('/PPNeueMontreal-Medium.json').then(r => r.json()),
-    new Promise(res => {
-      const i = new Image();
-      i.src = '/PPNeueMontreal-Medium.png';
-      i.onload = () => res(i);
-    }),
-  ]);
-  const fontTex = new Texture(gl, { generateMipmaps: false });
-  fontTex.image = img;
-  return { meta, fontTex };
 }

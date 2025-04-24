@@ -1,13 +1,14 @@
-'use client'
+"use client";
+"use client";
+"use client""use client"'use client'
+import React from 'react'
 import { useBase } from '@/hooks/webgl/useBase'
 
-export default function BaseComponent({ pos = 0, touch = 0, className, children }) {
-  const { containerRef } = useBase({ pos, touch })
-
+export default function Base({ className }) {
+  const { containerRef } = useBase()
   return (
-    <div ref={containerRef} className={`base-container relative ${className || ''}`}>
+    <div ref={containerRef} className={`base-container relative ${className||''}`}>
       <canvas className="absolute inset-0 pointer-events-none" />
-      {children}
     </div>
   )
 }

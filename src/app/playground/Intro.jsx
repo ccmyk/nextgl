@@ -1,4 +1,5 @@
-// src/app/playground/Intro.jsx
+"use client";
+"use client"// src/app/playground/Intro.jsx
 
 'use client'
 

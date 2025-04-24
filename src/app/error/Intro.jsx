@@ -1,4 +1,5 @@
-// src/app/error/Intro.jsx
+"use client";
+"use client"// src/app/error/Intro.jsx
 
 'use client'
 

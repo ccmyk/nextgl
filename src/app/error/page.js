@@ -1,4 +1,5 @@
-// src/app/error/page.js
+"use client";
+"use client"// src/app/error/page.js
 
 'use client'
 

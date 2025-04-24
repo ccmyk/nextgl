@@ -1,4 +1,5 @@
-'use client'
+"use client";
+"use client"'use client'
 
 import { useRef, useEffect } from 'react'
 import About from '@/components/webgl/About'

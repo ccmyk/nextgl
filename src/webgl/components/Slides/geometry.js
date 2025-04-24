@@ -1,5 +1,8 @@
-// scroll & mouse “geometry” helpers for Slides
+"use client";
+"use client"import gsap from 'gsap'
+import { clamp, lerp } from '@/webgl/core/utils'   // small util fns, or inline as shown below
 
+// scroll & mouse “geometry” helpers for Slides
 export function check(entry) {
   const vis = entry.isIntersecting
   if (vis) this.start(entry)
@@ -8,13 +11,10 @@ export function check(entry) {
 }
 
 export function start(entry) {
-  // only play for state 0
-  if (this.state === 1) {
-    // control single‐slide pointer events…
-    if (this.single) {
-      const y = entry.boundingClientRect.y
-      this.single.style.pointerEvents = (y > 60) ? 'all' : 'none'
-    }
+  // if we’re mid‐state (e.g. a single slide), only toggle pointer‐events
+  if (this.state === 1 && this.single) {
+    const y = entry.boundingClientRect.y
+    this.single.style.pointerEvents = y > 60 ? 'all' : 'none'
     return
   }
   gsap.set(this.canvas, { display: 'block' })
@@ -25,9 +25,7 @@ export function start(entry) {
   }
   if (this.active === 1) return
   this.active = 1
-  this.textures.forEach(tex =>
-    tex.image.tagName === 'VIDEO' && tex.image.play()
-  )
+  this.textures.forEach(t => t.image.tagName === 'VIDEO' && t.image.play())
   this.slideanim.play()
 }
 
@@ -40,14 +38,12 @@ export function stop(entry) {
   }
   if (this.active < 1 || this.state !== 0) return
   this.slideanim.pause()
-  this.textures.forEach(tex =>
-    tex.image.tagName === 'VIDEO' && tex.image.pause()
-  )
+  this.textures.forEach(t => t.image.tagName === 'VIDEO' && t.image.pause())
   this.active = 0
 }
 
-export function updateX(sum = 0) {
-  this.statepos = (this.objpos.x * this.totalpos)
+export function updateX() {
+  this.statepos = this.objpos.x * this.totalpos
   this.meshes.forEach((m, i) => {
     let x = this.posmeshes[i] - this.statepos
     if (x <= this.minpos) {
@@ -61,13 +57,12 @@ export function updateX(sum = 0) {
 
 export function updateY(y = 0) {
   if (this.ctr.stop !== 1) {
-    this.ctr.current = y - this.ctr.start
-    this.ctr.current = clamp(0, this.ctr.limit, this.ctr.current)
+    this.ctr.current = clamp(y - this.ctr.start, 0, this.ctr.limit)
   }
 }
 
 export function updateScale() {
-  const w = (this.device < 3)
+  const w = this.device < 3
     ? this.screen[0] * 0.322
     : this.screen[0] * 0.75
   const h = this.bound[3]
@@ -78,11 +73,7 @@ export function updateScale() {
 }
 
 export function updateAnim() {
-  this.ctr.progt = (this.ctr.current / this.ctr.limit).toFixed(3)
+  this.ctr.progt = Number((this.ctr.current / this.ctr.limit).toFixed(3))
   this.ctr.prog  = lerp(this.ctr.prog, this.ctr.progt, 0.015)
   this.animctr.progress(this.ctr.prog)
 }
-
-// you’ll need these available globally:
-function clamp(v, min, max) { return Math.min(Math.max(v, min), max) }
-function lerp(a, b, t)      { return a*(1-t) + b*t }

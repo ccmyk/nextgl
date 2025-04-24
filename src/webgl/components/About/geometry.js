@@ -1,7 +1,7 @@
-import gsap from 'gsap'
+"use client";
+"use client"import gsap from 'gsap'
 
-// Optional: if you need clamp and lerp here,
-// either import from a small utils file or inline them:
+// tiny helpers
 const clamp = (v, min, max) => Math.min(Math.max(v, min), max)
 const lerp  = (a, b, t)    => a * (1 - t) + b * t
 
@@ -20,7 +20,7 @@ export function start() {
       .fromTo(
         this.post.passes[0].program.uniforms.uStart,
         { value: -0.92 },
-        { value: 1, duration: 4, ease: 'power2.inOut' },
+        { value: 1.0, duration: 4, ease: 'power2.inOut' },
         0
       )
     this.animstart.play()

@@ -1,4 +1,5 @@
-// src/app/project/IONext.jsx
+"use client";
+"use client"// src/app/project/IONext.jsx
 
 'use client'
 

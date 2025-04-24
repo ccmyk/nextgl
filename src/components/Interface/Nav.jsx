@@ -1,196 +1,77 @@
-'use client'
+"use client";
+"use client";
+"use client""use client"'use client'
+import { useEffect, useRef, useState } from 'react'
+import { useAppEvents }      from '@/context/AppEventsContext'
+import { useSplitText }      from '@/hooks/useSplitText'
+import { useNavClock }       from '@/hooks/useNavClock'
+import styles                from '@/styles/components/nav.pcss'
 
-import { useRef, useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useWebGL } from '@/context/WebGLContext'
-import TitleEffect from '@/components/webgl/Title/TitleEffect'
-import SplitType from 'split-type'
-import gsap from 'gsap'
+export default function Nav({ html }) {
+  const containerRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const { dispatchAnim } = useAppEvents()
 
-function NavLink({ href, children, isActive, onMouseEnter, onMouseLeave }) {
-  const linkRef = useRef(null)
-  const charsRef = useRef(null)
+  // split-text any target
+  useSplitText('.nav_logo, .nav_right a, .nav_clock_p, .nav_clock_h, .nav_clock_m, .nav_clock_a')
 
+  // onMount: insert legacy HTML
   useEffect(() => {
-    if (!linkRef.current) return
-
-    // Use SplitType through ref instead of direct DOM manipulation
-    charsRef.current = new SplitType(linkRef.current, {
-      types: 'chars',
-      tagName: 'span'
+    containerRef.current.innerHTML = html
+    // animate logo, city, H, M, A in
+    ['.nav_logo', '.nav_clock_p', '.nav_clock_h', '.nav_clock_m', '.nav_clock_a'].forEach(sel => {
+      dispatchAnim(0, sel)
+      dispatchAnim(1, sel)
     })
+  }, [html, dispatchAnim])
 
-    return () => charsRef.current?.revert()
-  }, [])
+  // live clock
+  const { hour, minute, ampm } = useNavClock(dispatchAnim)
+  // whenever hour/minute/ampm changes, splice into DOM
+  useEffect(() => {
+    const hEls = containerRef.current.querySelectorAll('.nav_clock_h .char .n')
+    hEls[0].textContent = hour[0]
+    hEls[1].textContent = hour[1]
+    const mEls = containerRef.current.querySelectorAll('.nav_clock_m .char .n')
+    mEls[0].textContent = minute[0]
+    mEls[1].textContent = minute[1]
+    const aEls = containerRef.current.querySelectorAll('.nav_clock_a .char .n')
+    aEls[0].textContent = ampm[0]
+    aEls[1].textContent = ampm[1]
+  }, [hour, minute, ampm])
 
-  return (
-    <Link 
-      href={href}
-      ref={linkRef}
-      className={isActive ? 'active' : ''}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      {children}
-    </Link>
-  )
-}
-
-function Clock({ time }) {
-  const { hours, minutes, ampm } = time
-  const clockRef = useRef(null)
-
-  return (
-    <TitleEffect>
-      <div className="nav_clock" ref={clockRef}>
-        <div className="nav_clock_city">
-          <p className="nav_clock_p">New York</p>
-        </div>
-        <div className="nav_clock_time">
-          <span className="nav_clock_h">{hours}</span>
-          <span className="nav_clock_divider">:</span>
-          <span className="nav_clock_m">{minutes}</span>
-          <span className="nav_clock_a">{ampm}</span>
-        </div>
-      </div>
-    </TitleEffect>
-  )
-}
-
-export default function Nav() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [time, setTime] = useState(() => {
-    const now = new Date()
-    const hours = now.getHours()
-    return {
-      hours: hours > 12 ? hours - 12 : hours === 0 ? 12 : hours,
-      minutes: now.getMinutes().toString().padStart(2, '0'),
-      ampm: hours >= 12 ? 'PM' : 'AM'
-    }
-  })
-
-  const navRef = useRef(null)
-  const menuRef = useRef(null)
-  const { camera } = useWebGL()
-
-  // Menu animation with exact legacy timing
+  // burger click toggles
   const toggleMenu = () => {
-    if (!menuRef.current) return
-
-    if (!menuOpen) {
-      gsap.timeline()
-        .set({}, {}, '<') // Start at the same time
-        .to(menuRef.current, {
-          y: 0,
-          opacity: 1,
-          duration: 0.4,
-          ease: 'power4.inOut',
-          onStart: () => {
-            // Use React state instead of classList
-            setMenuOpen(true)
-          }
-        })
+    if (isOpen) {
+      document.documentElement.classList.remove('act-menu')
+      dispatchAnim(null, 'closemenu')
     } else {
-      gsap.timeline()
-        .to(menuRef.current, {
-          y: -20,
-          opacity: 0,
-          duration: 0.3,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            setMenuOpen(false)
-          }
-        })
+      document.documentElement.classList.add('act-menu')
+      dispatchAnim(null, 'openmenu')
     }
+    setIsOpen(!isOpen)
   }
 
-  // Update clock with same interval as legacy
+  // link-hover: re-play write animation on links
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date()
-      const hours = now.getHours()
-      setTime({
-        hours: hours > 12 ? hours - 12 : hours === 0 ? 12 : hours,
-        minutes: now.getMinutes().toString().padStart(2, '0'),
-        ampm: hours >= 12 ? 'PM' : 'AM'
-      })
-    }
-
-    const interval = setInterval(updateTime, 60000)
-    return () => clearInterval(interval)
-  }, [])
+    containerRef.current.querySelectorAll('.nav_right a').forEach(a => {
+      a.addEventListener('mouseenter', () => dispatchAnim(1, a))
+    })
+  }, [dispatchAnim])
 
   return (
-    <nav 
-      ref={navRef} 
-      className={`nav ${menuOpen ? 'menu-open' : ''}`}
-      data-device={camera?.aspect < 1 ? 'portrait' : 'landscape'}
-    >
-      <TitleEffect>
-        <div className="nav_logo">
-          <NavLink href="/">
-            NextGL
-          </NavLink>
-        </div>
-      </TitleEffect>
-
-      <Clock time={time} />
-
-      <div className="nav_right">
-        <NavLink href="/about">About</NavLink>
-        <NavLink href="/projects">Projects</NavLink>
-        <NavLink href="/playground">Playground</NavLink>
-      </div>
-
-      <button 
-        className={`nav_burger ${menuOpen ? 'active' : ''}`}
-        onClick={toggleMenu}
-        aria-expanded={menuOpen}
-      >
-        <span className="line"></span>
-        <span className="line"></span>
-        <span className="line"></span>
+    <nav className={styles.nav} ref={containerRef}>
+      {/* legacy HTML will drop in here */}
+      <button className={styles.nav_burger} onClick={toggleMenu}>
+        <span/>
+        <span/>
+        <span/>
       </button>
-
-      <div 
-        ref={menuRef}
-        className={`menu-container ${menuOpen ? 'active' : ''}`}
-      >
-        <div className="menu-content">
-          <ul className="menu-links">
-            {[
-              ['/', 'Home'],
-              ['/about', 'About'],
-              ['/projects', 'Projects'],
-              ['/playground', 'Playground']
-            ].map(([href, text]) => (
-              <li key={href}>
-                <NavLink 
-                  href={href}
-                  onMouseEnter={(e) => {
-                    // Character animation using the same timing
-                    gsap.to(e.currentTarget.querySelectorAll('.char .n'), {
-                      y: -3,
-                      stagger: 0.02,
-                      duration: 0.2,
-                      ease: 'power4.inOut'
-                    })
-                  }}
-                  onMouseLeave={(e) => {
-                    gsap.to(e.currentTarget.querySelectorAll('.char .n'), {
-                      y: 0,
-                      stagger: 0.01,
-                      duration: 0.2,
-                      ease: 'power4.inOut'
-                    })
-                  }}
-                >
-                  {text}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className={styles.nav_right}>
+        {/* links go here via HTML */}
+      </div>
+      <div className={styles.nav_clock_s}>
+        <span className="nav_clock_p"/><span className="nav_clock_h"/><span className="nav_clock_m"/><span className="nav_clock_a"/>
       </div>
     </nav>
   )

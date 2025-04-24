@@ -1,4 +1,5 @@
-// src/components/media/LazyImage.jsx
+"use client";
+"use client"// src/components/media/LazyImage.jsx
 
 'use client'
 

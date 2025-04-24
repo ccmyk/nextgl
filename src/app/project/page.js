@@ -1,4 +1,5 @@
-// src/app/project/page.js
+"use client";
+"use client"// src/app/project/page.js
 
 'use client'
 

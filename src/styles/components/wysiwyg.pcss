@@ -1,0 +1,433 @@
+/* wysiwyg-rich text formatting */
+
+.wysi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  --wysil: 8rem;
+  --wysim: 2rem;
+  --wysis: 2rem
+}
+
+@media only screen and (max-width: 1024px) {
+  :root.T .wysi {
+    --wysil: 4.8rem;
+    --wysim: 2rem;
+    --wysis: 2rem
+  }
+}
+
+.wysi img {
+  width: 100%;
+  height: auto;
+  max-width: 77.6rem;
+  position: relative;
+  border-radius: 3.2rem
+}
+
+.wysi img+ul,
+.wysi img+ol {
+  margin-top: var(--wysil)
+}
+
+.wysi img+img {
+  margin-top: var(--wysil)
+}
+
+.wysi img+p {
+  margin-top: var(--wysil)
+}
+
+.wysi img+h1,
+.wysi img+h2,
+.wysi img+h3 {
+  margin-top: var(--wysil)
+}
+
+.wysi img+h4,
+.wysi img+h5,
+.wysi img+h6,
+.wysi img+h7 {
+  margin-top: var(--wysil)
+}
+
+.wysi img+blockquote {
+  margin-top: var(--wysil)
+}
+
+.wysi p {
+  font-size: 1.8rem;
+  line-height: 1.56;
+  width: 100%;
+  max-width: 57.5rem
+}
+
+.wysi p a {
+  text-decoration: underline;
+  color: #e63642
+}
+
+.wysi p strong,
+.wysi p b {
+  font-weight: 700
+}
+
+.wysi p+ul,
+.wysi p+ol {
+  margin-top: var(--wysim)
+}
+
+.wysi p+img {
+  margin-top: var(--wysil)
+}
+
+.wysi p+p {
+  margin-top: var(--wysis)
+}
+
+.wysi p+h1,
+.wysi p+h2,
+.wysi p+h3 {
+  margin-top: 4rem
+}
+
+.wysi p+h4,
+.wysi p+h5,
+.wysi p+h6,
+.wysi p+h7 {
+  margin-top: var(--wysim)
+}
+
+.wysi p+blockquote {
+  margin-top: var(--wysim)
+}
+
+.wysi ul {
+  width: 100%;
+  max-width: 57.5rem
+}
+
+.wysi ul li {
+  font-size: 1.8rem;
+  line-height: 1.56;
+  position: relative
+}
+
+.wysi ul li:before {
+  content: "";
+  width: .4rem;
+  height: .4rem;
+  display: inline-block;
+  margin-right: 1rem;
+  margin-bottom: .3rem;
+  background-color: #e63642
+}
+
+.wysi ul li+li {
+  margin-top: .6rem
+}
+
+.wysi ul li a {
+  text-decoration: underline
+}
+
+.wysi ul+h1,
+.wysi ul+h2,
+.wysi ul+h3 {
+  margin-top: 4rem
+}
+
+.wysi ul+h4,
+.wysi ul+h5,
+.wysi ul+h6,
+.wysi ul+h7 {
+  margin-top: var(--wysim)
+}
+
+.wysi ul+ul {
+  margin-top: var(--wysim)
+}
+
+.wysi ul+ol {
+  margin-top: var(--wysim)
+}
+
+.wysi ul+img {
+  margin-top: var(--wysil)
+}
+
+.wysi ul+p {
+  margin-top: var(--wysim)
+}
+
+.wysi ul+blockquote {
+  margin-top: var(--wysim)
+}
+
+.wysi ol {
+  width: 100%;
+  max-width: 57.5rem;
+  font-size: 1.8rem;
+  line-height: 1.56
+}
+
+.wysi ol li {
+  position: relative;
+  counter-increment: step-counter
+}
+
+.wysi ol li:before {
+  content: counter(step-counter);
+  margin-right: 1rem;
+  color: #e63642
+}
+
+.wysi ol li+li {
+  margin-top: .6rem
+}
+
+.wysi ol li a {
+  text-decoration: underline
+}
+
+.wysi ol+ul {
+  margin-top: var(--wysim)
+}
+
+.wysi ol+ol {
+  margin-top: var(--wysim)
+}
+
+.wysi ol+img {
+  margin-top: var(--wysil)
+}
+
+.wysi ol+p {
+  margin-top: var(--wysim)
+}
+
+.wysi ol+h1,
+.wysi ol+h2,
+.wysi ol+h3 {
+  margin-top: 4rem
+}
+
+.wysi ol+h4,
+.wysi ol+h5,
+.wysi ol+h6,
+.wysi ol+h7 {
+  margin-top: var(--wysim)
+}
+
+.wysi ol+blockquote {
+  margin-top: var(--wysim)
+}
+
+.wysi blockquote {
+  width: 100%;
+  max-width: 57.5rem;
+  font-size: 3.2rem;
+  line-height: 1.5;
+  font-weight: 400
+}
+
+@media only screen and (max-width: 1024px) {
+  :root.T .wysi blockquote {
+    font-size: 1.8rem;
+    line-height: 1.44
+  }
+}
+
+.wysi blockquote p {
+  color: #000
+}
+
+.wysi blockquote a {
+  text-decoration: underline
+}
+
+.wysi blockquote+ul,
+.wysi blockquote+ol {
+  margin-top: var(--wysim)
+}
+
+.wysi blockquote+img {
+  margin-top: var(--wysil)
+}
+
+.wysi blockquote+h1,
+.wysi blockquote+h2,
+.wysi blockquote+h3 {
+  margin-top: 4rem
+}
+
+.wysi blockquote+h4,
+.wysi blockquote+h5,
+.wysi blockquote+h6,
+.wysi blockquote+h7 {
+  margin-top: var(--wysim)
+}
+
+.wysi blockquote+blockquote {
+  margin-top: var(--wysim)
+}
+
+.wysi h1,
+.wysi h2,
+.wysi h3 {
+  font-size: 4rem;
+  line-height: 1.3;
+  font-weight: 600;
+  width: 100%;
+  max-width: 57.5rem
+}
+
+@media only screen and (max-width: 1024px) {
+
+  :root.T .wysi h1,
+  :root.T .wysi h2,
+  :root.T .wysi h3 {
+    font-size: 2.8rem;
+    line-height: 1.14
+  }
+}
+
+.wysi h1+p,
+.wysi h2+p,
+.wysi h3+p {
+  margin-top: 2rem
+}
+
+.wysi h1+ul,
+.wysi h1+ol,
+.wysi h2+ul,
+.wysi h2+ol,
+.wysi h3+ul,
+.wysi h3+ol {
+  margin-top: 2rem
+}
+
+.wysi h1+img,
+.wysi h2+img,
+.wysi h3+img {
+  margin-top: 2rem
+}
+
+.wysi h1+blockquote,
+.wysi h2+blockquote,
+.wysi h3+blockquote {
+  margin-top: 2rem
+}
+
+.wysi h1+h1,
+.wysi h1+h2,
+.wysi h1+h3,
+.wysi h1+h4,
+.wysi h1+h5,
+.wysi h1+h6,
+.wysi h1+h7,
+.wysi h2+h1,
+.wysi h2+h2,
+.wysi h2+h3,
+.wysi h2+h4,
+.wysi h2+h5,
+.wysi h2+h6,
+.wysi h2+h7,
+.wysi h3+h1,
+.wysi h3+h2,
+.wysi h3+h3,
+.wysi h3+h4,
+.wysi h3+h5,
+.wysi h3+h6,
+.wysi h3+h7 {
+  margin-top: 2rem
+}
+
+.wysi h4,
+.wysi h5,
+.wysi h6,
+.wysi h7 {
+  width: 100%;
+  max-width: 57.5rem;
+  font-size: 3.2rem;
+  line-height: 1.5;
+  font-weight: 700
+}
+
+@media only screen and (max-width: 1024px) {
+
+  :root.T .wysi h4,
+  :root.T .wysi h5,
+  :root.T .wysi h6,
+  :root.T .wysi h7 {
+    font-size: 1.8rem;
+    line-height: 1.44
+  }
+}
+
+.wysi h4+p,
+.wysi h5+p,
+.wysi h6+p,
+.wysi h7+p {
+  margin-top: 2rem
+}
+
+.wysi h4+ul,
+.wysi h4+ol,
+.wysi h5+ul,
+.wysi h5+ol,
+.wysi h6+ul,
+.wysi h6+ol,
+.wysi h7+ul,
+.wysi h7+ol {
+  margin-top: 2rem
+}
+
+.wysi h4+img,
+.wysi h5+img,
+.wysi h6+img,
+.wysi h7+img {
+  margin-top: 2rem
+}
+
+.wysi h4+blockquote,
+.wysi h5+blockquote,
+.wysi h6+blockquote,
+.wysi h7+blockquote {
+  margin-top: 2rem
+}
+
+.wysi h4+h1,
+.wysi h4+h2,
+.wysi h4+h3,
+.wysi h5+h1,
+.wysi h5+h2,
+.wysi h5+h3,
+.wysi h6+h1,
+.wysi h6+h2,
+.wysi h6+h3,
+.wysi h7+h1,
+.wysi h7+h2,
+.wysi h7+h3 {
+  margin-top: 2rem
+}
+
+.wysi h4+h4,
+.wysi h4+h5,
+.wysi h4+h6,
+.wysi h4+h7,
+.wysi h5+h4,
+.wysi h5+h5,
+.wysi h5+h6,
+.wysi h5+h7,
+.wysi h6+h4,
+.wysi h6+h5,
+.wysi h6+h6,
+.wysi h6+h7,
+.wysi h7+h4,
+.wysi h7+h5,
+.wysi h7+h6,
+.wysi h7+h7 {
+  margin-top: 2rem
+}

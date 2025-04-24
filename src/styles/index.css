@@ -9,22 +9,25 @@
 @import "./base/media.pcss";
 
 /* Layout Styles */
-@import "./layout/app.pcss";
 @import "./layout/navigation.pcss";
 @import "./layout/footer.pcss";
 @import "./layout/responsive.pcss";
 
 /* Components */
+@import "./components/about.pcss";
 @import "./components/animations.pcss";
 @import "./components/background.pcss";
 @import "./components/buttons.pcss";
 @import "./components/details.pcss";
 @import "./components/forms.pcss";
-@import "./components/links.pcss";
-@import "./components/swiper.pcss";
-@import "./components/wysiwyg.pcss";
-@import "./components/utility.pcss";
+@import "./components/loader.pcss";
 @import "./components/mouse.pcss";
+@import "./components/slides.pcss";
+@import "./components/swiper.pcss";
+@import "./components/title.pcss";
+@import "./components/utility.pcss";
+@import "./components/webgl.pcss";
+@import "./components/wysiwyg.pcss";
 
 /* Pages */
 @import "./pages/home.pcss";

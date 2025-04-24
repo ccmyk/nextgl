@@ -1,4 +1,5 @@
-import { Geometry, Text } from 'ogl'
+"use client";
+"use client"import { Geometry, Text } from 'ogl'
 
 /**
  * Create an MSDF text geometry for a Title.

@@ -1,0 +1,410 @@
+/* WebGL */
+
+.pHide {
+  position: fixed;
+  pointer-events: none;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999
+}
+
+.iO,
+.Oi,
+.OiAlt {
+  visibility: hidden;
+  pointer-events: none
+}
+
+html:not(.dev) .iO,
+html:not(.dev) .Oi,
+html:not(.dev) .OiChange,
+html:not(.dev) .OiAlt {
+  background: transparent !important
+}
+
+section.fake {
+  height: 110vh
+}
+
+#gl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  pointer-events: none
+}
+
+#glLoader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 32
+}
+
+#glBg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0
+}
+
+.move {
+  will-change: transform
+}
+
+.canvas {
+  pointer-events: none;
+  position: fixed;
+  left: 0;
+  top: 0
+}
+
+.checkfix {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  font-size: 12px;
+  z-index: 1000;
+  background: #333;
+  color: #fff;
+  font-family: Arial;
+  padding: 12px;
+  opacity: .1
+}
+
+.checkfix:hover {
+  opacity: 1
+}
+
+.imgP {
+  opacity: 0;
+  height: auto;
+  transition: .6s opacity cubic-bezier(.55, 0, .1, 1)
+}
+
+.imgP.Ldd {
+  opacity: 1
+}
+
+.glMedia {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none
+}
+
+
+#gl, #glLoader, #glBg, .canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#gl { z-index: 20; }
+#glLoader { z-index: 32; }
+#glBg { z-index: 0; }
+
+.move {
+  will-change: transform;
+}
+
+/* Animation classes */
+
+.Awrite,
+.Atext {
+  position: relative;
+  text-transform: uppercase
+}
+
+.Awrite .iO,
+.Atext .iO {
+  position: absolute;
+  left: 0;
+  top: 150%;
+  height: 10px;
+  pointer-events: none
+}
+
+.Awrite .char,
+.Atext .char {
+  position: relative;
+  pointer-events: none
+}
+
+.Awrite .char .b,
+.Atext .char .b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--dark);
+  width: 1.1rem;
+  height: 1.1rem;
+  display: none
+}
+
+.Awrite .char .n,
+.Atext .char .n {
+  opacity: 0;
+  color: var(--dark)
+}
+
+.Awrite .char .f,
+.Atext .char .f {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  color: var(--light);
+  z-index: 1;
+  background: var(--dark);
+  display: none;
+  transform-origin: left center
+}
+
+.Awrite.nono,
+.Atext.nono {
+  color: var(--dark)
+}
+
+.Awrite-inv,
+.Atext-inv {
+  color: var(--light);
+  padding: 2px 4px 1px;
+  background: var(--dark)
+}
+
+.Awrite-inv .char .n,
+.Atext-inv .char .n,
+.Awrite-inv.nono,
+.Atext-inv.nono {
+  color: var(--light)
+}
+
+.Atext {
+  text-transform: uppercase;
+  position: relative;
+  line-height: 1.27;
+  pointer-events: none
+}
+
+.Atext a {
+  pointer-events: all
+}
+
+.Atext p+p {
+  margin-top: 1.8rem
+}
+
+.Atext .char .f {
+  background: transparent
+}
+
+.Atext .iO {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  top: 150%;
+  height: 10px
+}
+
+.Atext.stview .iO {
+  top: 0%;
+  height: 100%
+}
+
+.Aline {
+  text-transform: uppercase;
+  position: relative;
+  line-height: 1.27;
+  pointer-events: none;
+  opacity: 0
+}
+
+.Aline a {
+  pointer-events: all
+}
+
+.Aline p+p {
+  margin-top: 1.8rem
+}
+
+.Aline.stview .iO {
+  top: 0%;
+  height: 100%
+}
+
+.Atitle {
+  position: relative;
+  display: inline-flex;
+  justify-content: flex-start
+}
+
+.Atitle .cCover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0
+}
+
+.Atitle .Oi {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 1 !important
+}
+
+.Atitle .tt1 {
+  opacity: 0
+}
+
+.Atitle canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none
+}
+
+/* Loader animations */
+.loader {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: left top;
+  overflow: hidden;
+  pointer-events: none
+}
+
+.loader_bg {
+  background: #000;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0
+}
+
+.loader_cnt {
+  height: 100vh;
+  color: #f8f6f2;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  position: relative
+}
+
+:root.D .loader_cnt {
+  align-items: flex-start;
+  height: 100vh;
+  padding-top: .8rem;
+  padding-bottom: 4rem
+}
+
+@media (orientation: landscape) {
+  :root.T .loader_cnt {
+    align-items: flex-start;
+    height: 100vh;
+    padding-top: .8rem;
+    padding-bottom: 4rem
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .loader_cnt {
+    align-items: flex-start;
+    height: 100vh;
+    max-height: var(--ck_hmin);
+    padding-top: .8rem;
+    padding-bottom: 4rem
+  }
+}
+
+.loader_tp {
+  font-family: montreal;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-kerning: none
+}
+
+:root.D .loader_tp {
+  font-size: 28rem;
+  margin-left: 59.2rem
+}
+
+@media (orientation: landscape) {
+  :root.T .loader_tp {
+    font-size: 28rem;
+    margin-left: 59.2rem
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .loader_tp {
+    font-size: 28rem;
+    letter-spacing: -.02em;
+    margin-left: 8.5rem
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .loader_tp {
+    font-size: 16.7rem;
+    letter-spacing: -.02em;
+    margin-left: 3.7rem
+  }
+}
+
+.loader_bp {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start
+}
+
+:root.D .loader_bp {
+  margin-left: 59.2rem
+}
+
+@media (orientation: landscape) {
+  :root.T .loader_bp {
+    margin-left: 59.2rem
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .loader_bp {
+    width: 29rem;
+    margin-left: 8.5rem
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .loader_bp {
+    width: 29rem;
+    margin-left: 4.5rem
+  }
+}
+
+.loader_bp .Awrite {
+  --light: #000;
+  --dark: #F8F6F2
+}
+
+.loader_bp .Awrite+.Awrite {
+  margin-top: .2rem
+}
+
+/* Transition animations */

@@ -1,6 +1,7 @@
-'use client';
+"use client";
+"use client"'use client';
 
-import { Program, Mesh } from 'ogl';
+const { { Program, Mesh } } = dynamic(() => import('ogl'), { ssr: false });
 import gsap from 'gsap';
 import { createLoaderGeometry } from './geometry';
 import vert from './shaders/main.vert.glsl';
@@ -32,10 +33,9 @@ export class Loader {
       uniforms: this.uniforms,
       transparent: true,
     });
-    this.mesh    = new Mesh(gl, { geometry, program });
+    this.mesh = new Mesh(gl, { geometry, program });
     if (scene) scene.addChild(this.mesh);
 
-    // GSAP timeline → same timings & eases as legacy
     this._initTimeline();
   }
 

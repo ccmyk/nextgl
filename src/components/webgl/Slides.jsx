@@ -1,12 +1,17 @@
-'use client'
-import { useSlides } from '@/hooks/webgl/useSlides'
+"use client";
+"use client";
+"use client""use client"'use client';
 
-export default function SlidesComponent({ ids=0, touch=0, className, children }) {
-  const { containerRef } = useSlides({ ids, touch })
+import { useSlides } from '@/hooks/webgl/useSlides';
+
+export default function SlidesCanvas({ pos = 0, touch = 0 }) {
+  const { containerRef } = useSlides({ pos, touch });
+
   return (
-    <div ref={containerRef} className={`slides-container relative ${className||''}`}>
-      <canvas className="absolute inset-0 pointer-events-none" />
-      {children}
-    </div>
-  )
+    <div
+      ref={containerRef}
+      className="cSlides"
+      style={{ position: 'relative', width: '100%', height: '100%' }}
+    />
+  );
 }

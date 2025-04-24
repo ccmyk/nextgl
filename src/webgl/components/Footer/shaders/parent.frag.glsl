@@ -2,15 +2,11 @@ precision highp float;
 
 varying vec2 vUv;
 
-// the rendered text pass
 uniform sampler2D tMap;
-// control timing & ripple
 uniform float uTime;
 uniform float uStart;
-// mouse ripple uniforms
 uniform float uMouseT;
 uniform float uMouse;
-// overall fade‑out for Footer
 uniform float uOut;
 
 float ripple(float uv, float time, float prog, float multi) {
@@ -20,15 +16,12 @@ float ripple(float uv, float time, float prog, float multi) {
 
 void main() {
   float timer = uStart;
-  float prog   = 1.0 - abs(timer);
-  float r      = ripple(vUv.y, timer, prog, -0.36) * (0.1 * prog);
-  vec2  uv     = vec2(vUv.x, vUv.y + r);
+  float prog  = 1.0 - abs(timer);
+  float rOut  = ripple(vUv.y, timer, prog, -0.36) * (0.1 * prog);
+  vec2 uvp    = vec2(vUv.x, vUv.y +  rOut + ripple(vUv.y, uMouse, 1.0 - abs(uMouse), -0.36) * 0.1);
 
-  vec4 col = texture2D(tMap, uv);
-
-  // apply fade‑out (uOut), then discard if fully transparent
+  vec4 col = texture2D(tMap, uvp);
   col.a *= uOut;
   if (col.a < 0.01) discard;
-
   gl_FragColor = col;
 }

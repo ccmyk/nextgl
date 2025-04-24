@@ -1,4 +1,5 @@
-// src/components/media/LazyVideo.jsx
+"use client";
+"use client"// src/components/media/LazyVideo.jsx
 
 'use client'
 

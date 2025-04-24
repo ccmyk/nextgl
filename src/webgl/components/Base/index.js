@@ -1,194 +1,94 @@
-'use client'
-import { Vec2, Program, Mesh, Texture } from 'ogl'
+"use client";
+"use client"'use client'
+import { Program, Mesh, Geometry, Vec2 } from 'ogl'
 import gsap from 'gsap'
-import { check, start, stop, updateX, updateY, updateScale, updateAnim } from './geometry'
-import vertex from './shaders/main.vert.glsl'
-import fragment from './shaders/main.frag.glsl'
+import {
+  check,
+  start,
+  stop,
+  updateX,
+  updateY,
+  updateScale
+} from './geometry'
+import vert from './shaders/main.vert.glsl'
+import frag from './shaders/main.frag.glsl'
 
-class Base {
-  constructor({ el, pos = 0, mesh, texture, renderer, touch = 0, canvas }) {
-    this.el = el
-    this.pos = pos
-    this.mesh = mesh
-    this.tex = texture
-    this.renderer = renderer
-    this.touch = touch
-    this.canvas = canvas
+export default class Base {
+  constructor({ gl, scene, camera, renderer }) {
+    this.name      = 'Base'
+    this.gl        = gl
+    this.scene     = scene
+    this.camera    = camera
+    this.renderer  = renderer
 
-    this.active = -1
-    this.isready = 0
-    this.media = el.parentNode.querySelector('img,video')
+    this.active    = -1
+    this.isready   = 0
 
-    if (this.tex.image.tagName === 'VIDEO') {
-      this.isv = 1
-      this.mesh.program.uniforms.uTextureSize.value = [
-        this.media.width,
-        this.media.height
-      ]
-    }
+    // build full-screen triangle + program
+    this.program = new Program(gl, {
+      vertex:   vert,
+      fragment: frag,
+      uniforms: {
+        uResolution: { value: new Vec2(gl.canvas.width, gl.canvas.height) },
+        uTime:       { value: 0 },
+        uStart0:     { value: 0 },
+        uStart1:     { value: 0 },
+        uStart2:     { value: 1 },
+        uStartX:     { value: 0 },
+        uMultiX:     { value: -0.4 },
+        uStartY:     { value: 0.1 },
+        uMultiY:     { value: 0.45 },
+      },
+      transparent: true,
+      depthWrite:  false,
+      cullFace:    null,
+    })
 
-    this.coords = [0, 0]
-    this.norm = [0, 0]
-    this.end = [0, 0]
-    this.ease = 0.06
+    const geometry = new Geometry(gl, {
+      position: { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) },
+      uv:       { size: 2, data: new Float32Array([ 0,  0, 2,  0,  0, 2]) },
+    })
 
-    this.ctr = { actual: 0, current: 0, limit: 0, start: 0, prog: 0, progt: 0, lerp: 0.065, stop: 0 }
+    this.mesh = new Mesh(gl, { geometry, program: this.program })
+    scene.addChild(this.mesh)
 
-    let xanim = el.dataset.op ? -0.8 : 0.8
-    this.animctr = gsap.timeline({ paused: true })
-      .fromTo(
-        this.mesh.program.uniforms.uStart,
-        { value: xanim },
-        { value: 0, ease: 'power2.inOut', onComplete: () => {
-            this.ctr.stop = 1
-            this.el.classList.add('act')
-          }
-        },
-        0
-      )
+    // wire up intersection/scroll helpers
+    Object.assign(Base.prototype, { check, start, stop, updateX, updateY, updateScale })
+
+    this.initTimeline()
   }
 
-  async load() {
-    this.initEvents()
+  initTimeline() {
+    this.timeline = gsap.timeline({
+      paused: true,
+      onComplete: () => { this.active = 1 }
+    })
+    .fromTo(this.program.uniforms.uStart0, { value: 0 }, { value: 1, duration: 0.6, ease: 'power2.inOut' }, 0)
+    .fromTo(this.program.uniforms.uStartX, { value: 0 }, { value: -0.1, duration: 2, ease: 'power2.inOut' }, 0)
+    .fromTo(this.program.uniforms.uMultiX, { value: -0.4 }, { value:  0.1, duration: 2, ease: 'power2.inOut' }, 0)
+    .fromTo(this.program.uniforms.uStartY, { value: 0.1 }, { value: 0.95, duration: 2, ease: 'power2.inOut' }, 0)
+    .fromTo(this.program.uniforms.uMultiY, { value: 0.45 }, { value: 0.3,  duration: 2, ease: 'power2.inOut' }, 0)
+    .fromTo(this.program.uniforms.uStart2, { value: 1 },   { value: 0,    duration: 1, ease: 'power2.inOut' }, 0.6)
+    this.timeline.timeScale(1.4)
   }
 
-  update(time, speed, pos) {
-    if (!this.mesh || this.isready === 0 || this.active < 0) return false
-
-    this.end[0] = this.lerp(this.end[0], this.norm[0], this.ease)
-    this.end[1] = this.lerp(this.end[1], this.norm[1], this.ease)
-
-    this.mesh.program.uniforms.uMouse.value = this.end
-
-    if (this.ctr.actual !== pos) {
-      this.ctr.actual = pos
-      this.updateY(pos)
-    }
-    if (this.ctr.stop !== 1) {
-      this.updateAnim()
-    }
-    if (this.isv && this.tex.image.readyState >= this.tex.image.HAVE_ENOUGH_DATA) {
-      this.tex.needsUpdate = true
-    }
-
-    this.renderer.render({ scene: this.mesh })
+  update(time) {
+    if (!this.renderer || this.active !== 1) return false
+    this.program.uniforms.uTime.value = time
+    this.renderer.render({ scene: this.scene, camera: this.camera })
     return true
   }
 
-  initEvents() {
-    this.mvFn = e => {
-      this.ease = 0.03
-      this.coords[0] = e.touches ? e.touches[0].clientX : e.clientX
-      this.norm[0] = (this.coords[0] - this.bound[0]) / this.bound[2] - 0.5
-    }
-    this.lvFn = () => {
-      this.ease = 0.01
-      this.norm[0] = 0
-    }
-
-    if (this.touch === 0) {
-      this.el.onmousemove = this.mvFn
-      this.el.onmouseleave = this.lvFn
-    } else {
-      this.el.style.touchAction = 'none'
-      this.el.ontouchmove = this.mvFn
-      this.el.ontouchend = this.lvFn
-    }
+  onResize({ width, height }) {
+    this.renderer.setSize(width, height)
+    this.camera.perspective({
+      aspect: this.gl.canvas.width / this.gl.canvas.height
+    })
+    this.program.uniforms.uResolution.value.set(width, height)
   }
 
   removeEvents() {
-    this.active = -2
-    this.ease = 0.022
-    this.norm[0] = -0.5
-    this.el.style.pointerEvents = 'none'
-
-    gsap.timeline({
-      onUpdate: () => {
-        this.end[0] = this.lerp(this.end[0], this.norm[0], this.ease)
-        this.mesh.program.uniforms.uMouse.value = this.end
-        this.renderer.render({ scene: this.mesh })
-      },
-      onComplete: () => {
-        this.renderer.gl.getExtension('WEBGL_lose_context').loseContext()
-        this.canvas.remove()
-      }
-    })
-    .to(this.canvas, { webkitFilter: 'blur(6px)', filter: 'blur(6px)', opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.4)
-  }
-
-  onResize(viewport, screen) {
-    this.viewport = [viewport.w, viewport.h]
-    this.screen = [screen.w, screen.h]
-
-    const boundRect = this.media.getBoundingClientRect()
-    this.bound = [boundRect.x, boundRect.y, boundRect.width, boundRect.height]
-
-    let calc = 0, fix = this.screen[1] * 0.2
-    if (this.touch === 0) {
-      if (this.media.clientHeight > this.screen[1] * 0.7) calc = this.screen[1] * -0.4
-    } else if (this.screen[0] < this.screen[1]) {
-      fix = 0
-      calc = 0
-    }
-
-    this.ctr.start = parseInt(boundRect.y - screen.h + window.scrollY + fix)
-    this.ctr.limit = parseInt(this.media.clientHeight + calc + fix)
-
-    if (this.mesh) {
-      this.updateY()
-      this.renderer.setSize(boundRect.width, boundRect.height)
-      this.mesh.program.uniforms.uCover.value = new Vec2(this.bound[2], this.bound[3])
-      this.renderer.render({ scene: this.mesh })
-    }
-  }
-
-  lerp(v1, v2, t) {
-    return v1 * (1 - t) + v2 * t
+    this.active = 0
+    this.gl.getExtension('WEBGL_lose_context').loseContext()
   }
 }
-
-// attach position handlers
-Base.prototype.check = check
-Base.prototype.start = start
-Base.prototype.stop = stop
-Base.prototype.updateX = updateX
-Base.prototype.updateY = updateY
-Base.prototype.updateScale = updateScale
-Base.prototype.updateAnim = updateAnim
-
-export default Base
-
-
-// src/webgl/components/Base/geometry.js
-export function check(entry) {
-  const vis = entry.isIntersecting
-  if (vis === undefined) return false
-  if (vis) this.start()
-  else this.stop()
-  return vis
-}
-export function start() {
-  if (this.active === 1) return false
-  if (this.isv) this.tex.image.play()
-  this.active = 1
-  this.updateX()
-  this.updateY()
-  this.updateScale()
-}
-export function stop() {
-  if (this.active === 0 || this.active === -1) return false
-  if (this.isv) this.media.pause()
-  this.active = 0
-}
-export function updateX(x = 0) {}
-export function updateY(y = 0) {
-  if (this.ctr.stop !== 1) {
-    this.ctr.current = Math.min(Math.max(y - this.ctr.start, 0), this.ctr.limit)
-  }
-}
-export function updateAnim() {
-  this.ctr.progt = (this.ctr.current / this.ctr.limit).toFixed(3)
-  this.ctr.prog = this.ctr.prog * (1 - this.ctr.lerp) + this.ctr.progt * this.ctr.lerp
-  this.animctr.progress(this.ctr.prog)
-}
-export function updateScale() {}

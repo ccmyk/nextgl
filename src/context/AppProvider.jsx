@@ -1,120 +1,135 @@
 'use client'
 
-import { createContext, useContext, useRef, useEffect } from 'react';
-import { create } from 'zustand';
-import { browserCheck } from '@/lib/startup/browser';
+import React, { createContext, useContext, useEffect, useRef } from 'react'
+import { create } from 'zustand'
+import LoaderInterface from '@/components/interface/Loader'
+import { useLenis } from '@/context/LenisContext'
+import { useWebGL } from '@/context/WebGLContext'
+import { useAppEvents } from '@/context/AppEventsContext'
 
-const useAppStore = create((set, get) => ({
-  // Initial state
+// 1) your Zustand store
+const useAppStore = create((set) => ({
+  // state
   isLoaded: false,
   currentPage: null,
   isNavigating: false,
   menuOpen: false,
   theme: 'light',
-  dimensions: {
-    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
-    height: typeof window !== 'undefined' ? window.innerHeight : 800,
-  },
+  dimensions: { width: 0, height: 0 },
   deviceClass: '',
   deviceNum: 0,
   isTouch: false,
   webp: false,
   webm: false,
   vidauto: false,
-  
-  // Actions
+  // actions
   setLoaded: () => set({ isLoaded: true }),
   setCurrentPage: (page) => set({ currentPage: page }),
-  setNavigating: (isNavigating) => set({ isNavigating }),
-  setMenuOpen: (menuOpen) => set({ menuOpen }),
+  setNavigating: (nav) => set({ isNavigating: nav }),
+  setMenuOpen: (open) => set({ menuOpen: open }),
   setTheme: (theme) => set({ theme }),
+  setDimensions: (d) => set({ dimensions: d }),
   initializeDevice: () => {
-    const { deviceclass, device, isTouch, webp, webm, vidauto } = browserCheck();
-    if (typeof document !== 'undefined') {
-      const doc = document.documentElement;
-      if (!isTouch) {
-        doc.classList.add('D');
-      } else {
-        doc.classList.add('T', deviceclass);
-      }
-    }
-    set({
-      deviceClass: deviceclass,
-      deviceNum: device,
-      isTouch,
-      webp,
-      webm,
-      vidauto
-    });
-  },
-  updateDimensions: () => {
-    if (typeof window === 'undefined') return;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    set({
-      dimensions: { width, height }
-    });
-  },
-}));
+    const ua = navigator.userAgent
+    const isTouch = /Mobi|Android|Tablet|iPad|iPhone/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    let deviceNum = 0, deviceClass = 'desktop'
+    const w = window.innerWidth, h = window.innerHeight
 
-// Create context for refs that can't be stored in Zustand
-const AppContext = createContext(null);
+    if (!isTouch) {
+      deviceClass = 'desktop'
+      deviceNum = w > 1780 ? -1 : 0
+      document.documentElement.classList.add('D')
+    } else {
+      document.documentElement.classList.add('T')
+      if (w > 767) {
+        if (w > h) { deviceClass = 'tabletL'; deviceNum = 1 }
+        else        { deviceClass = 'tabletS'; deviceNum = 2 }
+      } else {
+        deviceClass = 'mobile'; deviceNum = 3
+      }
+      document.documentElement.classList.add(deviceClass)
+    }
+
+    const canvas = document.createElement('canvas')
+    const webp = canvas.toDataURL('image/webp').includes('data:image/webp') ? 1 : 0
+    let webm = true
+    if (ua.includes('Safari') && !ua.includes('Chrome')) webm = false
+
+    set({ isTouch, deviceNum, deviceClass, webp, webm, vidauto: 0 })
+  }
+}))
+
+// 2) AppContext for refs + helpers
+const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
-  // DOM refs that need to be accessible app-wide
-  const mainRef = useRef();
-  const pageRef = useRef();
-  const contentRef = useRef();
-  const navRef = useRef();
-  const loaderRef = useRef();
-  const mouseRef = useRef();
-  
-  // Initialize device detection
-  useEffect(() => {
-    useAppStore.getState().initializeDevice();
-  }, []);
+  const store = useAppStore()
+  const {
+    isLoaded,
+    setLoaded,
+    initializeDevice,
+    setDimensions,
+    dimensions
+  } = store
 
-  // Handle window resize
+  // React contexts
+  const lenis       = useLenis()
+  const { scrollTo } = useWebGL()
+  const { dispatchAnim } = useAppEvents()
+
+  // DOM refs
+  const mainRef    = useRef(null)
+  const pageRef    = useRef(null)
+  const contentRef = useRef(null)
+  const navRef     = useRef(null)
+  const mouseRef   = useRef(null)
+
+  // on mount → device + initial dimensions
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    // Initial dimension update
-    useAppStore.getState().updateDimensions();
-    
-    // Add resize listener
-    const handleResize = () => {
-      useAppStore.getState().updateDimensions();
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
+    initializeDevice()
+    const onResize = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight })
+    }
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [initializeDevice, setDimensions])
+
+  // once loaded → start smooth scroll
+  useEffect(() => {
+    if (isLoaded) lenis.start()
+  }, [isLoaded, lenis])
+
+  // Show loader until it calls onFinish
+  if (!isLoaded) {
+    return (
+      <AppContext.Provider
+        value={{ store, scrollTo, dispatchAnim, mainRef, pageRef, contentRef, navRef, mouseRef }}
+      >
+        <LoaderInterface onFinish={setLoaded} />
+      </AppContext.Provider>
+    )
+  }
+
+  // After loaded → render the app
   return (
     <AppContext.Provider
-      value={{
-        store: useAppStore,
-        mainRef,
-        pageRef,
-        contentRef,
-        navRef,
-        loaderRef,
-        mouseRef,
-      }}
+      value={{ store, scrollTo, dispatchAnim, mainRef, pageRef, contentRef, navRef, mouseRef }}
     >
       {children}
     </AppContext.Provider>
-  );
+  )
 }
 
 export function useAppContext() {
-  const context = useContext(AppContext);
-  if (context === null) {
-    throw new Error('useAppContext must be used within an AppProvider');
+  const ctx = useContext(AppContext)
+  if (!ctx) {
+    throw new Error('useAppContext must be used within <AppProvider>')
   }
-  return context;
+  return ctx
 }
 
 export function useAppState() {
-  return useAppStore();
+  return useAppStore()
 }

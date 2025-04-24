@@ -1,40 +1,33 @@
-'use client';
+"use client";
+"use client";
+"use client""use client"'use client';
 
 import { useRef, useEffect } from 'react';
 import { useLoader } from '@/hooks/webgl/useLoader';
 import gsap from 'gsap';
 
-export default function Loader() {
+export default function LoaderComponent() {
   const { isReady, progress, effectRef } = useLoader();
   const containerRef = useRef(null);
   const numberRef    = useRef(null);
   const textRef      = useRef(null);
 
-  // animate “000 → 42 → 90” exactly like legacy
+  // Legacy count “000 → 42 → 90”
   useEffect(() => {
     if (!numberRef.current || !textRef.current) return;
-
     const obj = { num: 0 };
     const tl = gsap.timeline({ paused: true })
       .fromTo(obj, { num: 0 }, {
-        num: 42,
-        duration: 2,
-        ease: 'none',
-        onUpdate: () => {
-          numberRef.current.textContent = obj.num.toFixed(0).padStart(3, '0');
-        }
+        num: 42, duration: 2, ease: 'none',
+        onUpdate: () => numberRef.current.textContent = obj.num.toFixed(0).padStart(3, '0')
       }, 0)
       .to(obj, {
-        num: 90,
-        duration: 8,
-        ease: 'power2.inOut',
-        onUpdate: () => {
-          numberRef.current.textContent = obj.num.toFixed(0).padStart(3, '0');
-        }
+        num: 90, duration: 8, ease: 'power2.inOut',
+        onUpdate: () => numberRef.current.textContent = obj.num.toFixed(0).padStart(3, '0')
       }, 2.2)
       .play();
 
-    // text “Loading”“Please Wait” char‐anim exactly as legacy
+    // Trigger the two-line “Loading / Please Wait” char animations
     textRef.current
       .querySelectorAll('.Awrite')
       .forEach(el => {
@@ -47,10 +40,9 @@ export default function Loader() {
     return () => tl.kill();
   }, []);
 
-  // hide loader when webgl is ready
+  // When WebGL reports ready, count → 100 and fade out
   useEffect(() => {
     if (!isReady) return;
-    // count → 100
     gsap.to({ num: progress }, {
       num: 100,
       duration: 0.49,
@@ -61,7 +53,6 @@ export default function Loader() {
           .padStart(3, '0');
       }
     });
-    // fade out container
     gsap.to(containerRef.current, {
       opacity: 0,
       duration: 0.5,
@@ -80,7 +71,7 @@ export default function Loader() {
         <div ref={numberRef} className="loader_tp">000</div>
         <div ref={textRef} className="loader_text">
           <div className="Awrite">Loading</div>
-          <div className="Awrite">Please Wait</div>
+          <div className="Awrite">Please Wait</div>
         </div>
       </div>
       <div className="loader_bg" />

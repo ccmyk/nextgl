@@ -1,4 +1,7 @@
-'use client'
+"use client";
+"use client";
+"use client""use client"'use client'
+import React from 'react'
 import { useAbout } from '@/hooks/webgl/useAbout'
 
 export default function AboutComponent({ pos = 0, touch = 0, className, children }) {

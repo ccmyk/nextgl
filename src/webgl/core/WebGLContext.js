@@ -1,114 +1,110 @@
-'use client'
+"use client";
+"use client"'use client'
 
-import { createContext, useContext, useRef, useEffect } from 'react'
+import React, { createContext, useContext, useRef, useEffect, useCallback, useMemo } from 'react'
 import { webgl } from './WebGLManager'
-import gsap from 'gsap'
 import Lenis from '@studio-freight/lenis'
+import gsap from 'gsap'
 
-const WebGLContext = createContext(null)
+const WebGLContext = createContext({
+  webgl:   null,
+  lenis:   null,
+  scrollTo: () => {},
+})
 
 export function WebGLProvider({ children }) {
   const canvasRef = useRef(null)
-  const lenisRef = useRef(null)
-  const isInitializedRef = useRef(false)
+  const lenisRef  = useRef(null)
 
-  // Initialize WebGL system
+  // Initialize once
   useEffect(() => {
-    if (isInitializedRef.current) return
-    
+    if (canvasRef.current) return
+
+    // 1) Create and style the shared <canvas>
     const canvas = document.createElement('canvas')
-    canvas.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 1;
-    `
+    Object.assign(canvas.style, {
+      position:       'fixed',
+      top:            0,
+      left:           0,
+      width:         '100vw',
+      height:        '100vh',
+      pointerEvents: 'none',
+      zIndex:        1,
+    })
     document.body.appendChild(canvas)
     canvasRef.current = canvas
 
-    // Initialize WebGL with same settings as legacy
+    // 2) Init WebGLManager
     webgl.init(canvas)
 
-    // Initialize Lenis with same config as legacy
+    // 3) Init Lenis scroller
     lenisRef.current = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-      infinite: false,
+      easing:   (t) => Math.min(1, 1.001 - 2**(-10 * t)),
+      orientation:       'vertical',
+      gestureOrientation:'vertical',
+      smoothWheel:       true,
+      wheelMultiplier:   1,
+      smoothTouch:       false,
+      touchMultiplier:   2,
+      infinite:          false,
     })
 
-    // Animation loop with same timing as legacy
-    gsap.ticker.add((time) => {
-      lenisRef.current.raf(time * 1000)
+    // sync Lenis with GSAP ticker
+    gsap.ticker.add((t) => {
+      lenisRef.current.raf(t * 1000)
     })
 
-    // Handle resize
-    const handleResize = () => {
-      const { innerWidth: width, innerHeight: height } = window
-      canvas.width = width * window.devicePixelRatio
-      canvas.height = height * window.devicePixelRatio
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-      webgl.resize(width, height)
+    // 4) Resize observer
+    const onResize = () => {
+      const w = window.innerWidth
+      const h = window.innerHeight
+      canvas.width  = w * window.devicePixelRatio
+      canvas.height = h * window.devicePixelRatio
+      canvas.style.width  = `${w}px`
+      canvas.style.height = `${h}px`
+      webgl.resize(w, h)
     }
+    window.addEventListener('resize', onResize)
+    onResize()
 
-    handleResize()
-    window.addEventListener('resize', handleResize)
-
-    isInitializedRef.current = true
-
+    // cleanup
     return () => {
-      window.removeEventListener('resize', handleResize)
-      if (lenisRef.current) {
-        lenisRef.current.destroy()
-      }
+      window.removeEventListener('resize', onResize)
+      lenisRef.current?.destroy()
       webgl.destroy()
-      if (canvas.parentNode) {
-        canvas.parentNode.removeChild(canvas)
-      }
+      canvas.remove()
     }
   }, [])
 
-  // Functions for component coordination
-  const startTransition = async (from, to) => {
-    if (!webgl.active) return
-    await webgl.transition(from, to)
-  }
+  // scrollTo helper
+  const scrollTo = useCallback((target, options = {}) => {
+    lenisRef.current?.scrollTo(target, {
+      offset:  0,
+      duration: 1.2,
+      easing:  (t) => Math.min(1, 1.001 - 2**(-10 * t)),
+      ...options
+    })
+  }, [])
 
-  const scrollTo = (target, options = {}) => {
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(target, {
-        offset: 0,
-        immediate: false,
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        ...options
-      })
-    }
-  }
+  // Context value memoization
+  const value = useMemo(() => ({
+    webgl,
+    lenis: lenisRef.current,
+    scrollTo,
+  }), [scrollTo])
 
   return (
-    <WebGLContext.Provider value={{
-      webgl,
-      lenis: lenisRef.current,
-      startTransition,
-      scrollTo
-    }}>
+    <WebGLContext.Provider value={value}>
       {children}
     </WebGLContext.Provider>
   )
 }
 
 export function useWebGL() {
-  const context = useContext(WebGLContext)
-  if (!context) {
-    throw new Error('useWebGL must be used within WebGLProvider')
+  const ctx = useContext(WebGLContext)
+  if (!ctx.webgl) {
+    throw new Error('useWebGL() must be inside <WebGLProvider>')
   }
-  return context
+  return ctx
 }

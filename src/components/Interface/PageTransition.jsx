@@ -1,4 +1,6 @@
-// src/components/Interface/PageTransition.jsx
+"use client";
+"use client";
+"use client""use client"// src/components/Interface/PageTransition.jsx
 
 'use client'
 
