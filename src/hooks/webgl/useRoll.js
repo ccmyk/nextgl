@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useRef, useEffect } from 'react';
 import { useWebGL } from '@/webgl/core/WebGLContext';

@@ -1,6 +1,5 @@
 "use client";
-"use client";
-"use client""use client"'use client'
+
 import { useEffect, useRef, useState } from 'react'
 import { useAppEvents }      from '@/context/AppEventsContext'
 import { useSplitText }      from '@/hooks/useSplitText'

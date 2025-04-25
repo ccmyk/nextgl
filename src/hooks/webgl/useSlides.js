@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useRef, useEffect } from 'react';
 import { Renderer, Program, Mesh, Transform, Camera, Plane } from 'ogl';

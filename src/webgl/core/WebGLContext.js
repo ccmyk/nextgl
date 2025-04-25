@@ -1,5 +1,4 @@
-"use client";
-"use client"'use client'
+'use client'
 
 import React, { createContext, useContext, useRef, useEffect, useCallback, useMemo } from 'react'
 import { webgl } from './WebGLManager'

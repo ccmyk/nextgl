@@ -1,5 +1,6 @@
-"use client";
-"use client"import gsap from 'gsap'
+'use client'
+
+import gsap from 'gsap'
 
 export function check(entry) {
   const vis = entry.isIntersecting

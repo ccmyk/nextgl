@@ -1,7 +1,6 @@
-"use client";
-"use client"'use client';
+'use client'
 
-const { { Program, Mesh, Texture, Vec2 } } = dynamic(() => import('ogl'), { ssr: false });
+import { Program, Mesh, Texture, Vec2 } from 'ogl'
 import gsap from 'gsap';
 import { createRollGeometry } from './geometry';
 import vert from './shaders/single.vert.glsl';

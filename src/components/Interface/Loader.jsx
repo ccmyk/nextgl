@@ -1,6 +1,4 @@
-"use client";
-"use client";
-"use client""use client"'use client'
+'use client'
 
 import { useLoader } from '@/hooks/useLoader'
 import '@/styles/loader.css'

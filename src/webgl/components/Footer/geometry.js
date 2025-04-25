@@ -1,5 +1,6 @@
-"use client";
-"use client"// scroll & mouse helpers for Footer
+'use client'
+
+// scroll & mouse helpers for Footer
 export function check(entry) {
   const vis = entry.isIntersecting;
   if (vis) this.start();

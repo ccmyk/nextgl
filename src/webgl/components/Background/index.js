@@ -1,11 +1,10 @@
-"use client";
-"use client"'use client';
+'use client'
 
-const { { Program, Mesh, Vec2 } } = dynamic(() => import('ogl'), { ssr: false });
-import gsap from 'gsap';
-import { createBackgroundGeometry } from './geometry';
-import vert from './shaders/main.vert.glsl';
-import frag from './shaders/main.frag.glsl';
+import { Program, Mesh, Vec2 } from 'ogl'
+import gsap from 'gsap'
+import { createBackgroundGeometry } from './geometry'
+import vert from './shaders/main.vert.glsl'
+import frag from './shaders/main.frag.glsl'
 import { webgl } from '@/webgl/core/WebGLManager';
 
 export default class Background {

@@ -1,13 +1,11 @@
-import js from '@eslint/js';
 import prettierPlugin from 'eslint-plugin-prettier';
 import next from 'eslint-config-next';
 
-/** @type {import("eslint").Linter.FlatConfig[]} */
+/** @type {import("eslint").Linter.Config[]} */
 export default [
-  js.configs.recommended,
   ...next(),
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,glsl}'],
     plugins: {
       prettier: prettierPlugin,
     },

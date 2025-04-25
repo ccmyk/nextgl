@@ -1,6 +1,4 @@
-"use client";
-"use client"// Client-only module
-'use client';
+'use client'
 
 import Pg from './Pg';
 import * as position from './geometry';

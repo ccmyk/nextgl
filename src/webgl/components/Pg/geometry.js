@@ -1,5 +1,6 @@
-"use client";
-"use client"import gsap from 'gsap';
+'use client'
+
+import gsap from 'gsap';
 
 // 1) IntersectionObserver handler
 export function check(entry) {

@@ -1,6 +1,5 @@
 "use client";
-"use client";
-"use client""use client"'use client'
+
 import React from 'react'
 import { useAbout } from '@/hooks/webgl/useAbout'
 

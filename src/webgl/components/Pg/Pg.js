@@ -1,7 +1,6 @@
-"use client";
-"use client"'use client';
+'use client'
 
-import gsap from 'gsap';
+import gsap from 'gsap'
 
 export default class Pg {
   constructor({ el, pos = 0, renderer, mesh, scene, cam, touch = 0, canvas }) {

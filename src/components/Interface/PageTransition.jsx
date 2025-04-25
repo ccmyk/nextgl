@@ -1,8 +1,4 @@
 "use client";
-"use client";
-"use client""use client"// src/components/Interface/PageTransition.jsx
-
-'use client'
 
 import { useRef, useEffect } from 'react'
 import { useAppContext } from '@/context/AppProvider'

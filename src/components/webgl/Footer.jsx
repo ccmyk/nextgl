@@ -1,6 +1,5 @@
 "use client";
-"use client";
-"use client""use client"'use client';
+
 import React from 'react';
 import { useFooter } from '@/hooks/webgl/useFooter';
 

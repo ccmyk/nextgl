@@ -1,5 +1,5 @@
-"use client";
-"use client"'use client'
+'use client'
+
 import { Program, Mesh, Geometry, Vec2 } from 'ogl'
 import gsap from 'gsap'
 import {

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { createContext, useContext, useEffect, useRef } from 'react'
 import Lenis from 'lenis'

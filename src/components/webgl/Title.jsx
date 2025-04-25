@@ -1,6 +1,4 @@
 "use client";
-"use client";
-"use client""use client"'use client'
 
 import { useTitle } from '@/hooks/webgl/useTitle'
 

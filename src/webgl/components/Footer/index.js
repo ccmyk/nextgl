@@ -1,7 +1,6 @@
-"use client";
-"use client"'use client';
+'use client'
 
-const { { Program, Mesh, Post } } = dynamic(() => import('ogl'), { ssr: false });
+const { Program, Mesh, Post } = dynamic(() => import('ogl'), { ssr: false });
 import gsap from 'gsap';
 import {
   check,

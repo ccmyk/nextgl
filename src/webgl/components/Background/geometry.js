@@ -1,5 +1,4 @@
-"use client";
-"use client"const { { Geometry } } = dynamic(() => import('ogl'), { ssr: false });
+'use client'
 
 export function createBackgroundGeometry(gl) {
   return new Geometry(gl, {

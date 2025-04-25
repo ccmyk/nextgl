@@ -1,5 +1,4 @@
-"use client";
-"use client"import gsap from 'gsap'
+'use client'
 
 // tiny helpers
 const clamp = (v, min, max) => Math.min(Math.max(v, min), max)

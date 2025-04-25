@@ -1,5 +1,6 @@
 "use client";
-"use client"import localFont from 'next/font/local'
+
+import localFont from 'next/font/local'
 
 export const montreal = localFont({
   src: '../assets/fonts/PPNeueMontreal-Medium.woff2',

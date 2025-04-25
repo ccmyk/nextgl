@@ -1,6 +1,7 @@
-"use client";
-"use client"import gsap from 'gsap'
-import { clamp, lerp } from '@/webgl/core/utils'   // small util fns, or inline as shown below
+'use client'
+
+import gsap from 'gsap'
+import { clamp, lerp } from '@/webgl/core/utils'
 
 // scroll & mouse “geometry” helpers for Slides
 export function check(entry) {

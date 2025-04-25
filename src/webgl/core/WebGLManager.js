@@ -1,5 +1,4 @@
-"use client";
-"use client"'use client'
+'use client'
 
 import { Renderer, Camera, Transform } from 'ogl'
 

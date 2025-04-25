@@ -1,6 +1,4 @@
 "use client";
-"use client";
-"use client""use client"'use client';
 
 import { useRef, useEffect } from 'react';
 import { usePg } from '@/hooks/webgl/usePg';

@@ -1,6 +1,4 @@
 "use client";
-"use client";
-"use client""use client"'use client';
 
 import { useRef, useEffect } from 'react';
 import { useLoader } from '@/hooks/webgl/useLoader';

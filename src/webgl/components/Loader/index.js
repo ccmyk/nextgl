@@ -1,7 +1,6 @@
-"use client";
-"use client"'use client';
+'use client'
 
-const { { Program, Mesh } } = dynamic(() => import('ogl'), { ssr: false });
+import { Program, Mesh } from 'ogl'
 import gsap from 'gsap';
 import { createLoaderGeometry } from './geometry';
 import vert from './shaders/main.vert.glsl';

@@ -1,7 +1,6 @@
-"use client";
-"use client"'use client';
+'use client'
 
-const { { Geometry } } = dynamic(() => import('ogl'), { ssr: false });
+import { Geometry } from 'ogl'
 
 /**
  * Full-screen quad geometry for Loader.

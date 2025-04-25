@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { browserCheck }   from '@/lib/startup/browserCheck'
 import { loadOptions }    from '@/lib/api/loadOptions'
