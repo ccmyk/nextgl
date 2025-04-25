@@ -1,90 +1,219 @@
-"use client";
-"use client"// src/components/media/LazyVideo.jsx
+'use client';
 
-'use client'
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useResize } from '../../hooks/page/useResize'; // Adjust path if needed
 
-import { useEffect, useRef, useState, useCallback } from 'react'
-import gsap from 'gsap'
+const LazyVideo = ({ src, auto = false, touch, canplay, animev, ...props }) => {
+  const videoRef = useRef(null);
+  const buttonRef = useRef(null);
+  const [loaded, setLoaded] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [muted, setMuted] = useState(true); // Start muted
+  const [toggling, setToggling] = useState(false);
+  const { h, max, checkObj } = useResize(videoRef); // Pass videoRef
 
-export default function LazyVideo({ src, auto = false, touch = false }) {
-  const containerRef = useRef(null)
-  const videoRef = useRef(null)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [visible, setVisible] = useState(false)
-  const observerRef = useRef(null)
-
-  // Audio toggle logic (with GSAP animation fallback)
-  const toggleAudio = useCallback(async () => {
-    if (!videoRef.current) return
-
-    const video = videoRef.current
-    const muted = video.muted
-
-    const bOn = containerRef.current?.querySelector('.on')
-    const bOff = containerRef.current?.querySelector('.off')
-
-    if (muted) {
-      video.muted = false
-      gsap.to(bOn, { autoAlpha: 1, duration: 0.3 })
-      gsap.to(bOff, { autoAlpha: 0, duration: 0.3 })
-    } else {
-      video.muted = true
-      gsap.to(bOn, { autoAlpha: 0, duration: 0.3 })
-      gsap.to(bOff, { autoAlpha: 1, duration: 0.3 })
-    }
-  }, [])
-
-  // Lazy load trigger via IO
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true)
-        observer.disconnect()
+  const toggleAudio = useCallback(
+    async (out = null) => {
+      if (!buttonRef.current || toggling) {
+        return;
       }
-    }, { threshold: 0.25 })
 
-    if (containerRef.current) {
-      observer.observe(containerRef.current)
-    }
+      setToggling(true);
 
-    observerRef.current = observer
+      if (out === 1 || !muted) {
+        setMuted(true);
 
-    return () => observer.disconnect()
-  }, [])
+        if (animev && animev.current) {
+          animev.current.detail.state = -1;
+          animev.current.detail.el = buttonRef.current.querySelector('.on');
+          document.dispatchEvent(animev.current);
+
+          await new Promise((resolve) => setTimeout(resolve, 64));
+
+          if (animev && animev.current) {
+            animev.current.detail.state = 1;
+            animev.current.detail.el = buttonRef.current.querySelector('.off');
+            document.dispatchEvent(animev.current);
+          }
+        }
+      } else {
+        setMuted(false);
+
+        if (animev && animev.current) {
+          animev.current.detail.state = -1;
+          animev.current.detail.el = buttonRef.current.querySelector('.off');
+          document.dispatchEvent(animev.current);
+
+          await new Promise((resolve) => setTimeout(resolve, 64));
+
+          if (animev && animev.current) {
+            animev.current.detail.state = 1;
+            animev.current.detail.el = buttonRef.current.querySelector('.on');
+            document.dispatchEvent(animev.current);
+          }
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 320));
+      setToggling(false);
+    },
+    [muted, toggling, animev]
+  );
 
   useEffect(() => {
-    if (!visible || !videoRef.current) return
-
-    const video = videoRef.current
-    video.src = src
-    video.classList.add('ivi')
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
     if (auto) {
-      video.loop = true
-      video.muted = true
-      video.setAttribute('playsinline', 'true')
-      video.setAttribute('webkit-playsinline', 'true')
-      if (!touch) video.play()
-    }
+      videoEl.loop = true;
+      videoEl.muted = true;
+      videoEl.setAttribute('webkit-playsinline', 'webkit-playsinline');
+      videoEl.setAttribute('playsinline', 'playsinline');
 
-    const onCanPlay = () => {
-      setIsLoaded(true)
-      video.classList.add('Ldd')
+      if (touch) {
+        videoEl.load();
+      }
     }
+  }, [auto, touch]);
 
-    video.addEventListener('canplay', onCanPlay)
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const buttonEl = buttonRef.current;
+
+    if (!videoEl) return;
+
+    let observer;
+
+    const handleIntersect = (entries) => {
+      entries.forEach((entry) => {
+        // Mimic legacy check
+        if (entry.isIntersecting == undefined) {
+          return;
+        }
+
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+
+          if (!loaded) {
+            videoEl.src = videoEl.dataset.lazy;
+          }
+
+          if (!touch) {
+            videoEl.play().catch((error) => {
+              console.error('Playback failed:', error);
+            });
+          } else {
+            videoEl.setAttribute('autoplay', 'true');
+          }
+          observer.disconnect();
+        } else {
+          setIsVisible(false);
+          const isPlaying =
+            videoEl.currentTime > 0 &&
+            !videoEl.paused &&
+            !videoEl.ended &&
+            videoEl.readyState > videoEl.HAVE_CURRENT_DATA;
+
+          if (isPlaying) {
+            if (touch) {
+              videoEl.setAttribute('autoplay', 'false');
+              toggleAudio(1);
+            } else {
+              videoEl.pause();
+              toggleAudio(1);
+            }
+          }
+        }
+      });
+    };
+
+    observer = new IntersectionObserver(handleIntersect, {
+      threshold: 0.1, // Adjust as needed
+    });
+
+    observer.observe(videoEl);
+
     return () => {
-      video.removeEventListener('canplay', onCanPlay)
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [src, loaded, touch, toggleAudio]);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    videoEl.muted = muted;
+  }, [muted]);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    videoEl.classList.toggle('ivi', isVisible);
+  }, [isVisible]);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    videoEl.oncanplay = () => {
+      setLoaded(true);
+      videoEl.classList.add('Ldd');
+    };
+
+    videoEl.onplay = () => {
+      // You might not need to store isPlaying in state,
+      // videoEl.isPlaying is available directly
+    };
+
+    return () => {
+      videoEl.oncanplay = null;
+      videoEl.onplay = null;
+    };
+  }, [src]);
+
+  useEffect(() => {
+    const buttonEl = buttonRef.current;
+    if (buttonEl) {
+      buttonEl.onclick = () => toggleAudio();
     }
-  }, [visible, auto, touch, src])
+
+    if (animev && animev.current) {
+      animev.current.detail.state = 0;
+      animev.current.detail.el = buttonRef.current.querySelector('.on');
+      document.dispatchEvent(animev.current);
+
+      animev.current.detail.state = 0;
+      animev.current.detail.el = buttonRef.current.querySelector('.off');
+      document.dispatchEvent(animev.current);
+
+      animev.current.detail.state = 1;
+      animev.current.detail.el = buttonRef.current.querySelector('.off');
+      document.dispatchEvent(animev.current);
+    }
+  }, [toggleAudio, animev]);
 
   return (
-    <div className="lazy-video-container" ref={containerRef}>
-      <video ref={videoRef} preload="none" playsInline muted />
-      <button className="cAudio" onClick={toggleAudio}>
-        <span className="on">🔊</span>
-        <span className="off">🔇</span>
-      </button>
-    </div>
-  )
-}
+    <>
+      <video
+        ref={videoRef}
+        data-lazy={src}
+        className={`lazy-video ${loaded ? 'Ldd' : ''}`}
+        {...props}
+      />
+      {/* Assuming the button structure is always present */}
+      {/* You might need to adjust this depending on how the button is rendered */}
+      {props.children}
+      {props.hasButton && (
+        <button ref={buttonRef} className="cAudio">
+          <span className="on">ON</span>
+          <span className="off">OFF</span>
+        </button>
+      )}
+    </>
+  );
+};
+
+export default LazyVideo;
