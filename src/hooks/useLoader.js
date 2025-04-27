@@ -1,25 +1,30 @@
-'use client'
+// src/hooks/useLoader.js
 
-import { useRef, useEffect, useState } from 'react'
-import { useAppEvents } from '@/context/AppEventsContext'
-import gsap from 'gsap'
+import { useState, useEffect } from 'react';
+import { useLoadingEvents } from './useLoadingEvents';
 
 export function useLoader() {
-  const { dispatchAnim } = useAppEvents()
-  const [num, setNum] = useState(0)
-  const tl = useRef(null)
+  const [domReady, setDomReady] = useState(false);
+  const [glReady, setGlReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
+  // Listen for load events
+  useLoadingEvents({
+    onDomReady: () => setDomReady(true),
+    onGlReady: () => setGlReady(true),
+  });
+
+  // When both ready, trigger fade-out
   useEffect(() => {
-    tl.current = gsap.timeline({ paused: true })
-      .fromTo({ v: 0 }, { v: 42, ease: 'none', duration: 2, onUpdate() { setNum(this.targets()[0].v.toFixed(0)) } }, 0)
-      .to({ v: 90 }, { v: 90, ease: 'power2.inOut', duration: 8, onUpdate() { setNum(this.targets()[0].v.toFixed(0)) } }, 2.2)
-    return () => tl.current.kill()
-  }, [])
+    if (domReady && glReady) {
+      setIsFadingOut(true);
+      const timeout = setTimeout(() => {
+        setIsLoading(false);
+      }, 500); // match fade duration
+      return () => clearTimeout(timeout);
+    }
+  }, [domReady, glReady]);
 
-  const start = () => {
-    dispatchAnim(1, document.querySelectorAll('.Awrite')[0])
-    dispatchAnim(1, document.querySelectorAll('.Awrite')[1])
-    tl.current.play()
-  }
-
-  return { num, start }
+  return { isLoading, isFadingOut };
+}

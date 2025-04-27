@@ -1,24 +1,28 @@
-'use client'
+// src/context/AppEventsContext.js
 
-import { createContext, useContext } from 'react'
+import { createContext } from 'react';
+import mitt from 'mitt';
 
-const AppEventsContext = createContext({
-  dispatchAnim: (state, el) => {},
-})
+const emitter = mitt();
+
+export const AppEventsContext = createContext({
+  on: () => () => {},
+  emit: () => {},
+});
 
 export function AppEventsProvider({ children }) {
-  const dispatchAnim = (state, el) => {
-    const ev = new CustomEvent('anim', { detail: { el, state, style: 0, params: [0] } })
-    document.dispatchEvent(ev)
-  }
+  // Wrap mitt emitter into context value
+  const value = {
+    on: (type, handler) => {
+      emitter.on(type, handler);
+      return () => emitter.off(type, handler);
+    },
+    emit: (type, event) => emitter.emit(type, event),
+  };
 
   return (
-    <AppEventsContext.Provider value={{ dispatchAnim }}>
+    <AppEventsContext.Provider value={value}>
       {children}
     </AppEventsContext.Provider>
-  )
-}
-
-export function useAppEvents() {
-  return useContext(AppEventsContext)
+  );
 }

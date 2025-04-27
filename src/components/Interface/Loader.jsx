@@ -1,22 +1,33 @@
-'use client'
+// src/components/Interface/Loader.jsx
 
-import { useLoader } from '@/hooks/useLoader'
-import '@/styles/loader.css'
-import { useEffect } from 'react'
+'use client';
+
+import { useLoader } from '@/hooks/useLoader';
+import { useLoadingEvents } from '@/hooks/useLoadingEvents';
+import styles from '@/styles/components/loader.pcss';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Loader() {
-  const { num, start } = useLoader()
+  // Subscribe to DOM and GL ready events
+  useLoadingEvents();
 
-  useEffect(() => { start() }, [])
+  const { isLoading, isFadingOut } = useLoader();
 
   return (
-    <div className="loader">
-      <div className="loader_bg" />
-      <div className="loader_cnt">
-        <div className="loader_tp Awrite">0</div>
-        <div className="loader_tp Awrite">0</div>
-      </div>
-      <div className="loader_n">{String(num).padStart(3, '0')}</div>
-    </div>
-  )
+    <AnimatePresence>
+      {(isLoading || isFadingOut) && (
+        <motion.div
+          className={styles.loaderOverlay}
+          initial={{ opacity: 1 }}
+          animate={{ opacity: isFadingOut ? 0 : 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className={styles.loaderContent}>
+            <div className={styles.spinner} />
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 }
