@@ -423,22 +423,474 @@ The views are refactored into:
 - `/components/views/[View]View.jsx`
 - `/components/views/[View]Intro.jsx`
 
-## Next Steps
+## Implementation Priorities
 
-1. **Complete Core Functionality**
-   - Finalize missing hooks
-   - Complete CSS module implementation
-   - Ensure all components work together
+Based on the analysis of both codebases and current progress, the following implementation priorities will guide the completion of the refactoring project.
 
-2. **Enhance Integration**
-   - Verify WebGL components function correctly
-   - Implement complete animation system
-   - Ensure proper page transitions
+### 1. Missing Critical Components
 
-3. **Testing and Optimization**
-   - Compare with legacy implementation
-   - Optimize performance
-   - Test across devices and browsers
+#### useSplitText Hook for Text Animations
+
+The `useSplitText` hook is a critical missing piece that blocks proper text animations. This hook needs to replicate the functionality of the legacy `writeCt` function in `anims.js`.
+
+**Implementation Plan:**
+
+```jsx
+// src/hooks/useSplitText.js
+import { useEffect, useRef } from 'react';
+import SplitType from 'split-type';
+
+export const useSplitText = (elementRef, options = {}) => {
+  const splitInstance = useRef(null);
+  
+  useEffect(() => {
+    if (!elementRef.current) return;
+    
+    // Clear any existing split
+    if (splitInstance.current?.revert) {
+      splitInstance.current.revert();
+    }
+    
+    // Determine the selection target
+    const target = options.selector 
+      ? elementRef.current.querySelectorAll(options.selector)
+      : elementRef.current;
+    
+    // Create the text split
+    splitInstance.current = new SplitType(target, {
+      types: options.types || 'chars,words'
+    });
+    
+    // Handle different animation types
+    if (options.type === 'Atext' || options.type === 'Aline') {
+      // Handle line animations
+      const lines = elementRef.current.querySelectorAll('.line');
+      lines.forEach((line, i) => {
+        // Set animation delay parameter
+        line.dataset.params = (i * 0.15).toString();
+      });
+    } 
+    else if (options.processChars) {
+      // Process characters for Awrite animations
+      const chars = elementRef.current.querySelectorAll('.char');
+      const fakes = '##·$%&/=€|()@+09*+]}{[';
+      
+      chars.forEach(char => {
+        // Wrap original character
+        const text = char.innerHTML;
+        char.innerHTML = `<span class="n">${text}</span>`;
+        
+        // Add fake characters for animation
+        for (let i = 0; i < (options.fakeCount || 2); i++) {
+          const randIndex = Math.floor(Math.random() * fakes.length);
+          const fakeChar = fakes[randIndex];
+          char.insertAdjacentHTML('afterbegin', 
+            `<span class="f" aria-hidden="true">${fakeChar}</span>`);
+        }
+      });
+      
+      // Set initial opacity for animation
+      if (elementRef.current && !options.skipOpacity) {
+        elementRef.current.style.opacity = '0';
+      }
+    }
+    
+    return () => {
+      if (splitInstance.current?.revert) {
+        splitInstance.current.revert();
+      }
+    };
+  }, [elementRef, options]);
+  
+  return splitInstance;
+};
+```
+
+#### Animation Context Implementation
+
+A central animation context is needed to coordinate animations across components, replicating the event-based system in the legacy code.
+
+**Implementation Plan:**
+
+```jsx
+// src/context/AnimationContext.jsx
+import { createContext, useContext, useRef, useCallback } from 'react';
+import gsap from 'gsap';
+
+const AnimationContext = createContext({
+  registerAnimation: () => {},
+  triggerAnimation: () => {},
+  createTimeline: () => {},
+});
+
+export const AnimationProvider = ({ children }) => {
+  const animations = useRef(new Map());
+  const timelines = useRef(new Map());
+  
+  // Register animation function with the context
+  const registerAnimation = useCallback((id, animationFn) => {
+    animations.current.set(id, animationFn);
+    return () => animations.current.delete(id);
+  }, []);
+  
+  // Trigger animation by ID or element
+  const triggerAnimation = useCallback((target, state = 1, params = {}) => {
+    if (typeof target === 'string') {
+      // Trigger by ID
+      const animFn = animations.current.get(target);
+      if (animFn) animFn(state, params);
+    } else if (target instanceof Element) {
+      // Find selector-based animations that match the element
+      for (const [id, animFn] of animations.current.entries()) {
+        if (id.startsWith('selector:') && target.matches(id.substring(9))) {
+          animFn(state, params);
+        }
+      }
+    }
+  }, []);
+  
+  // Create and manage GSAP timeline
+  const createTimeline = useCallback((id, options = {}) => {
+    // Kill existing timeline
+    if (timelines.current.has(id)) {
+      timelines.current.get(id).kill();
+    }
+    
+    // Create new timeline
+    const timeline = gsap.timeline({
+      paused: true,
+      ...options,
+    });
+    
+    timelines.current.set(id, timeline);
+    return timeline;
+  }, []);
+  
+  return (
+    <AnimationContext.Provider value={{ 
+      registerAnimation, 
+      triggerAnimation,
+      createTimeline,
+    }}>
+      {children}
+    </AnimationContext.Provider>
+  );
+};
+
+export const useAnimation = () => useContext(AnimationContext);
+```
+
+#### PCSS Module Completion
+
+CSS modules need to be created for each component, starting with critical ones like navigation.
+
+**Implementation Plan:**
+
+```css
+/* src/styles/components/nav.pcss */
+.nav {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 24px 0;
+  pointer-events: none;
+  
+  /* Variables */
+  --light: #F8F6F2;
+  --gray: #8A8A8A;
+  --dark: #000;
+}
+
+.nav_blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  
+  & > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+}
+
+.nav_top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.nav_left {
+  display: flex;
+  align-items: center;
+  
+  & .sep {
+    width: 1px;
+    height: 16px;
+    background-color: var(--dark);
+    margin: 0 16px;
+  }
+}
+
+.nav_logo {
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  pointer-events: auto;
+}
+
+.nav_clock {
+  display: flex;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+.nav_right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  
+  & a {
+    font-size: 16px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    pointer-events: auto;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.nav_burger {
+  display: none;
+  width: 32px;
+  height: 32px;
+  position: relative;
+  cursor: pointer;
+  pointer-events: auto;
+  
+  & span {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    height: 2px;
+    background-color: var(--dark);
+    transition: transform 0.3s ease;
+    
+    &:nth-child(1) {
+      top: 10px;
+    }
+    
+    &:nth-child(2) {
+      top: 16px;
+    }
+    
+    &:nth-child(3) {
+      top: 22px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav_right_ops {
+    display: none;
+  }
+  
+  html.act-menu .nav_right_ops {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    background-color: var(--light);
+  }
+}
+```
+
+#### WebGL Component Integration
+
+WebGL components need proper integration with React lifecycle and state management.
+
+**Implementation Plan:**
+
+```jsx
+// src/hooks/useWebGLComponent.js
+import { useEffect, useRef } from 'react';
+import { useWebGLContext } from '@/context/WebGLContext';
+
+export const useWebGLComponent = (componentName, options = {}) => {
+  const { registerComponent, updateComponent, removeComponent } = useWebGLContext();
+  const instanceId = useRef(`${componentName}-${Math.random().toString(36).substring(2, 9)}`);
+  
+  useEffect(() => {
+    // Register the component with the WebGL context
+    registerComponent(instanceId.current, {
+      name: componentName,
+      ...options
+    });
+    
+    return () => {
+      // Clean up on unmount
+      removeComponent(instanceId.current);
+    };
+  }, [componentName, registerComponent, removeComponent]);
+  
+  // Update component props
+  useEffect(() => {
+    updateComponent(instanceId.current, options);
+  }, [updateComponent, options]);
+  
+  return instanceId.current;
+};
+```
+
+### 2. Next Steps
+
+#### Create Key Hooks for Animation System
+
+1. **useTextAnimation Hook**
+
+This hook will handle text animations based on the legacy `writeFn` function:
+
+```jsx
+// src/hooks/useTextAnimation.js
+import { useEffect, useRef, useCallback } from 'react';
+import { useAnimation } from '@/context/AnimationContext';
+import gsap from 'gsap';
+
+export const useTextAnimation = (ref, type = 'Awrite', options = {}) => {
+  const { createTimeline, registerAnimation } = useAnimation();
+  const timelineRef = useRef(null);
+  const componentId = useRef(`text-anim-${Math.random().toString(36).substring(2, 9)}`);
+  
+  // Animation trigger function
+  const triggerAnimation = useCallback((state = 1, params = {}) => {
+    if (!ref.current) return;
+    
+    // Parse animation parameters
+    const paramsStr = ref.current.dataset.params || '0,0';
+    const defaultParams = paramsStr.split(',').map(parseFloat);
+    const delay = params.delay !== undefined ? params.delay : defaultParams[0] || 0;
+    
+    // Create animation timeline
+    timelineRef.current = createTimeline(componentId.current, {
+      onComplete: () => {
+        if (ref.current) ref.current.classList.add('ivi');
+      }
+    });
+    
+    if (state === 1) {
+      // Forward animation
+      if (type === 'Awrite') {
+        // Character-by-character animation
+        const chars = ref.current.querySelectorAll('.char');
+        const times = [0.3, 0.05, 0.16, 0.05, 0.016]; // Animation timings
+        
+        // Set container visible
+        timelineRef.current.set(ref.current, { opacity: 1 }, 0);
+        
+        // Animate each character
+        chars.forEach((char, i) => {
+          const n = char.querySelector('.n');
+          timelineRef.current.to(n, {
+            opacity: 1,
+            duration: times[0],
+            ease: 'power4.inOut'
+          }, (i * times[1]) + delay);
+          
+          // Animate fake characters
+          const fakes = char.querySelectorAll('.f');
+          fakes.forEach((f, u) => {
+            timelineRef.current
+              .set(f, { opacity: 0, display: 'block' }, 0)
+              .fromTo(f,
+                { scaleX: 1, opacity: 1 },
+                {
+                  scaleX: 0,
+                  opacity: 0,
+                  duration: times[2],
+                  ease: 'power4.inOut'
+                },
+                delay + ((i * times[3]) + ((1 + u) * times[4]))
+              )
+              .set(f, { display: 'none' }, '>');
+          });
+        });
+      } else if (type === 'Atext' || type === 'Aline') {
+        // Line-by-line animation
+        const lines = ref.current.querySelectorAll('.line');
+        
+        timelineRef.current.set(ref.current, { opacity: 1 }, 0);
+        
+        lines.forEach((line, i) => {
+          const lineDelay = line.dataset.params ? parseFloat(line.dataset.params) : i * 0.1;
+          timelineRef.current.fromTo(line,
+            { opacity: 0, yPercent: 50 },
+            {
+              opacity: 1,
+              yPercent: 0,
+              duration: 0.6,
+              ease: 'power4.inOut'
+            },
+            lineDelay + delay
+          );
+        });
+      }
+      
+      // Play the animation
+      timelineRef.current.play();
+    } else if (state === -1) {
+      // Reverse animation
+      if (timelineRef.current) {
+        timelineRef.current.reverse();
+      } else {
+        // Create reverse animation if timeline doesn't exist
+        timelineRef.current = createTimeline(componentId.current);
+        
+        if (type === 'Awrite') {
+          const chars = [...ref.current.querySelectorAll('.char')].reverse();
+          
+          timelineRef.current.set(ref.current, { opacity: 1 }, 0);
+          
+          chars.forEach((char, i) => {
+            timelineRef.current.to(char, {
+              opacity: 0,
+              duration: 0.2,
+              ease: 'power4.inOut'
+            }, i * 0.04);
+          });
+          
+          timelineRef.current.to(ref.current, {
+            opacity: 0,
+            duration: 0.4,
+            ease: 'power4.inOut'
+          }, 0.4);
+        } else {
+          const lines = [...ref.current.querySelectorAll('.line')].reverse();
+          
+          lines.forEach((line, i) => {
+            timelineRef.current.to(line, {
+              opacity: 0,
+              duration: 0.2,
 
 ## HTML Structure Analysis
 
@@ -837,17 +1289,804 @@ GSAP should be integrated with React's component lifecycle:
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
-export const useGSAP = (callback, deps = []) => {
-  const ctx = useRef(gsap.context(() => {}));
+export const useAnimatedElement = () => {
+  // Implementation details...
+};
+```
+
+## Documentation Approach
+
+This document will continue to be updated as the refactoring progresses to maintain an accurate record of:
+- Component mapping between legacy and new code
+- Architectural decisions and patterns
+- Implementation progress and status
+
+## Current Status and Completion Plan
+
+This section outlines the current state of the refactoring project, identifies remaining work items, and provides a clear roadmap for completion.
+
+### Current Status
+
+Based on analysis of the codebase, here is the current completion status:
+
+| System | Status | Description |
+|--------|--------|-------------|
+| WebGL Components | 80% | All 9 WebGL components have basic structure, but need integration |
+| React Components | 70% | Most component shells created, but some are incomplete |
+| Animation System | 40% | Basic animation hooks outlined, but text animation incomplete |
+| CSS Modules | 30% | Basic structure created, but most modules need implementation |
+| Routing | 90% | App Router structure complete, dynamic routes implemented |
+| State Management | 60% | Context structure in place, but event system needs work |
+
+### Missing Critical Components
+
+1. **useSplitText Hook**
+   - Currently missing
+   - Required for text animation effects
+   - Blocks proper Nav implementation
+
+2. **CSS Modules**
+   - nav.pcss and animation-related modules missing
+   - Required for visual consistency
+
+3. **Animation Context**
+   - Needs more complete implementation
+   - Required for coordinating animations
+
+4. **WebGL Integration**
+   - WebGL components created but not fully integrated with lifecycle
+
+### Implementation Priorities
+
+#### 1. Text Animation System (Highest Priority)
+
+The text animation system is a key visual feature and dependency for multiple components. Implementation should follow this sequence:
+
+1. Create useSplitText.js hook:
+```javascript
+// hooks/useSplitText.js
+import { useEffect, useRef } from 'react';
+import SplitType from 'split-type';
+
+export const useSplitText = (elementRef, options = {}) => {
+  const splitInstance = useRef(null);
   
   useEffect(() => {
-    ctx.current.kill();
-    ctx.current = gsap.context(callback);
+    if (!elementRef.current) return;
     
-    return () => ctx.current.revert();
-  }, deps);
+    // Split text
+    splitInstance.current = new SplitType(elementRef.current, {
+      types: options.types || 'chars,words'
+    });
+    
+    // Process for animation if requested
+    if (options.processChars) {
+      const chars = elementRef.current.querySelectorAll('.char');
+      const fakes = '##·$%&/=€|()@+09*+]}{[';
+      
+      chars.forEach(char => {
+        // Add character structure
+        const text = char.innerHTML;
+        char.innerHTML = `<span class="n">${text}</span>`;
+        
+        // Add fake characters for animation
+        for (let i = 0; i < (options.fakeCount || 2); i++) {
+          const randIndex = Math.floor(Math.random() * fakes.length);
+          const fakeChar = fakes[randIndex];
+          char.insertAdjacentHTML('afterbegin', 
+            `<span class="f" aria-hidden="true">${fakeChar}</span>`);
+        }
+      });
+      
+      // Set initial opacity
+      if (elementRef.current) elementRef.current.style.opacity = '0';
+    }
+    
+    return () => {
+      if (splitInstance.current?.revert) {
+        splitInstance.current.revert();
+      }
+    };
+  }, [elementRef, options]);
   
-  return ctx;
+  return splitInstance;
+};
+```
+
+2. Implement animation context for coordinating animations:
+```javascript
+// context/AnimationContext.jsx
+import { createContext, useContext, useRef, useCallback } from 'react';
+
+const AnimationContext = createContext({
+  registerAnimation: () => {},
+  triggerAnimation: () => {},
+});
+
+export const AnimationProvider = ({ children }) => {
+  const animations = useRef(new Map());
+  
+  const registerAnimation = useCallback((id, animationFn) => {
+    animations.current.set(id, animationFn);
+    return () => animations.current.delete(id);
+  }, []);
+  
+  const triggerAnimation = useCallback((id, state = 1) => {
+    const animFn = animations.current.get(id);
+    if (animFn) animFn(state);
+  }, []);
+  
+  return (
+    <AnimationContext.Provider value={{ registerAnimation, triggerAnimation }}>
+      {children}
+    </AnimationContext.Provider>
+  );
+};
+
+export const useAnimation = () => useContext(AnimationContext);
+```
+
+3. Create animation-related CSS modules
+
+#### 2. Component Completion (High Priority)
+
+Once the animation system is in place, complete these key components:
+
+1. Nav.jsx - Navigation component with clock
+2. PageTransition.jsx - Page transition animations
+3. Title.jsx WebGL integration
+
+#### 3. WebGL Integration (Medium Priority)
+
+Focus on properly integrating WebGL with React lifecycle:
+
+1. Complete WebGLContext implementation
+2. Add proper cleanup and resource management
+3. Ensure canvas resize handling
+4. Connect with animation system
+
+#### 4. CSS Migration (Medium Priority)
+
+Continue migrating CSS to modular structure:
+
+1. Complete component-specific modules
+2. Implement animation-related styles
+3. Ensure responsive behavior
+
+### Testing Strategy
+
+To ensure proper implementation, follow this testing approach:
+
+1. **Component-by-Component Testing**
+   - Test each component against legacy version
+   - Verify visual appearance
+   - Check interactive behavior
+
+2. **Animation Testing**
+   - Compare timing and easing with legacy
+   - Ensure proper sequencing
+   - Test on different devices
+
+3. **Integration Testing**
+   - Test full page flows
+   - Verify transitions between pages
+   - Check WebGL effects during navigation
+
+### Implementation Timeline
+
+| Phase | Timeframe | Focus |
+|-------|-----------|-------|
+| Phase 1 | Week 1-2 | Text animation system, Nav component |
+| Phase 2 | Week 3-4 | WebGL integration, CSS modules |
+| Phase 3 | Week 5-6 | Page transitions, view components |
+| Phase 4 | Week 7-8 | Testing, optimization, bug fixes |
+
+### Next Steps
+
+1. Create useSplitText.js hook (highest priority)
+2. Implement nav.pcss CSS module
+3. Complete Nav.jsx component
+4. Test basic text animation behavior
+
+## Completion Strategy
+
+This section outlines a focused strategy for completing the remaining refactoring work, with emphasis on critical missing components.
+
+### 1. Critical Missing Hooks for Text Animation
+
+The most important missing component is the `useSplitText` hook, which is blocking text animation functionality across multiple components:
+
+#### useSplitText Hook Implementation 
+
+```jsx
+// src/hooks/useSplitText.js
+import { useEffect, useRef } from 'react';
+import SplitType from 'split-type';
+
+export const useSplitText = (selector, options = {}) => {
+  const splitRef = useRef(null);
+  
+  useEffect(() => {
+    // If selector is a string, find matching elements
+    const elements = typeof selector === 'string' 
+      ? document.querySelectorAll(selector)
+      : [selector.current];
+      
+    if (!elements.length) return;
+    
+    // Initialize split-type for each element
+    elements.forEach(el => {
+      if (!el) return;
+      
+      // Create split
+      const split = new SplitType(el, {
+        types: options.types || 'chars,words'
+      });
+      
+      // Process characters if needed
+      if (options.processChars) {
+        const chars = el.querySelectorAll('.char');
+        const fakes = '##·$%&/=€|()@+09*+]}{[';
+        
+        chars.forEach(char => {
+          // Wrap original text in .n span
+          const originalText = char.innerHTML;
+          char.innerHTML = `<span class="n">${originalText}</span>`;
+          
+          // Add fake characters
+          for (let i = 0; i < (options.fakeCount || 2); i++) {
+            const randIndex = Math.floor(Math.random() * fakes.length);
+            const fakeChar = fakes[randIndex];
+            char.insertAdjacentHTML('afterbegin', 
+              `<span class="f" aria-hidden="true">${fakeChar}</span>`);
+          }
+        });
+        
+        // Set initial opacity
+        if (!options.skipInitialOpacity) {
+          el.style.opacity = '0';
+        }
+      }
+      
+      splitRef.current = split;
+    });
+    
+    return () => {
+      if (splitRef.current?.revert) {
+        splitRef.current.revert();
+      }
+    };
+  }, [selector, options]);
+  
+  return splitRef.current;
+};
+```
+
+**Implementation Plan:**
+1. Create the `useSplitText.js` file in the `src/hooks` directory
+2. Implement the hook as shown above
+3. Add necessary dependencies (split-type) via `pnpm add split-type`
+4. Test with a simple text element
+
+#### useTextAnimation Hook
+
+This hook will handle the animation logic for text elements:
+
+```jsx
+// src/hooks/useTextAnimation.js
+import { useEffect, useRef, useCallback } from 'react';
+import { useSplitText } from './useSplitText';
+import gsap from 'gsap';
+
+export const useTextAnimation = (ref, type = 'Awrite', options = {}) => {
+  const timeline = useRef(null);
+  const animationId = useRef(`text-anim-${Math.random().toString(36).substring(2, 9)}`);
+  
+  // Initialize text splitting
+  const splitInstance = useSplitText(ref, {
+    types: type === 'Awrite' ? 'chars,words' : 'lines',
+    processChars: type === 'Awrite',
+    fakeCount: options.fakeCount || 2,
+    skipInitialOpacity: options.skipInitialOpacity
+  });
+  
+  // Animation function
+  const animate = useCallback((state = 1, params = {}) => {
+    if (!ref.current) return;
+    
+    // Clear any existing animation
+    if (timeline.current) {
+      timeline.current.kill();
+    }
+    
+    // Parse animation parameters
+    const paramsData = ref.current.dataset.params || '0,0';
+    const [delay = 0, flag = 0] = paramsData.split(',').map(parseFloat);
+    
+    // Create new timeline
+    timeline.current = gsap.timeline({
+      paused: true,
+      onComplete: () => {
+        if (ref.current) {
+          ref.current.classList.add('ivi');
+        }
+      }
+    });
+    
+    if (state === 1) {
+      // Forward animation
+      if (type === 'Awrite') {
+        // Character animation logic
+        const chars = ref.current.querySelectorAll('.char');
+        const times = [0.3, 0.05, 0.16, 0.05, 0.016]; // Timing constants
+        
+        // Make container visible
+        timeline.current.set(ref.current, { opacity: 1 }, 0);
+        
+        // Animate each character
+        chars.forEach((char, i) => {
+          const n = char.querySelector('.n');
+          
+          // Show real character
+          timeline.current.to(n, {
+            opacity: 1,
+            duration: times[0],
+            ease: 'power4.inOut'
+          }, (i * times[1]) + delay);
+          
+          // Animate fake characters
+          const fakes = char.querySelectorAll('.f');
+          fakes.forEach((f, u) => {
+            timeline.current
+              .set(f, { opacity: 0, display: 'block' }, 0)
+              .fromTo(f,
+                { scaleX: 1, opacity: 1 },
+                {
+                  scaleX: 0,
+                  opacity: 0,
+                  duration: times[2],
+                  ease: 'power4.inOut'
+                },
+                delay + ((i * times[3]) + ((1 + u) * times[4]))
+              )
+              .set(f, { display: 'none' }, '>');
+          });
+        });
+      } else if (type === 'Atext' || type === 'Aline') {
+        // Line animation logic
+        const lines = ref.current.querySelectorAll('.line');
+        
+        timeline.current.set(ref.current, { opacity: 1 }, 0);
+        
+        lines.forEach((line, i) => {
+          timeline.current.fromTo(line,
+            { opacity: 0, yPercent: 50 },
+            {
+              opacity: 1,
+              yPercent: 0,
+              duration: 0.6,
+              ease: 'power4.inOut'
+            },
+            (i * 0.1) + delay
+          );
+        });
+      }
+      
+      // Handle animation flags
+      if (flag === -1) {
+        // Set to end state immediately
+        timeline.current.progress(1);
+      } else {
+        // Play the animation
+        timeline.current.play();
+      }
+    } else if (state === -1) {
+      // Reverse animation (hide element)
+      if (type === 'Awrite') {
+        const chars = [...ref.current.querySelectorAll('.char')].reverse();
+        
+        chars.forEach((char, i) => {
+          timeline.current.to(char, {
+            opacity: 0,
+            duration: 0.2,
+            ease: 'power4.inOut'
+          }, i * 0.04);
+        });
+        
+        timeline.current.to(ref.current, {
+          opacity: 0,
+          duration: 0.4,
+          ease: 'power4.inOut'
+        }, 0.4);
+      } else {
+        const lines = [...ref.current.querySelectorAll('.line')].reverse();
+        
+        lines.forEach((line, i) => {
+          timeline.current.to(line, {
+            opacity: 0,
+            duration: 0.2,
+            ease: 'power4.inOut'
+          }, i * 0.04);
+        });
+        
+        timeline.current.to(ref.current, {
+          opacity: 0,
+          duration: 0.4,
+          ease: 'power4.inOut'
+        }, 0.4);
+      }
+      
+      timeline.current.play();
+    }
+    
+    return timeline.current;
+  }, [ref, type, options.fakeCount, options.skipInitialOpacity]);
+  
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (timeline.current) {
+        timeline.current.kill();
+      }
+    };
+  }, []);
+  
+  return animate;
+};
+```
+
+### 2. WebGL Integration Strategy
+
+The refactoring includes 9 WebGL components, each with their own shaders and geometry. To properly integrate these with React, we need to:
+
+#### WebGL Context Implementation
+
+```jsx
+// src/context/WebGLContext.jsx
+import { createContext, useContext, useState, useRef, useCallback, useEffect } from 'react';
+import WebGLManager from '@/webgl/core/WebGLManager';
+
+const WebGLContext = createContext(null);
+
+export const WebGLProvider = ({ children }) => {
+  const [isInitialized, setIsInitialized] = useState(false);
+  const manager = useRef(null);
+  const componentsRef = useRef(new Map());
+  
+  // Initialize WebGL manager
+  useEffect(() => {
+    manager.current = new WebGLManager();
+    setIsInitialized(true);
+    
+    return () => {
+      // Clean up WebGL resources
+      if (manager.current) {
+        manager.current.dispose();
+      }
+    };
+  }, []);
+  
+  // Register a WebGL component
+  const registerComponent = useCallback((id, config) => {
+    if (!manager.current) return;
+    
+    componentsRef.current.set(id, config);
+    manager.current.createComponent(id, config);
+    
+    return () => {
+      componentsRef.current.delete(id);
+      manager.current.removeComponent(id);
+    };
+  }, []);
+  
+  // Update a component's props
+  const updateComponent = useCallback((id, props) => {
+    if (!manager.current || !componentsRef.current.has(id)) return;
+    
+    manager.current.updateComponent(id, props);
+  }, []);
+  
+  // Remove a component
+  const removeComponent = useCallback((id) => {
+    if (!manager.current) return;
+    
+    componentsRef.current.delete(id);
+    manager.current.removeComponent(id);
+  }, []);
+  
+  // Resize handler
+  const handleResize = useCallback(() => {
+    if (manager.current) {
+      manager.current.resize();
+    }
+  }, []);
+  
+  // Set up resize listener
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
+  
+  const contextValue = {
+    manager: manager.current,
+    isInitialized,
+    registerComponent,
+    updateComponent,
+    removeComponent
+  };
+  
+  return (
+    <WebGLContext.Provider value={contextValue}>
+      {children}
+    </WebGLContext.Provider>
+  );
+};
+
+export const useWebGL = () => useContext(WebGLContext);
+```
+
+#### WebGL Component Hook Template
+
+```jsx
+// src/hooks/webgl/useWebGLComponent.js
+import { useEffect, useRef } from 'react';
+import { useWebGL } from '@/context/WebGLContext';
+
+export const useWebGLComponent = (componentType, props = {}) => {
+  const { registerComponent, updateComponent } = useWebGL();
+  const componentId = useRef(`${componentType}-${Math.random().toString(36).substring(2, 9)}`);
+  
+  // Register component on mount
+  useEffect(() => {
+    if (!registerComponent) return;
+    
+    const cleanup = registerComponent(componentId.current, {
+      type: componentType,
+      ...props
+    });
+    
+    return cleanup;
+  }, [componentType, registerComponent]);
+  
+  // Update props when they change
+  useEffect(() => {
+    if (!updateComponent) return;
+    
+    updateComponent(componentId.current, props);
+  }, [props, updateComponent]);
+  
+  return componentId.current;
+};
+```
+
+### 3. Animation Context Implementation
+
+To coordinate animations across components, we need a central animation context:
+
+```jsx
+// src/context/AnimationContext.jsx
+import { createContext, useContext, useRef, useCallback } from 'react';
+
+const AnimationContext = createContext({
+  registerAnimation: () => {},
+  triggerAnimation: () => {},
+});
+
+export const AnimationProvider = ({ children }) => {
+  const animations = useRef(new Map());
+  
+  // Register an animation function
+  const registerAnimation = useCallback((id, animationFn) => {
+    animations.current.set(id, animationFn);
+    return () => animations.current.delete(id);
+  }, []);
+  
+  // Trigger animation by ID or element
+  const triggerAnimation = useCallback((target, state = 1, params = {}) => {
+    if (typeof target === 'string') {
+      // Trigger by ID
+      const animFn = animations.current.get(target);
+      if (animFn) animFn(state, params);
+    } else if (target instanceof Element) {
+      // Find animations that match this element (slower)
+      animations.current.forEach((animFn, id) => {
+        if (id.startsWith('selector:') && target.matches(id.substring(9))) {
+          animFn(state, params);
+        }
+      });
+    }
+  }, []);
+  
+  return (
+    <AnimationContext.Provider value={{ registerAnimation, triggerAnimation }}>
+      {children}
+    </AnimationContext.Provider>
+  );
+};
+
+export const useAnimation = () => useContext(AnimationContext);
+```
+
+### 4. Component Priorities and Timeline
+
+Based on the current status and dependencies, here's a prioritized timeline for completing the refactoring:
+
+#### Week 1: Core Animation System (Highest Priority)
+
+| Day | Task | Details |
+|-----|------|---------|
+| 1 | Create useSplitText hook | Implement split-text logic with fake character generation |
+| 1 | Create useTextAnimation hook | Implement animation timeline for text effects |
+| 2 | Implement Animation Context | Create context for coordinating animations |
+| 2-3 | Implement nav.pcss module | Create CSS module for navigation styling |
+| 3-4 | Complete Nav.jsx component | Wire up with animation hooks, implement clock |
+| 5 | Test basic text animations | Verify character/line animations work properly |
+
+#### Week 2: WebGL Integration (High Priority)
+
+| Day | Task | Details |
+|-----|------|---------|
+| 1-2 | Finalize WebGLContext | Complete context implementation and manager |
+| 2-3 | Implement WebGL component hooks | Create/update hooks for all 9 components |
+| 3-4 | Test WebGL components | Verify rendering and shader behavior |
+| 4-5 | Integrate with animation system | Connect WebGL animations with React lifecycle |
+
+## Directory Structure Mapping and Implementation Status
+
+This section provides a detailed mapping between legacy components and their Next.js counterparts, showing completion status and identifying critical missing pieces.
+
+### 1. UI Components
+
+| Legacy Component | Next.js Component | Status | Missing Pieces |
+|------------------|-------------------|--------|---------------|
+| `components/Loader/index.js` | `components/interface/Loader.jsx`<br>`hooks/useLoader.js` | 🟡 70% | Animation integration |
+| `components/Mouse/index.js` | `components/interface/Mouse.jsx`<br>`hooks/useMouse.js` | 🟢 90% | Fine-tuning interactions |
+| `components/Nav/index.js` | `components/interface/Nav.jsx`<br>`hooks/useNavClock.js` | 🔴 40% | Missing split-text animation<br>Missing nav.pcss |
+
+### 2. WebGL Components
+
+| Legacy Component | Next.js Component | Status | Missing Pieces |
+|------------------|-------------------|--------|---------------|
+| `gl/Loader/` | `webgl/components/Loader/`<br>`components/webgl/Loader.jsx`<br>`hooks/webgl/useLoader.js` | 🟡 70% | Integration with React lifecycle |
+| `gl/Background/` | `webgl/components/Background/`<br>`components/webgl/Background.jsx`<br>`hooks/webgl/useBackground.js` | 🟡 80% | Event handling |
+| `gl/Title/` | `webgl/components/Title/`<br>`components/webgl/Title.jsx`<br>`hooks/webgl/useTitle.js` | 🟡 75% | Text rendering configuration |
+| `gl/Footer/` | `webgl/components/Footer/`<br>`components/webgl/Footer.jsx`<br>`hooks/webgl/useFooter.js` | 🟡 75% | Animation coordination |
+| `gl/Roll/` | `webgl/components/Roll/`<br>`components/webgl/Roll.jsx`<br>`hooks/webgl/useRoll.js` | 🟡 80% | Performance optimization |
+| `gl/About/` | `webgl/components/About/`<br>`components/webgl/About.jsx`<br>`hooks/webgl/useAbout.js` | 🟡 70% | MSDF text rendering |
+| `gl/Base/` | `webgl/components/Base/`<br>`components/webgl/Base.jsx`<br>`hooks/webgl/useBase.js` | 🟡 75% | Shader parameter binding |
+| `gl/Slides/` | `webgl/components/Slides/`<br>`components/webgl/Slides.jsx`<br>`hooks/webgl/useSlides.js` | 🟡 70% | Animation sequence |
+| `gl/Pg/` | `webgl/components/Pg/`<br>`components/webgl/Pg.jsx`<br>`hooks/webgl/usePg.js` | 🟡 65% | Interactive behavior |
+
+### 3. Context Providers
+
+| Legacy Module | Next.js Module | Status | Missing Pieces |
+|---------------|---------------|--------|---------------|
+| `main/events.js` | `context/AppEventsContext.js`<br>`context/AppProvider.jsx` | 🟡 80% | Event sequence coordination |
+| `gl/gl.js` | `context/WebGLContext.js` | 🟡 70% | Component registration system |
+| N/A | `context/AnimationContext.jsx` | 🔴 0% | **Not implemented yet** |
+
+### 4. Hooks
+
+| Legacy Function | Next.js Hook | Status | Missing Pieces |
+|-----------------|--------------|--------|---------------|
+| `anims.js:writeCt()` | `hooks/useSplitText.js` | 🔴 0% | **Critical: Not implemented** |
+| `anims.js:writeFn()` | `hooks/useTextAnimation.js` | 🔴 0% | **Critical: Not implemented** |
+| `page/scroll.js` | `hooks/page/usePageScroll.js` | 🟢 90% | Minor refinements |
+| `page/showhide.js` | `hooks/page/useShowHide.js` | 🟢 85% | State persistence |
+| `ios/lazyImg/index.js` | Lazy-loading components | 🟢 95% | Minimal adjustments |
+
+### 5. View Components
+
+| Legacy View | Next.js View | Status | Missing Pieces |
+|-------------|--------------|--------|---------------|
+| `views/Home/` | `app/home/page.js`<br>`components/views/HomeView.jsx`<br>`components/views/HomeIntro.jsx` | 🟡 75% | Animation integration |
+| `views/About/` | `app/about/page.js`<br>`components/views/AboutView.jsx`<br>`components/views/AboutIntro.jsx`<br>`components/views/AboutDual.jsx` | 🟡 70% | Integration with WebGL |
+| `views/Project/` | `app/project/[slug]/page.js`<br>`components/views/ProjectView.jsx`<br>`components/views/ProjectIntro.jsx` | 🟡 65% | Dynamic content loading |
+| `views/Projects/` | `app/projects/page.js`<br>`components/views/ProjectsView.jsx`<br>`components/views/ProjectsIntro.jsx` | 🟡 70% | Grid layout implementation |
+| `views/Error/` | `app/not-found.js`<br>`components/views/ErrorView.jsx`<br>`components/views/ErrorIntro.jsx` | 🟡 80% | Error state handling |
+| `views/Playground/` | `app/playground/page.js`<br>`components/views/Playground.jsx` | 🟡 60% | Interactive features |
+
+### 6. CSS Modules
+
+| Legacy CSS | Next.js CSS Module | Status | Missing Pieces |
+|------------|-------------------|--------|---------------|
+| Navigation styles | `styles/components/nav.pcss` | 🔴 0% | **Not implemented yet** |
+| Typography | `styles/base/typography.pcss` | 🟡 50% | Responsive styles |
+| Layout | `styles/layout/grid.pcss` | 🟡 40% | Container queries |
+| Animations | `styles/abstract/animations.pcss` | 🔴 20% | Most animation styles missing |
+
+### 7. Critical Missing Components
+
+1. **Text Animation System**
+   - `useSplitText` hook ⚠️ **Highest Priority**
+   - `useTextAnimation` hook
+   - `AnimationContext` for coordinating animations
+
+2. **CSS Modules**
+   - `nav.pcss` - Navigation styling
+   - `animations.pcss` - Core animation classes
+
+3. **Integration Components**
+   - Complete integration between React components and WebGL
+   - Page transition system
+
+### 8. Next Steps by Priority
+
+#### Immediate (This Week)
+
+1. **Create useSplitText.js hook**
+   ```jsx
+   // src/hooks/useSplitText.js
+   import { useEffect, useRef } from 'react';
+   import SplitType from 'split-type';
+
+   export const useSplitText = (ref, options = {}) => {
+     // Implementation details as per the earlier section in this document
+   };
+   ```
+
+2. **Create nav.pcss module**
+   ```css
+   /* src/styles/components/nav.pcss */
+   .nav {
+     position: fixed;
+     z-index: 100;
+     /* Rest of implementation as per earlier section */
+   }
+   ```
+
+3. **Complete AnimationContext implementation**
+   ```jsx
+   // src/context/AnimationContext.jsx
+   import { createContext, useContext, useRef, useCallback } from 'react';
+
+   const AnimationContext = createContext({
+     // Implementation details as per earlier section
+   });
+   ```
+
+#### Short-term (Next 2 Weeks)
+
+1. Complete `Nav.jsx` component with animation integration
+2. Finalize WebGL context and component registration
+3. Create essential CSS modules for components
+4. Implement page transition system
+
+#### Medium-term (2-4 Weeks)
+
+1. Complete all view components
+2. Optimize WebGL rendering
+3. Implement responsive design system
+4. Create comprehensive testing plan
+
+### 9. Implementation Examples for Critical Components
+
+#### useSplitText Hook
+
+```jsx
+// src/hooks/useSplitText.js
+import { useEffect, useRef } from 'react';
+import SplitType from 'split-type';
+
+export const useSplitText = (elementRef, options = {}) => {
+  // See implementation in section 1 above
+};
+```
+
+#### AnimationContext
+
+```jsx
+// src/context/AnimationContext.jsx
+import { createContext, useContext, useRef, useCallback } from 'react';
+
+const AnimationContext = createContext({
+  // See implementation in section 3 above
+});
+```
+
+This mapping provides a clear picture of the current state of the refactoring project and identifies the critical components that need implementation. It also provides a prioritized roadmap for completing the remaining work.
 };
 ```
 
