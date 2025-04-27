@@ -31,7 +31,7 @@
   "dependencies": {
     "beasties": "^0.3.3",
     "gsap": "^3.12.7",
-    "next": "14.2.25",
+    "next": "14.2.26",
     "ogl": "^1.0.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -42,7 +42,7 @@
     "@eslint/js": "^8.57.1",
     "@svgr/webpack": "^8.1.0",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.25",
+    "eslint-config-next": "14.2.26",
     "eslint-plugin-glsl": "0.0.0-wip",
     "eslint-plugin-prettier": "^5.2.6",
     "glslify-loader": "^2.0.0",
