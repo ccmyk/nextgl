@@ -1,28 +1,28 @@
-// next.config.js
-const path = require('path');
+// next.config.mjs
+import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
 
-  // 1) Webpack rules for normal builds (and for next dev without --turbo)
+  // 1) Webpack rules for normal builds (and next dev without --turbo)
   webpack(config, { isServer }) {
     // GLSL shaders via raw + glslify
     config.module.rules.push({
       test: /\.(glsl|frag|vert)$/,
-      use: ['raw-loader', 'glslify-loader'],
+      use: ['raw-loader', 'glslify-loader']
     });
 
     // SVG → React component
     config.module.rules.push({
       test: /\.svg$/,
-      use: ['@svgr/webpack'],
+      use: ['@svgr/webpack']
     });
 
     // “@” → src/
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(process.cwd(), 'src')
     };
 
     // Client‑side code splitting
@@ -33,14 +33,14 @@ const nextConfig = {
           vendors: {
             test: /[\\/]node_modules[\\/]/,
             priority: -10,
-            reuseExistingChunk: true,
+            reuseExistingChunk: true
           },
           default: {
             minChunks: 2,
             priority: -20,
-            reuseExistingChunk: true,
-          },
-        },
+            reuseExistingChunk: true
+          }
+        }
       };
     }
 
@@ -50,36 +50,28 @@ const nextConfig = {
   // 2) Remote image domains
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.example.com',
-      },
-    ],
+      { protocol: 'https', hostname: '**.example.com' }
+    ]
   },
 
-  // 3) Experimental features, including Turbopack loader rules
+  // 3) Experimental features
   experimental: {
-    // Turbopack loader for all .glsl/.frag/.vert files
     turbo: {
       rules: {
         '\\.(glsl|frag|vert)$': {
           loaders: ['raw-loader', 'glslify-loader'],
-          as: '*.js',
-        },
-      },
+          as: '*.js'
+        }
+      }
     },
-
-    // keep OGL on the server components allowed list
     serverComponentsExternalPackages: ['ogl'],
-
-    // other experiments
     optimizeCss: true,
-    scrollRestoration: true,
+    scrollRestoration: true
   },
 
-  // 4) ESLint config
+  // 4) Don’t block builds on ESLint errors in dev
   eslint: {
-    ignoreDuringBuilds: process.env.NODE_ENV === 'development',
+    ignoreDuringBuilds: process.env.NODE_ENV === 'development'
   },
 
   // 5) CORS headers for WebGL
@@ -88,12 +80,12 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'Cross-Origin-Opener-Policy',    value: 'same-origin' },
-          { key: 'Cross-Origin-Embedder-Policy',  value: 'require-corp' },
-        ],
-      },
+          { key: 'Cross-Origin-Opener-Policy',   value: 'same-origin' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' }
+        ]
+      }
     ];
-  },
+  }
 };
 
-module.exports = nextConfig;
+export default nextConfig;

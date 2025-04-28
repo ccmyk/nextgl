@@ -3,28 +3,43 @@
 import { useState, useEffect } from 'react';
 import { useLoadingEvents } from './useLoadingEvents';
 
-export function useLoader() {
+export function useLoader({ minDisplayTime = 1000 } = {}) {
   const [domReady, setDomReady] = useState(false);
   const [glReady, setGlReady] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
 
-  // Listen for load events
+  // Subscribe to domReady and glReady
   useLoadingEvents({
     onDomReady: () => setDomReady(true),
-    onGlReady: () => setGlReady(true),
+    onGlReady:  () => setGlReady(true),
   });
 
-  // When both ready, trigger fade-out
+  // Progress loop (imitate legacy loads.js)
   useEffect(() => {
-    if (domReady && glReady) {
-      setIsFadingOut(true);
-      const timeout = setTimeout(() => {
-        setIsLoading(false);
-      }, 500); // match fade duration
-      return () => clearTimeout(timeout);
+    let raf, start;
+    function step(timestamp) {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start;
+      const pct = Math.min(100, Math.floor((elapsed / minDisplayTime) * 100));
+      setProgress(pct);
+      if (pct < 100) {
+        raf = requestAnimationFrame(step);
+      }
     }
-  }, [domReady, glReady]);
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [minDisplayTime]);
 
-  return { isLoading, isFadingOut };
+  // When both ready AND min time passed, trigger fade-out
+  useEffect(() => {
+    if (domReady && glReady && progress >= 100) {
+      setIsFadingOut(true);
+      const t = setTimeout(() => setIsLoading(false), 500);
+      return () => clearTimeout(t);
+    }
+  }, [domReady, glReady, progress]);
+
+  return { isLoading, isFadingOut, progress };
 }

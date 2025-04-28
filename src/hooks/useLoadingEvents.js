@@ -7,25 +7,21 @@ export function useLoadingEvents({ onDomReady, onGlReady } = {}) {
   const { on, emit } = useContext(AppEventsContext);
 
   useEffect(() => {
-    // Emit domReady when window load fires
-    function handleDomLoad() {
-      emit('domReady');
-    }
-
+    // Fire domReady when window loads
+    function handleLoad() { emit('domReady'); }
     if (document.readyState === 'complete') {
       emit('domReady');
     } else {
-      window.addEventListener('load', handleDomLoad);
+      window.addEventListener('load', handleLoad);
     }
 
-    // Subscribe to events
-    const cleanupDom = on('domReady', onDomReady);
-    const cleanupGl  = on('glReady', onGlReady);
+    // Subscribe handlers
+    const offDom = on('domReady', onDomReady);
+    const offGl  = on('glReady',  onGlReady);
 
     return () => {
-      window.removeEventListener('load', handleDomLoad);
-      cleanupDom();
-      cleanupGl();
+      window.removeEventListener('load', handleLoad);
+      offDom(); offGl();
     };
   }, [onDomReady, onGlReady, on, emit]);
 }

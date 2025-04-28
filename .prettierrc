@@ -2,11 +2,11 @@
   "plugins": ["prettier-plugin-glsl"],
   "semi": true,
   "singleQuote": true,
-  "trailingComma": "es5",
+  "trailingComma": "all",
   "tabWidth": 2,
   "printWidth": 120,
-  "endOfLine": "lf",
+  "endOfLine": "auto",
   "bracketSpacing": true,
-  "arrowParens": "always",
+  "arrowParens": "avoid",
   "proseWrap": "preserve"
 }

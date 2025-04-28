@@ -4,10 +4,7 @@
 .loader {
   position: fixed;
   z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0; /* shorthand for top/right/bottom/left: 0 */
   transform-origin: left top;
   overflow: hidden;
   pointer-events: none;
@@ -17,10 +14,7 @@
 .loader_bg {
   background: #000;
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
 }
 
 /* Content Container */
@@ -33,29 +27,26 @@
   position: relative;
 }
 
-/* Desktop-specific adjustments */
+/* Desktop adjustments for Content Container */
 :root.D .loader_cnt {
   align-items: flex-start;
-  padding-top: .8rem;
-  padding-bottom: 4rem;
+  padding: .8rem 0 4rem;
 }
 
-/* Landscape orientation adjustments */
+/* Landscape orientation adjustments for Content Container */
 @media (orientation: landscape) {
   :root.T .loader_cnt {
     align-items: flex-start;
-    padding-top: .8rem;
-    padding-bottom: 4rem;
+    padding: .8rem 0 4rem;
   }
 }
 
-/* Portrait orientation adjustments */
+/* Portrait orientation adjustments for Content Container */
 @media (orientation: portrait) {
   :root.T .loader_cnt {
     align-items: flex-start;
     max-height: var(--ck_hmin);
-    padding-top: .8rem;
-    padding-bottom: 4rem;
+    padding: .8rem 0 4rem;
   }
 }
 
@@ -66,13 +57,13 @@
   font-kerning: none;
 }
 
-/* Desktop title adjustments */
+/* Desktop adjustments for Title */
 :root.D .loader_tp {
   font-size: 28rem;
   margin-left: 59.2rem;
 }
 
-/* Landscape title adjustments */
+/* Landscape orientation adjustments for Title */
 @media (orientation: landscape) {
   :root.T .loader_tp {
     font-size: 28rem;
@@ -80,7 +71,7 @@
   }
 }
 
-/* Portrait title adjustments */
+/* Portrait title adjustments (min-width) */
 @media (orientation: portrait) and (min-width: 744px) {
   :root.T .loader_tp {
     font-size: 28rem;
@@ -89,6 +80,7 @@
   }
 }
 
+/* Portrait title adjustments (max-width) */
 @media (orientation: portrait) and (max-width: 745px) {
   :root.T .loader_tp {
     font-size: 16.7rem;
@@ -105,19 +97,19 @@
   align-items: flex-start;
 }
 
-/* Desktop paragraph adjustments */
+/* Desktop adjustments for Paragraph */
 :root.D .loader_bp {
   margin-left: 59.2rem;
 }
 
-/* Landscape paragraph adjustments */
+/* Landscape orientation adjustments for Paragraph */
 @media (orientation: landscape) {
   :root.T .loader_bp {
     margin-left: 59.2rem;
   }
 }
 
-/* Portrait paragraph adjustments */
+/* Portrait paragraph adjustments (min-width) */
 @media (orientation: portrait) and (min-width: 744px) {
   :root.T .loader_bp {
     width: 29rem;
@@ -125,6 +117,7 @@
   }
 }
 
+/* Portrait paragraph adjustments (max-width) */
 @media (orientation: portrait) and (max-width: 745px) {
   :root.T .loader_bp {
     width: 29rem;
@@ -144,11 +137,8 @@
 /* React UI Loader Overlay */
 .loaderOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #ffffff;
+  inset: 0;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -168,21 +158,27 @@
   width: 50px;
   height: 50px;
   border: 4px solid rgba(0,0,0,0.1);
-  border-top-color: #000000;
+  border-top-color: #000;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Fade-out Animation */
 .loader-fade-out {
-  animation: loaderFadeOut 0.5s var(--ease-out-expo) forwards;
+  animation: loaderFadeOut 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
 }
 
 @keyframes loaderFadeOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }

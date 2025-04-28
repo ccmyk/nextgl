@@ -2,6 +2,7 @@
   "name": "nextgl",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "pnpm": {
     "overrides": {
       "puppeteer": "23.11.1",
@@ -25,8 +26,7 @@
     "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "build:msdf": "three-msdf --font src/assets/fonts/PPNeueMontreal-Medium.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontreal-Medium && three-msdf --font src/assets/fonts/PPNeueMontreal-Book.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontreal-Book && three-msdf --font src/assets/fonts/PPNeueMontrealMono-Book.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPNeueMontrealMono-Book && three-msdf --font src/assets/fonts/PPAir-Medium.ttf --charset src/webgl/components/Loader/shaders/charset.txt --size 64 --output public/fonts/PPAir-Medium"
+    "lint": "next lint"
   },
   "dependencies": {
     "beasties": "^0.3.3",
@@ -40,11 +40,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^8.57.1",
+    "@rushstack/eslint-patch": "^1.11.0",
     "@svgr/webpack": "^8.1.0",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.26",
+    "eslint": "^9.25.1",
+    "eslint-config-next": "15.3.1",
     "eslint-plugin-glsl": "0.0.0-wip",
     "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "framer-motion": "^12.9.2",
     "glslify-loader": "^2.0.0",
     "msdf-atlas-gen": "^1.0.0",
     "postcss": "^8.5.3",

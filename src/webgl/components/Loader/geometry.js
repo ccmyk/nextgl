@@ -1,32 +1,14 @@
-'use client'
+// src/webgl/components/Loader/geometry.js
 
-import { Geometry } from 'ogl'
+import { Geometry } from 'ogl';
+import { createPlaneVertices, createPlaneUVs } from './utils';
 
-/**
- * Full-screen quad geometry for Loader.
- */
 export function createLoaderGeometry(gl) {
+  const positions = new Float32Array(createPlaneVertices());
+  const uvs       = new Float32Array(createPlaneUVs());
+
   return new Geometry(gl, {
-    position: {
-      size: 3,
-      data: new Float32Array([
-        -1, -1, 0,
-         1, -1, 0,
-        -1,  1, 0,
-         1,  1, 0,
-      ]),
-    },
-    uv: {
-      size: 2,
-      data: new Float32Array([
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 1,
-      ]),
-    },
-    index: {
-      data: new Uint16Array([0, 2, 1, 1, 2, 3]),
-    },
+    position: { size: 2, data: positions },
+    uv:       { size: 2, data: uvs },
   });
 }

@@ -1,24 +1,29 @@
 // src/hooks/webgl/useWebglLoader.js
 
-import { useContext, useCallback } from 'react';
+import { useContext, useRef, useEffect } from 'react';
 import { AppEventsContext } from '@/context/AppEventsContext';
 import { setupLoaderScene } from '@/webgl/components/Loader';
 
-export function useWebglLoader(canvasRef) {
+export function useWebglLoader(canvasRef, loaderOptions = {}) {
   const { emit } = useContext(AppEventsContext);
+  const cleanupRef = useRef(null);
 
-  const initializeWebGL = useCallback(() => {
-    if (!canvasRef.current) return;
+  useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
+
     const gl = canvas.getContext('webgl');
     if (!gl) {
-      console.error('WebGL not supported');
-      emit('glReady'); // proceed anyway
+      emit('glReady');
       return;
     }
-    setupLoaderScene(gl);
-    emit('glReady');
-  }, [canvasRef, emit]);
 
-  return { initializeWebGL };
+    // Initialize scene and capture cleanup
+    cleanupRef.current = setupLoaderScene(gl, loaderOptions);
+    emit('glReady');
+
+    return () => {
+      if (cleanupRef.current) cleanupRef.current();
+    };
+  }, [canvasRef, emit, loaderOptions]);
 }
