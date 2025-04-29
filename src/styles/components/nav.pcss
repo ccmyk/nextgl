@@ -1,0 +1,80 @@
+/* Container */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  z-index: 1000;
+  /* …copy any legacy background, color, transform-origin, pointer-events, etc. */
+}
+
+/* Logo */
+.nav_logo {
+  font-family: montreal, sans-serif;
+  font-size: 1.5rem;
+  /* …other legacy typography */
+}
+
+/* Burger */
+.nav_burger {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.nav_burger span {
+  width: 24px;
+  height: 2px;
+  background: #000;
+  display: block;
+}
+
+/* Links */
+.nav_right {
+  display: flex;
+  gap: 2rem;
+}
+.nav_right a {
+  font-family: montreal, sans-serif;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  /* …legacy letter-spacing, numeric font features */
+}
+
+/* Clock wrapper */
+.nav_clock_s {
+  display: flex;
+  gap: 0.5rem;
+  font-variant-numeric: tabular-nums lining-nums;
+  /* …legacy sizing & positioning */
+}
+.nav_clock_p,
+.nav_clock_h,
+.nav_clock_m,
+.nav_clock_a {
+  display: inline-flex;
+  align-items: center;
+}
+/* Each digit */
+.char {
+  display: inline-block;
+  overflow: hidden;
+}
+/* Numeric span */
+.n {
+  display: inline-block;
+  /* …legacy font settings */
+}
+
+/* Active menu (burger open) */
+.act-menu .nav {
+  /* …legacy open-state transforms */
+}

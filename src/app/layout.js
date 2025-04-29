@@ -11,6 +11,12 @@ import { usePageTransition }  from '@/hooks/usePageTransition';
 
 export default function RootLayout({ children }) {
   usePageTransition();
+  const links = [
+    { href: '/',        label: 'Home'    },
+    { href: '/work',    label: 'Work'    },
+    { href: '/about',   label: 'About'    },
+    { href: '/contact', label: 'Contact' },
+  ];
   return (
     <html lang="en">
       <body>

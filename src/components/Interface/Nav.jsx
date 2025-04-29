@@ -1,77 +1,103 @@
-'use client'
+'use client';
 
-import { useEffect, useRef, useState } from 'react'
-import { useAppEvents }      from '@/context/AppEventsContext'
-import { useSplitText }      from '@/hooks/useSplitText'
-import { useNavClock }       from '@/hooks/useNavClock'
-import styles                from '@/styles/components/nav.pcss'
+import React, { useRef, useEffect, useState } from 'react';
+import { useAppEvents }               from '@/context/AppEventsContext';
+import { useSplitText }               from '@/hooks/useSplitText';
+import { useNavClock }                from '@/hooks/useNavClock';
+import styles                         from '@/styles/components/nav.pcss';
 
-export default function Nav({ html }) {
-  const containerRef = useRef(null)
-  const [isOpen, setIsOpen] = useState(false)
-  const { dispatchAnim } = useAppEvents()
+/**
+ * @param {{
+ *   logo: string,
+ *   links: Array<{ href: string; label: string }>,
+ * }} props
+ */
+export default function Nav({ logo, links }) {
+  const navRef     = useRef(null);
+  const { dispatchAnim } = useAppEvents();
+  const [isOpen, setIsOpen] = useState(false);
 
-  // split-text any target
-  useSplitText('.nav_logo, .nav_right a, .nav_clock_p, .nav_clock_h, .nav_clock_m, .nav_clock_a')
+  // 1️⃣ Split all the text nodes exactly as legacy did
+  useSplitText(
+    navRef,
+    '.nav_logo, .nav_right a, .nav_clock_p .char, .nav_clock_h .char, .nav_clock_m .char, .nav_clock_a .char'
+  );
 
-  // onMount: insert legacy HTML
+  // 2️⃣ On mount: fire your entry animations for logo, clock & links
   useEffect(() => {
-    containerRef.current.innerHTML = html
-    // animate logo, city, H, M, A in
-    ['.nav_logo', '.nav_clock_p', '.nav_clock_h', '.nav_clock_m', '.nav_clock_a'].forEach(sel => {
-      dispatchAnim(0, sel)
-      dispatchAnim(1, sel)
-    })
-  }, [html, dispatchAnim])
+    if (!navRef.current) return;
 
-  // live clock
-  const { hour, minute, ampm } = useNavClock(dispatchAnim)
-  // whenever hour/minute/ampm changes, splice into DOM
-  useEffect(() => {
-    const hEls = containerRef.current.querySelectorAll('.nav_clock_h .char .n')
-    hEls[0].textContent = hour[0]
-    hEls[1].textContent = hour[1]
-    const mEls = containerRef.current.querySelectorAll('.nav_clock_m .char .n')
-    mEls[0].textContent = minute[0]
-    mEls[1].textContent = minute[1]
-    const aEls = containerRef.current.querySelectorAll('.nav_clock_a .char .n')
-    aEls[0].textContent = ampm[0]
-    aEls[1].textContent = ampm[1]
-  }, [hour, minute, ampm])
+    const targets = [
+      '.nav_logo',
+      '.nav_clock_p',
+      '.nav_clock_h',
+      '.nav_clock_m',
+      '.nav_clock_a',
+      ...Array.from(links.keys()).map(i => `.nav_right a:nth-child(${i+1})`)
+    ];
 
-  // burger click toggles
+    targets.forEach(sel => {
+      dispatchAnim(0, sel);
+      dispatchAnim(1, sel);
+    });
+  }, [dispatchAnim, links]);
+
+  // 3️⃣ Live clock—updates its own animations via your hook
+  const { hour, minute, ampm } = useNavClock(dispatchAnim);
+
+  // 4️⃣ Burger toggle => same .act-menu class + open/closemenu events
   const toggleMenu = () => {
     if (isOpen) {
-      document.documentElement.classList.remove('act-menu')
-      dispatchAnim(null, 'closemenu')
+      document.documentElement.classList.remove('act-menu');
+      dispatchAnim(null, 'closemenu');
     } else {
-      document.documentElement.classList.add('act-menu')
-      dispatchAnim(null, 'openmenu')
+      document.documentElement.classList.add('act-menu');
+      dispatchAnim(null, 'openmenu');
     }
-    setIsOpen(!isOpen)
-  }
-
-  // link-hover: re-play write animation on links
-  useEffect(() => {
-    containerRef.current.querySelectorAll('.nav_right a').forEach(a => {
-      a.addEventListener('mouseenter', () => dispatchAnim(1, a))
-    })
-  }, [dispatchAnim])
+    setIsOpen(open => !open);
+  };
 
   return (
-    <nav className={styles.nav} ref={containerRef}>
-      {/* legacy HTML will drop in here */}
-      <button className={styles.nav_burger} onClick={toggleMenu}>
-        <span/>
-        <span/>
-        <span/>
+    <nav className={styles.nav} ref={navRef}>
+      {/* Logo */}
+      <div className="nav_logo">{logo}</div>
+
+      {/* Burger */}
+      <button className="nav_burger" onClick={toggleMenu}>
+        <span /><span /><span />
       </button>
-      <div className={styles.nav_right}>
-        {/* links go here via HTML */}
+
+      {/* Links */}
+      <div className="nav_right">
+        {links.map(({ href, label }, i) => (
+          <a
+            key={href}
+            href={href}
+            onMouseEnter={() => dispatchAnim(1, `.nav_right a:nth-child(${i+1})`)}
+          >
+            {label}
+          </a>
+        ))}
       </div>
-      <div className={styles.nav_clock_s}>
-        <span className="nav_clock_p"/><span className="nav_clock_h"/><span className="nav_clock_m"/><span className="nav_clock_a"/>
+
+      {/* Clock */}
+      <div className="nav_clock_s">
+        <span className="nav_clock_p">
+          {ampm.split('').map((c, i) => (
+            <span key={i} className="char"><span className="n">{c}</span></span>
+          ))}
+        </span>
+        <span className="nav_clock_h">
+          {hour.split('').map((c, i) => (
+            <span key={i} className="char"><span className="n">{c}</span></span>
+          ))}
+        </span>
+        <span className="nav_clock_m">
+          {minute.split('').map((c, i) => (
+            <span key={i} className="char"><span className="n">{c}</span></span>
+          ))}
+        </span>
       </div>
     </nav>
-  )
+  );
 }
