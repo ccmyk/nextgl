@@ -1,0 +1,38 @@
+/* src/styles/components/mbg.pcss */
+
+.Mbg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  pointer-events: none;
+  z-index: 1; /* behind UI, above canvas if needed */
+}
+
+.Mbg_col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.Mbg_col_el {
+  width: 100%;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.05);
+  /* animate them if you like: */
+  /* animation: mbgPulse 2s ease-in-out infinite alternate; */
+}
+
+/* If you need the -1 and -2 variants: */
+.Mbg_col_el-1 {
+  background: rgba(0,0,0,0.1);
+}
+.Mbg_col_el-2 {
+  background: rgba(0,0,0,0.02);
+}
+
+/* @keyframes mbgPulse {
+  to { background: rgba(0,0,0,0.15); }
+} */

@@ -1,38 +1,55 @@
-'use client'
+// ── src/app/layout.jsx ──
+import './globals.css';               // any base resets or @import’d CSS
+import '@/styles/index.css';           // your legacy index.css split into modules?
+import '@/styles/components/loader.pcss';
+import '@/styles/components/nav.pcss';
+import '@/styles/components/home.pcss';
+// …any other component PCSS files…
 
-import '@/styles/index.css'
-import { LenisProvider }      from '@/context/LenisContext'
-import { WebGLProvider }      from '@/context/WebGLContext'
-import { AppEventsProvider }  from '@/context/AppEventsContext'
-import { AppProvider }        from '@/context/AppProvider'
-import Nav                    from '@/components/interface/Nav'
-import Mouse                  from '@/components/interface/Mouse'
-import { usePageTransition }  from '@/hooks/usePageTransition';
+import { LenisProvider }      from '@/context/LenisContext';
+import { WebGLProvider }      from '@/context/WebGLContext';
+import { AppEventsProvider }  from '@/context/AppEventsContext';
+import { AppProvider }        from '@/context/AppProvider';
+
+import Loader     from '@/components/interface/Loader';
+import Nav        from '@/components/interface/Nav';
+import Mouse      from '@/components/interface/Mouse';
+import PageTransition from '@/components/interface/PageTransition';
+
+export const metadata = {
+  title: 'Chris Hall',
+  description: '…',
+};
 
 export default function RootLayout({ children }) {
-  usePageTransition();
-  const links = [
-    { href: '/',        label: 'Home'    },
-    { href: '/work',    label: 'Work'    },
-    { href: '/about',   label: 'About'    },
-    { href: '/contact', label: 'Contact' },
-  ];
   return (
-    <html lang="en">
+    <html lang="en" className="D">
       <body>
-        <LenisProvider>
-          <WebGLProvider>
-            <AppEventsProvider>
-              <AppProvider>
-                <Nav html={navHtml} />
-                {/* only render the cursor on non-touch devices */}
-                {!('ontouchstart' in window) && <Mouse />}
+        {/* 1) Bootstrapping contexts in order: AppProvider → AppEvents → Lenis → WebGL */}
+        <AppProvider>
+          <AppEventsProvider>
+            <LenisProvider>
+              <WebGLProvider>
+
+                {/* 2) Global UI: transitions, loaders, nav, cursor */}
+                <PageTransition />
+                <Loader />
+                <Nav logo="Chris Hall" links={[
+                  { href: '/', label: 'Home' },
+                  { href: '/work', label: 'Work' },
+                  { href: '/about', label: 'About' },
+                  { href: '/contact', label: 'Contact' },
+                ]} /> 
+                <Mouse />
+
+                {/* 3) Your page’s content (Home, Projects, etc.) */}
                 {children}
-              </AppProvider>
-            </AppEventsProvider>
-          </WebGLProvider>
-        </LenisProvider>
+
+              </WebGLProvider>
+            </LenisProvider>
+          </AppEventsProvider>
+        </AppProvider>
       </body>
     </html>
-  )
+  );
 }
