@@ -1,15 +1,31 @@
-"use client";
-import { useRef } from "react";
+// src/hooks/page/useDynamicCreation.js
+
+import { useContext, useEffect } from 'react';
+import { PageComponentsContext } from '@/context/PageComponentsContext';
 
 /**
- * Replace create.js:
- *  - initializes page state objects in React refs
+ * Port of legacy comps.js startComps/removeComps.
+ * Expects context value:
+ * { components: Record<string, { load?:fn, initEvents?:fn, removeEvents?:fn }[]> }
  */
 export function useDynamicCreation() {
-  const ios = useRef({});
-  const iosUpdaters = useRef([]);
-  const updaters = useRef([]);
-  const components = useRef({});
+  const { components } = useContext(PageComponentsContext);
 
-  return { ios, iosUpdaters, updaters, components };
+  useEffect(() => {
+    // startComps
+    Object.values(components).forEach(arr => {
+      arr.forEach(({ load, initEvents }) => {
+        if (load) load();
+        if (initEvents) initEvents();
+      });
+    });
+    return () => {
+      // stopComps
+      Object.values(components).forEach(arr => {
+        arr.forEach(({ removeEvents }) => {
+          if (removeEvents) removeEvents();
+        });
+      });
+    };
+  }, [components]);
 }

@@ -1,29 +1,32 @@
-"use client";
-import { useState, useEffect } from "react";
-import Lenis from "lenis";
+// src/hooks/page/usePageScroll.js
 
-/**
- * Replace scroll.js:
- *  - drives smooth scroll via Lenis
- *  - returns scrollY state, plus stop/start controls
- */
+"use client";
+
+import { useEffect } from 'react';
+import { useLenis } from '@/context/LenisContext';
+
 export function usePageScroll() {
-  const [scrollY, setScrollY] = useState(0);
-  const [isActive, setIsActive] = useState(true);
+  const lenis = useLenis();
 
   useEffect(() => {
-    const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - 2 ** -10 * t) });
-    function raf(time) {
-      lenis.raf(time);
-      setScrollY(window.scrollY);
-      if (isActive) requestAnimationFrame(raf);
+    if (!lenis) return;
+    function handle(e) {
+      const { scroll, velocity, direction, targetScroll } = e;
+      // stview
+      if (targetScroll > 0) document.documentElement.classList.add('stview');
+      else document.documentElement.classList.remove('stview');
+      // up/down
+      if (direction === 'down') {
+        document.documentElement.classList.remove('scroll-up');
+        document.documentElement.classList.add('scroll-down');
+      } else {
+        document.documentElement.classList.remove('scroll-down');
+        document.documentElement.classList.add('scroll-up');
+      }
+      // legacy scrollDetail event
+      document.dispatchEvent(new CustomEvent('scrollDetail', { detail: e }));
     }
-    requestAnimationFrame(raf);
-    return () => lenis.destroy();
-  }, [isActive]);
-
-  const stopScroll = () => setIsActive(false);
-  const startScroll = () => setIsActive(true);
-
-  return { scrollY, stopScroll, startScroll };
+    lenis.on('scroll', handle);
+    return () => lenis.off('scroll', handle);
+  }, [lenis]);
 }

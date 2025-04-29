@@ -1,99 +1,31 @@
+// src/components/lazy/LazyImage.jsx
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useResize } from '../../hooks/page/useResize'; // Assuming this is correct path
+import React, { useRef, useState, useEffect } from 'react';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
-const LazyImage = ({ src, alt = '', className = '', ...props }) => {
+export default function LazyImage({ src, alt, placeholder, ...props }) {
   const imgRef = useRef(null);
+  const [visible, setVisible] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const { h, max, checkObj } = useResize(imgRef);
 
-  useEffect(() => {
-    const imgEl = imgRef.current;
-    if (!imgEl || !src) return;
-
-    let observer;
-
-    const loadImage = () => {
-      const tempImg = new Image();
-      tempImg.src = src;
-      tempImg.onload = () => {
-        if (imgEl) {
-          imgEl.src = src;
-          setLoaded(true);
-        }
-      };
-    };
-
-    const handleIntersect = (entries) => {
-      entries.forEach((entry) => {
-        // Mimic legacy behavior with undefined check
-        if (entry.isIntersecting == undefined) {
-          return;
-        }
-
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          if (!loaded && !imgEl.getAttribute('src')) {
-            loadImage();
-          }
-          observer.disconnect();
-        } else {
-          setIsVisible(false);
-        }
-      });
-    };
-
-    observer = new IntersectionObserver(handleIntersect, {
-      threshold: 0.1, // Adjust as needed to match legacy
-    });
-
-    observer.observe(imgEl);
-
-    return () => {
-      if (observer) {
-        if (observer) {
-          observer.disconnect();
-        }
-      }
-    };
-  }, [src, loaded, h, max, checkObj]);
-
-  useEffect(() => {
-    const imgEl = imgRef.current;
-    if (!imgEl) return;
-
-    imgEl.classList.toggle('ivi', isVisible);
-  }, [isVisible]);
-
-  useEffect(() => {
-    const imgEl = imgRef.current;
-    if (!imgEl) return;
-
-    if (loaded) {
-      imgEl.classList.add('Ldd');
-      imgEl.removeAttribute('data-lazy');
-    }
-  }, [loaded]);
-
-  useEffect(() => {
-    if (/\.(gif)$/.test(src) && imgRef.current) {
-      imgRef.current.src = src;
-      imgRef.current.classList.add('Ldd');
-      setLoaded(true);
-    }
-  }, [src]);
+  useIntersectionObserver(imgRef, ([entry]) => {
+    if (entry.isIntersecting) setVisible(true);
+  });
 
   return (
-    <img
-      ref={imgRef}
-      alt={alt}
-      data-lazy={src}
-      className={`lazy-img ${loaded ? 'Ldd' : ''} ${className}`.trim()}
-      {...props}
-    />
+    <div ref={imgRef} style={{ position: 'relative', overflow: 'hidden' }}>
+      {!loaded && placeholder && (
+        <img src={placeholder} alt="" aria-hidden className="lazy-placeholder" />
+      )}
+      {visible && (
+        <img
+          src={src}
+          alt={alt}
+          onLoad={() => setLoaded(true)}
+          {...props}
+        />
+      )}
+    </div>
   );
-};
-
-export default LazyImage;
+}

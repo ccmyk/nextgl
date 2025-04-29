@@ -1,35 +1,33 @@
 // src/hooks/page/useShowHide.js
-"use client";
-import { useState, useEffect } from "react";
-import gsap from "gsap";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 /**
- * Replace showhide.js:
- *  - orchestrates intro/outro via GSAP
- *  - returns control functions
+ * Mimics legacy showhide.js: toggles classes on links/pages on navigation.
  */
-export function useShowHide(containerRef) {
-  const [visible, setVisible] = useState(false);
+export function useShowHide() {
+  const router = useRouter();
 
   useEffect(() => {
-    async function intro() {
-      if (!containerRef.current) return;
-      await gsap.fromTo(
-        containerRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.6 }
+    function handleHide() {
+      // legacy added .hide to main containers
+      document.querySelectorAll('.page-section').forEach(el =>
+        el.classList.add('hide')
       );
-      setVisible(true);
     }
-    intro();
-  }, [containerRef]);
-
-  function hide() {
-    if (containerRef.current) {
-      gsap.to(containerRef.current, { opacity: 0, duration: 0.4 });
-      setVisible(false);
+    function handleShow() {
+      document.querySelectorAll('.page-section').forEach(el =>
+        el.classList.remove('hide')
+      );
     }
-  }
 
-  return { visible, hide };
+    router.events.on('routeChangeStart', handleHide);
+    router.events.on('routeChangeComplete', handleShow);
+
+    return () => {
+      router.events.off('routeChangeStart', handleHide);
+      router.events.off('routeChangeComplete', handleShow);
+    };
+  }, [router]);
 }

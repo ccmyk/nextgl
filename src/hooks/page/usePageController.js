@@ -1,40 +1,31 @@
-"use client";
-import { useRef } from "react";
-import { usePageEvents } from "./usePageEvents";
-import { usePageLoader } from "./usePageLoader";
-import { useIOSObserver } from "./useIOSObserver";
-import { useDynamicCreation } from "./useDynamicCreation";
-import { usePageScroll } from "./usePageScroll";
-import { useShowHide } from "./useShowHide";
+// src/hooks/page/usePageController.js
+
+import { useContext, useEffect } from 'react';
+import { WebGLContext } from '@/context/WebGLContext';
+import { AppEventsContext } from '@/context/AppEventsContext';
 
 /**
- * Composite hook that wires all legacy logic into one React model.
- * Usage in your page component:
- *   const page = usePageController(containerRef);
+ * Port of legacy pagemain.js: camera setup, view flags, pop logic.
  */
-export function usePageController(containerRef) {
-  const { windowSize, isDown, scrollY } = usePageEvents();
-  const loaded = usePageLoader();
-  const iosRefCallback = useIOSObserver();
-  const { ios, iosUpdaters, updaters, components } = useDynamicCreation();
-  const { scrollY: lenisY, stopScroll, startScroll } = usePageScroll();
-  const { visible, hide } = useShowHide(containerRef);
+export function usePageController() {
+  const { camera, scene } = useContext(WebGLContext);
+  const { on, emit } = useContext(AppEventsContext);
 
-  // Expose unified page API
-  return {
-    windowSize,
-    isDown,
-    scrollY,
-    lenisY,
-    loaded,
-    visible,
-    hide,
-    stopScroll,
-    startScroll,
-    ios,
-    iosUpdaters,
-    updaters,
-    components,
-    iosRefCallback,
-  };
+  useEffect(() => {
+    // legacy pagemain initial setup
+    camera.position.set(0, 0, 5);
+    scene.add(camera);
+
+    // pop on pageShow
+    const offShow = on('pageShow', () => {
+      // replicate view pop animation
+      camera.position.set(0, 0, 5); // or call manager.viewPop()
+    });
+
+    // cleanup
+    return () => {
+      offShow();
+      // any other tear-down if necessary
+    };
+  }, [camera, scene, on]);
 }
