@@ -1,149 +1,184 @@
-/*
- * NextGL - CSS Reset
- * A modern CSS reset for consistent styling across browsers
- */
-
-/* Box sizing rules */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/*! normalize.css v3.0.2 | MIT License | git.io/normalize */
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
-
-/* Remove default margin and padding */
-html,
-body,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-figure,
-blockquote,
-dl,
-dd {
-  margin: 0;
-  padding: 0;
-}
-
-/* Set core body defaults */
 body {
-  min-height: 100vh;
-  scroll-behavior: smooth;
-  text-rendering: optimizeSpeed;
-  line-height: var(--line-height-normal);
-  font-family: var(--font-sans);
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Remove list styles */
-ul,
-ol {
   margin: 0;
-  padding: 0;
-  list-style: none;
 }
-
-/* Make images easier to work with */
-img,
-picture,
-video,
-canvas,
-svg {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
   display: block;
-  max-width: 100%;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a {
+  background-color: transparent;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: 700;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: .67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -.5em;
+}
+sub {
+  bottom: -.25em;
+}
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+  margin: 0;
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type=button],
+input[type=reset],
+input[type=submit] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type=checkbox],
+input[type=radio] {
+  box-sizing: border-box;
+  padding: 0;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
   height: auto;
 }
-
-/* Preserve aspect ratio for embedded content */
-iframe,
-embed,
-object {
-  max-width: 100%;
+input[type=search] {
+  -webkit-appearance: textfield;
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
 }
-
-/* Remove text decorations */
-a {
-  text-decoration: none;
-  color: inherit;
+input[type=search]::-webkit-search-cancel-button,
+input[type=search]::-webkit-search-decoration {
+  -webkit-appearance: none;
 }
-
-/* Inherit fonts for inputs and buttons */
-input,
-button,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: .35em .625em .75em;
 }
-
-/* Reset button styles */
-button {
-  background: none;
-  border: none;
+legend {
+  border: 0;
   padding: 0;
-  cursor: pointer;
-  outline: none;
 }
-
-/* Remove all animations and transitions for people that prefer not to see them */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+textarea {
+  overflow: auto;
 }
-
-/* Normalize form elements */
-input,
-button,
-textarea,
-select {
-  margin: 0;
-  border: none;
-  outline: none;
-  background: transparent;
+optgroup {
+  font-weight: 700;
 }
-
-/* Remove default button styles in Safari */
-button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
-  -webkit-appearance: none;
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
-
-/* Correct the cursor style of increment and decrement buttons in Safari */
-[type="number"]::-webkit-inner-spin-button,
-[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
+td,
+th {
+  padding: 0;
 }
-
-/* Remove focus outlines for mouse users */
-:focus:not(:focus-visible) {
-  outline: none;
-}
-
-/* Fix 100vh issue on mobile browsers */
-html, body {
-  height: 100%;
-}
-
-/* Anchor smooth scrolling */
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--header-height);
-}
-
-/* Reset Margins, Padding, Borders, and Fonts */
 html,
 body,
 div,
@@ -231,29 +266,7 @@ video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
-  box-sizing: inherit;
 }
-
-*, *:before, *:after {
-  box-sizing: inherit;
-  user-select: none;
-  outline: none;
-  -webkit-touch-callout: none;
-}
-
-html {
-  box-sizing: border-box;
-  overscroll-behavior: none;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: subpixel-antialiased;
-  -webkit-text-size-adjust: none;
-}
-
-body {
-  line-height: 1;
-  overscroll-behavior: none;
-}
-
 article,
 aside,
 details,
@@ -262,28 +275,98 @@ figure,
 footer,
 header,
 hgroup,
-main,
 menu,
 nav,
-section,
-summary {
-  display: block
+section {
+  display: block;
 }
-
-audio,
-canvas,
-progress,
-video {
-  display: inline-block;
-  vertical-align: baseline
+body {
+  line-height: 1;
 }
-
-audio:not([controls]) {
-  display: none;
-  height: 0
+ul {
+  list-style: none;
 }
-
-[hidden],
-template {
-  display: none
+html {
+  box-sizing: border-box;
+  overscroll-behavior: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-text-size-adjust: none;
+}
+svg title {
+  font-size: 0;
+}
+body {
+  overscroll-behavior: none;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
+  -webkit-touch-callout: none;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+:focus {
+  outline: none;
+}
+::-moz-focus-inner {
+  border: 0;
+}
+a {
+  color: inherit;
+  outline: none;
+  text-decoration: none;
+}
+button {
+  background: none;
+  border: none;
+  border-radius: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  pointer-events: auto;
+}
+img {
+  height: auto;
+  width: 100%;
+  max-width: 100%;
+  vertical-align: middle;
+}
+svg {
+  max-width: 100%;
+}
+input,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  pointer-events: auto;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+#app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#content {
+  z-index: 3;
 }

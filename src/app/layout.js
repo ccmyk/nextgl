@@ -1,10 +1,5 @@
-// ── src/app/layout.jsx ──
-import './globals.css';               // any base resets or @import’d CSS
-import '@/styles/index.css';           // your legacy index.css split into modules?
-import '@/styles/components/loader.pcss';
-import '@/styles/components/nav.pcss';
-import '@/styles/components/home.pcss';
-// …any other component PCSS files…
+// ── src/app/layout.jsx ──         // any base resets or @import’d CSS
+import '@/styles/index.pcss';           // your legacy index.css split into modules?
 
 import { LenisProvider }      from '@/context/LenisContext';
 import { WebGLProvider }      from '@/context/WebGLContext';

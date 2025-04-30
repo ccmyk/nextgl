@@ -1,8 +1,46 @@
-/* Misc utility classes */
+img {
+  height: auto;
+  width: 100%;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+svg {
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  outline: none;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  border-radius: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  pointer-events: auto;
+}
+
+input,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  pointer-events: auto;
+}
 
 .scr_read {
   border: 0;
   clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
   clip-path: inset(50%);
   height: 1px;
   margin: -1px;
@@ -14,28 +52,53 @@
   word-break: normal;
 }
 
-.rotatedev {
-  z-index: 500;
+.move {
+  will-change: transform;
+}
+
+.pHide {
   position: fixed;
+  pointer-events: none;
   left: 0;
   top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.iO,
+.Oi,
+.OiAlt {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html:not(.dev) .iO,
+html:not(.dev) .Oi,
+html:not(.dev) .OiChange,
+html:not(.dev) .OiAlt {
+  background: transparent !important;
+}
+
+section.fake {
+  height: 110vh;
+}
+
+.checkfix {
+  position: fixed;
   right: 0;
   bottom: 0;
-  background: #000;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  font-size: 12px;
+  z-index: 1000;
+  background: #333;
   color: #fff;
-  display: none;
+  font-family: Arial;
+  padding: 12px;
+  opacity: .1;
 }
-
-@media (min-aspect-ratio: 1/1) {
-  .touch .rotatedev {
-    display: flex;
-  }
+.checkfix:hover {
+  opacity: 1;
 }
-
-/* Development checks */
 
 .checkBG {
   position: fixed;
@@ -69,4 +132,22 @@
 
 .ctrsCK {
   display: none !important
+}
+
+.imgP {
+  opacity: 0;
+  height: auto;
+  transition: .6s opacity cubic-bezier(.55, 0, .1, 1)
+}
+.imgP.Ldd {
+  opacity: 1
+}
+
+.glMedia {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none
 }
