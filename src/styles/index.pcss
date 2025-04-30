@@ -1,28 +1,42 @@
-/* Base Styles */
+/* Base & Resets */
 @import "./base/reset.pcss";
-@import "./base/layout.pcss";
-@import "./base/typography.pcss";
 @import "./base/variables.pcss";
 
-/* Components */
-@import "./components/about.pcss";
-@import "./components/animations.pcss";
-@import "./components/details.pcss";
-@import "./components/footer.pcss";
-@import "./components/home.pcss";
-@import "./components/lenis.pcss";
+/* Typography */
+@import "./base/fonts.pcss"; /* Font definitions */
+@import "./base/typography.pcss"; /* Text styles */
+
+/* Layout & Structure */
+@import "./base/layout.pcss"; /* Core layout */
+@import "./base/media.pcss"; /* Media queries */
+
+/* Component Styles */
 @import "./components/loader.pcss";
-@import "./components/mbg.pcss";
-@import "./components/mouse.pcss";
 @import "./components/nav.pcss";
-@import "./components/playground.pcss";
-@import "./components/project.pcss";
-@import "./components/projects.pcss";
-@import "./components/scrollbar.pcss";
+@import "./components/footer.pcss";
+@import "./components/mbg.pcss";
 @import "./components/slides.pcss";
 @import "./components/title.pcss";
-@import "./components/utility.pcss";
+
+/* Page Styles */
+@import "./pages/home.pcss";
+@import "./pages/projects.pcss";
+@import "./pages/project.pcss";
+@import "./pages/about.pcss";
+@import "./pages/playground.pcss";
+@import "./pages/error.pcss";
+
+/* Utilities */
+@import "./components/animations.pcss";
+@import "./components/scrollbar.pcss";
+@import "./components/mouse.pcss";
 @import "./components/webgl.pcss";
+@import "./components/utility.pcss";
 @import "./components/wysi.pcss";
 
-@import "./components/swiper.pcss";
+/* Third Party */
+@import "./vendor/swiper.pcss";
+@import "./vendor/lenis.pcss";
+@import "./components/details.pcss";
+
+

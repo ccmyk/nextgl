@@ -4,12 +4,10 @@
 import { useScroll }          from '@/hooks/useScroll';
 import Mbg                    from '@/components/interface/Mbg';
 import WebglLoader            from '@/components/webgl/Loader';
-import home_hero               from '@/components/views/HomeHero';
+import HomeHero               from '@/components/views/HomeHero';
 import HomeIntro              from '@/components/views/HomeIntro';
 import HomeView               from '@/components/views/HomeView';
 
-import '@/styles/components/mbg.pcss';
-import '@/styles/components/home.pcss';
 
 export default function HomePage() {
   // run the global scroll‐state hook (toggles .stview/.scroll-up/down)

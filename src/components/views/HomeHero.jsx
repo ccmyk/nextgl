@@ -1,40 +1,143 @@
+// src/components/views/HomeHero.jsx
+
 'use client';
 
-import { useRef, useEffect } from 'react';
-import { useInView }         from '@/hooks/useIntersectionObserver';
-import AnimatedWrite         from '@/components/webgl/AnimatedWrite';
-import Title                 from '@/components/webgl/Title';
-import '@/styles/components/home_hero.pcss';
+import React, { useRef, useEffect } from 'react';
+import { gsap } from 'gsap';
+import { useInView } from '@/hooks/useIntersectionObserver';
+import { useSplitText } from '@/hooks/useSplitText';
+import Title from '@/components/webgl/Title';
+import AnimatedWrite from '@/components/interface/AnimatedWrite';
+import { useWebGLContext } from '@/context/WebGLContext';
 
 export default function HomeHero() {
   const heroRef = useRef(null);
-  const inView  = useInView(heroRef, { threshold: 0.1 });
+  const ttRef = useRef(null);
+  const subTitleRef = useRef(null);
+  const portfolioRef = useRef(null);
+  const scrollRef = useRef(null);
+  const linksRef = useRef(null);
+  const { registerWebGLElement } = useWebGLContext();
 
+  // Register this view for WebGL interactions
   useEffect(() => {
-    if (inView) {
-      // fire your GSAP/animation timelines here
+    if (heroRef.current) {
+      registerWebGLElement('hero', heroRef.current);
     }
+    
+    // Set up scroll indicator animation
+    const scrollAnim = gsap.to(scrollRef.current, {
+      opacity: 0.6,
+      yoyo: true,
+      repeat: -1,
+      duration: 1.2,
+      ease: 'cubic-bezier(.55, 0, .1, 1)',
+      paused: true
+    });
+    
+    return () => {
+      scrollAnim.kill();
+    };
+  }, [registerWebGLElement]);
+
+  // Track when component enters viewport
+  const entry = useInView(heroRef, { threshold: 0.1 });
+  const inView = entry?.isIntersecting;
+
+  // Apply split text to subtitle for animation
+  useSplitText(subTitleRef, {
+    types: 'lines',
+    linesClass: 'tt3_line'
+  });
+
+  // Animation sequence
+  useEffect(() => {
+    if (!inView || !heroRef.current) return;
+
+    // Main timeline for sequencing
+    const tl = gsap.timeline({
+      defaults: {
+        ease: 'cubic-bezier(.55, 0, .1, 1)',
+        duration: 0.6
+      }
+    });
+
+    // Subtitle animation - matches legacy timing
+    const lines = subTitleRef.current.querySelectorAll('.tt3_line');
+    tl.fromTo(
+      lines,
+      { y: 20, opacity: 0 },
+      { 
+        y: 0, 
+        opacity: 1, 
+        stagger: 0.1,
+      },
+      1.2 // Delayed start
+    );
+
+    // Portfolio tag - matches legacy timing
+    tl.fromTo(
+      portfolioRef.current,
+      { opacity: 0 },
+      { opacity: 1 },
+      1.6
+    );
+
+    // Scroll indicator - matches legacy timing
+    tl.fromTo(
+      scrollRef.current,
+      { opacity: 0 },
+      { 
+        opacity: 1,
+        onComplete: () => {
+          // Start oscillating animation for scroll text
+          gsap.to(scrollRef.current, {
+            opacity: 0.6,
+            yoyo: true,
+            repeat: -1,
+            duration: 1.2,
+            ease: 'cubic-bezier(.55, 0, .1, 1)'
+          });
+        }
+      },
+      1.8
+    );
+
+    // Links - matches legacy timing
+    tl.fromTo(
+      linksRef.current.querySelectorAll('a'),
+      { opacity: 0, y: 10 },
+      { 
+        opacity: 1, 
+        y: 0,
+        stagger: 0.1,
+      },
+      2.0
+    );
+
+    return () => {
+      tl.kill();
+    };
   }, [inView]);
 
   const words = [
     { text: 'Chris', l: '-0.022', idx: 0 },
-    { text: 'Hall',  l: '-0.016', idx: 1 },
+    { text: 'Hall', l: '-0.016', idx: 1 },
   ];
 
   return (
     <section ref={heroRef} className="home_hero">
       <div className="c‑vw cnt">
         <div className="cnt_hold">
-
-          {/*** cnt_tt ***/}
-          <h2 className="cnt_tt">
+          {/** Main title with WebGL treatment **/}
+          <h2 ref={ttRef} className="cnt_tt">
             {words.map(({ text, l, idx }) => (
               <div key={idx} className="Atitle">
+                {/** Canvas container for WebGL title **/}
                 <div className="cCover">
-                  {/** WebGL canvas **/}
                   <Title text={text} index={idx} className="glF" />
                 </div>
-                {/** placeholder overlay **/}
+                {/** Invisible placeholder for original DOM position **/}
                 <div
                   className="Oi Oi-tt"
                   data-temp="tt"
@@ -44,7 +147,7 @@ export default function HomeHero() {
                   data-oi={idx}
                   style={{ visibility: 'hidden' }}
                 />
-                {/** actual split‑text **/}
+                {/** Text overlay that will be animated **/}
                 <AnimatedWrite
                   className="ttj Oiel act"
                   data-temp="Oiel"
@@ -56,44 +159,44 @@ export default function HomeHero() {
             ))}
           </h2>
 
-          {/*** cnt_bt ***/}
+          {/** Subtitle section **/}
           <div className="cnt_bt inview stview">
-            {/** placeholder for h3 **/}
+            {/** Placeholder for intersection observer **/}
             <div
               className="iO"
               data-io="0"
               style={{ visibility: 'hidden' }}
             />
-            <h3 className="tt3">
+            {/** Animated subtitle **/}
+            <h3 ref={subTitleRef} className="tt3">
               Art Director &amp; Designer<br/>
               Living in Los Angeles
             </h3>
 
+            {/** Portfolio tag **/}
             <h4
+              ref={portfolioRef}
               className="Awrite inview stview ivi"
               data-params="1.6"
-              style={{ opacity: 1 }}
             >
-              {/** placeholder for h4 **/}
               <div
                 className="iO iO-std"
                 data-io="1"
                 style={{ visibility: 'hidden' }}
               />
-              {/** animated text **/}
               <AnimatedWrite className="word" data-io="1">
                 PORTFOLIO_2025
               </AnimatedWrite>
             </h4>
           </div>
 
-          {/*** cnt_sc ***/}
+          {/** Scroll indicator **/}
           <div className="cnt_sc">
             <h4
+              ref={scrollRef}
               className="Awrite inview stview okF"
               data-params="1.6"
               data-bucle="1"
-              style={{ opacity: 1 }}
             >
               <div
                 className="iO iO-std"
@@ -106,11 +209,11 @@ export default function HomeHero() {
             </h4>
           </div>
 
-          {/*** cnt_lk ***/}
-          <div className="cnt_lk">
+          {/** Links section **/}
+          <div ref={linksRef} className="cnt_lk">
             {[
-              { href: 'https://drive.google.com/…', text: 'Resume',   io: 3 },
-              { href: 'https://linkedin.com/in/…', text: 'LinkedIn', io: 4 }
+              { href: 'https://drive.google.com/...', text: 'Resume',   io: 3 },
+              { href: 'https://linkedin.com/in/...', text: 'LinkedIn', io: 4 }
             ].map(({ href, text, io }) => (
               <a
                 key={io}
@@ -119,7 +222,6 @@ export default function HomeHero() {
                 href={href}
                 target="_blank"
                 rel="noopener"
-                style={{ opacity: 1 }}
               >
                 <div
                   className="iO iO-std"
@@ -144,7 +246,6 @@ export default function HomeHero() {
               </a>
             ))}
           </div>
-
         </div>
       </div>
     </section>

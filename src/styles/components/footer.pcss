@@ -1,3 +1,5 @@
+/* src/styles/components/footer.pcss */
+
 .footer {
   padding-bottom: 1.6rem;
   padding-top: 1.6rem;
@@ -6,127 +8,6 @@
   padding-bottom: 5.6rem;
   position: relative;
   overflow: hidden;
-}
-
-:root.D .footer_cm {
-  width: 100%;
-}
-
-@media (orientation: landscape) {
-  :root.T .footer_cm {
-    width: 100%;
-  }
-}
-
-@media (orientation: portrait) {
-  :root.T .footer_cm {
-    width: 100vw;
-    margin: 0 auto;
-  }
-  :root.T .footer_cm.fix {
-    width: 100vw;
-  }
-}
-
-@media only screen and (max-width: 430px) {
-  :root.T .footer_cm {
-    width: 39rem;
-  }
-}
-
-.footer_cm .Atitle {
-  margin-left: var(--pgrid);
-}
-
-.footer_cm .Atitle .cCover {
-  position: absolute;
-}
-
-:root.D .footer_cm .Atitle .cCover {
-  left: -2rem;
-  right: -2rem;
-  top: -2rem;
-  bottom: -2rem;
-  pointer-events: none;
-  transform: translateY(-2.2rem);
-}
-
-@media (orientation: landscape) {
-  :root.T .footer_cm .Atitle .cCover {
-    left: -2rem;
-    right: -2rem;
-    top: -2rem;
-    bottom: -2rem;
-    pointer-events: none;
-    transform: translateY(-2.2rem);
-  }
-}
-
-@media (orientation: portrait) and (min-width: 744px) {
-  :root.T .footer_cm .Atitle .cCover {
-    left: 0;
-    right: 0;
-    top: -1.5rem;
-    bottom: -1.5rem;
-    pointer-events: none;
-    transform: translateY(-1.4rem);
-  }
-}
-
-@media (orientation: portrait) and (max-width: 745px) {
-  :root.T .footer_cm .Atitle .cCover {
-    left: 0;
-    right: 0;
-    top: -1rem;
-    bottom: -1rem;
-    pointer-events: none;
-    transform: translateY(-.8rem);
-  }
-}
-
-.footer_cm .Atitle .cCover canvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.footer_cm .Atitle .ttj {
-  opacity: 0;
-}
-
-:root.D .footer_cm .Atitle .ttj {
-  font-size: 27.7rem;
-}
-
-@media (orientation: landscape) {
-  :root.T .footer_cm .Atitle .ttj {
-    font-size: 27.7rem;
-  }
-}
-
-@media (orientation: portrait) and (min-width: 744px) {
-  :root.T .footer_cm .Atitle .ttj {
-    font-size: 14.8rem;
-    white-space: nowrap;
-  }
-}
-
-@media (orientation: portrait) and (max-width: 745px) {
-  :root.T .footer_cm .Atitle .ttj {
-    font-size: 19vw;
-    white-space: nowrap;
-  }
-}
-
-@media only screen and (max-width: 430px) {
-  :root.T .footer_cm .Atitle .ttj {
-    font-size: 7.4rem;
-  }
-}
-
-:root.AND .footer_cm .Atitle .ttj {
-  opacity: 1;
 }
 
 :root.D .footer .cnt {
@@ -294,4 +175,126 @@
 .footer .Awrite.nono:not(.stview.inview) {
   opacity: 0;
   transition: .4s opacity cubic-bezier(.55, 0, .1, 1);
+}
+
+/* .footer_cm */
+:root.D .footer_cm {
+  width: 100%;
+}
+
+@media (orientation: landscape) {
+  :root.T .footer_cm {
+    width: 100%;
+  }
+}
+
+@media (orientation: portrait) {
+  :root.T .footer_cm {
+    width: 100vw;
+    margin: 0 auto;
+  }
+  :root.T .footer_cm.fix {
+    width: 100vw;
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  :root.T .footer_cm {
+    width: 39rem;
+  }
+}
+
+.footer_cm .Atitle {
+  margin-left: var(--pgrid);
+}
+
+.footer_cm .Atitle .cCover {
+  position: absolute;
+}
+
+:root.D .footer_cm .Atitle .cCover {
+  left: -2rem;
+  right: -2rem;
+  top: -2rem;
+  bottom: -2rem;
+  pointer-events: none;
+  transform: translateY(-2.2rem);
+}
+
+@media (orientation: landscape) {
+  :root.T .footer_cm .Atitle .cCover {
+    left: -2rem;
+    right: -2rem;
+    top: -2rem;
+    bottom: -2rem;
+    pointer-events: none;
+    transform: translateY(-2.2rem);
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .footer_cm .Atitle .cCover {
+    left: 0;
+    right: 0;
+    top: -1.5rem;
+    bottom: -1.5rem;
+    pointer-events: none;
+    transform: translateY(-1.4rem);
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .footer_cm .Atitle .cCover {
+    left: 0;
+    right: 0;
+    top: -1rem;
+    bottom: -1rem;
+    pointer-events: none;
+    transform: translateY(-.8rem);
+  }
+}
+
+.footer_cm .Atitle .cCover canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.footer_cm .Atitle .ttj {
+  opacity: 0;
+}
+
+:root.D .footer_cm .Atitle .ttj {
+  font-size: 27.7rem;
+}
+
+@media (orientation: landscape) {
+  :root.T .footer_cm .Atitle .ttj {
+    font-size: 27.7rem;
+  }
+}
+
+@media (orientation: portrait) and (min-width: 744px) {
+  :root.T .footer_cm .Atitle .ttj {
+    font-size: 14.8rem;
+    white-space: nowrap;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 745px) {
+  :root.T .footer_cm .Atitle .ttj {
+    font-size: 19vw;
+    white-space: nowrap;
+  }
+}
+
+@media only screen and (max-width: 430px) {
+  :root.T .footer_cm .Atitle .ttj {
+    font-size: 7.4rem;
+  }
+}
+
+:root.AND .footer_cm .Atitle .ttj {
+  opacity: 1;
 }
