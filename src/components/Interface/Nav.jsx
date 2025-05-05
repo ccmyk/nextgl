@@ -1,11 +1,10 @@
-'use client';
-
 // src/components/Interface/Nav.jsx
 
-import React, { useState } from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useNavAnimation } from '@/hooks/useNavAnimation';
-import styles from '@/styles/components/nav.pcss';
 
 export default function Nav({ logo, links }) {
   const [isOpen, setIsOpen] = useState(false);
